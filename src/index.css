@@ -1,0 +1,191 @@
+@font-face {
+  font-family: 'Bigilla';
+  src: url('/fonts/bigilla/Bigilla.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Bigilla';
+  src: url('/fonts/bigilla/Bigilla-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Lekton';
+  src: url('/fonts/lekton/lekton005_l.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Arial Nova';
+  src: url('/fonts/Arial Nova Font/ArialNova.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Arial Nova';
+  src: url('/fonts/Arial Nova Font/ArialNova-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+:root {
+  --color-earl-gray: #e8e6d8;
+  --color-electric-blue: #004AAD;
+  --color-butter-yellow: #F6F1B5;
+  --color-dark-choc: #4B2E26;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --font-brand: 'Bigilla', serif;
+  --font-subtitle: 'Lekton', monospace;
+  --font-body: 'Arial Nova', sans-serif;
+
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 2rem;
+  --spacing-lg: 4rem;
+  --spacing-xl: 8rem;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-earl-gray);
+  color: var(--color-dark-choc);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-brand);
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+p {
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+}
+
+button {
+  font-family: var(--font-subtitle);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* Utilities */
+.font-subtitle {
+  font-family: var(--font-subtitle);
+}
+
+.text-electric-blue {
+  color: var(--color-electric-blue);
+}
+
+.bg-butter-yellow {
+  background-color: var(--color-butter-yellow);
+}
+
+.section-padding {
+  padding: var(--spacing-lg) 5%;
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding: var(--spacing-xl) 5%;
+  }
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-primary {
+  background-color: var(--color-electric-blue);
+  color: var(--color-white);
+  padding: 1rem 2rem;
+  font-family: var(--font-subtitle);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: 50px;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-dark-choc);
+  transform: translateY(-2px);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-earl-gray);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-electric-blue);
+  border-radius: 4px;
+}
+
+/* Image Placeholder Box */
+.img-placeholder {
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-family: var(--font-subtitle);
+}
+
+/* Hide Scrollbar Utility */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Force disable smooth scroll for infinite loops */
+.no-smooth-scroll {
+  scroll-behavior: auto !important;
+  overscroll-behavior-y: none;
+}

@@ -8,16 +8,20 @@ const AnimatedButton = ({ to, children, className, style, onClick, type = "butto
 
     const handleEnter = () => {
         setHover(true);
-        setRandomDirs([1, 2, 3].map(() => ({
-            x: (Math.random() - 0.5) * 250,
-            y: (Math.random() - 0.5) * 150,
-            r: (Math.random() - 0.5) * 360
-        })));
+        setRandomDirs([1, 2, 3].map(() => {
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 80 + Math.random() * 40;
+            return {
+                x: Math.cos(angle) * distance,
+                y: Math.sin(angle) * distance,
+                r: (Math.random() - 0.5) * 360
+            };
+        }));
     };
 
     return (
         <div style={{ position: 'relative', display: 'inline-block' }} onMouseEnter={handleEnter} onMouseLeave={() => setHover(false)}>
-            <div style={{ position: 'absolute', top: '50%', left: '50%', width: 0, height: 0, zIndex: 0, pointerEvents: 'none' }}>
+            <div style={{ position: 'absolute', top: '50%', left: '50%', width: 0, height: 0, zIndex: 2, pointerEvents: 'none' }}>
                 {[1, 2, 3].map((i, index) => (
                     <motion.img
                         key={i}
@@ -36,7 +40,12 @@ const AnimatedButton = ({ to, children, className, style, onClick, type = "butto
                 ))}
             </div>
             {to ? (
-                <Link to={to} className={className} style={{ position: 'relative', zIndex: 1, ...style }}>
+                <Link
+                    to={to}
+                    className={className}
+                    style={{ position: 'relative', zIndex: 1, ...style }}
+                    onClick={() => window.scrollTo(0, 0)}
+                >
                     {children}
                 </Link>
             ) : (

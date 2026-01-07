@@ -1,12 +1,41 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+    const [isDarkText, setIsDarkText] = useState(false);
+    const location = useLocation();
 
     const toggleMenu = () => setIsOpen(!isOpen);
+
+    useEffect(() => {
+        // Refresh ScrollTrigger and set up triggers for light sections
+        const ctx = gsap.context(() => {
+            const sections = gsap.utils.toArray('.light-section');
+            sections.forEach(section => {
+                ScrollTrigger.create({
+                    trigger: section,
+                    start: "top 80px", // Trigger when section hits top (navbar area)
+                    end: "bottom 80px",
+                    onEnter: () => setIsDarkText(true),
+                    onLeave: () => setIsDarkText(false),
+                    onEnterBack: () => setIsDarkText(true),
+                    onLeaveBack: () => setIsDarkText(false)
+                });
+            });
+        });
+
+        // Force a check/refresh slightly after render to ensure elements are present
+        setTimeout(() => ScrollTrigger.refresh(), 100);
+
+        return () => ctx.revert();
+    }, [location]);
 
     const menuVariants = {
         closed: {
@@ -43,6 +72,24 @@ export default function Navbar() {
         open: { opacity: 1, y: 0, transition: { duration: 0.5 } }
     };
 
+    const isHome = location.pathname === '/';
+
+    // Unified Logic:
+    // 1. Menu Open -> Butter Yellow (on Blue Overlay)
+    // 2. Not Home -> Dark Choc (Static)
+    // 3. Home -> Dynamic (Black on Light, Butter Yellow on Dark)
+
+    const getColor = () => {
+        if (isOpen) return 'var(--color-butter-yellow)';
+        if (!isHome) return 'var(--color-dark-choc)';
+        return isDarkText ? 'var(--color-black)' : 'var(--color-butter-yellow)';
+    };
+
+    const logoColor = getColor();
+    const menuColor = getColor();
+
+    const showShadow = !isOpen && isHome && !isDarkText;
+
     return (
         <>
             <header style={{
@@ -55,15 +102,55 @@ export default function Navbar() {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 zIndex: 100,
-                mixBlendMode: 'difference',
-                color: 'white'
+                // Removed mixBlendMode and color (handled individually)
+                transition: 'color 0.3s ease'
             }}>
-                <Link to="/" style={{ display: 'block', width: '200px' }}>
-                    <img src="/images/Full-Logo.png" alt="Bloom Branding" style={{ width: '100%', height: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+                <Link to="/" style={{ display: 'block', width: '200px', color: logoColor }}>
+                    <div style={{
+                        position: 'relative',
+                        width: '100%',
+                        lineHeight: 0,
+                        filter: showShadow ? 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))' : 'none',
+                        transition: 'filter 0.3s ease'
+                    }}>
+                        {/* Ghost image to maintain aspect ratio and size */}
+                        <img
+                            src="/images/Full-Logo.png"
+                            alt="Bloom Branding"
+                            style={{ width: '100%', height: 'auto', opacity: 0 }}
+                        />
+                        {/* Colored mask overlay */}
+                        <div style={{
+                            position: 'absolute',
+                            inset: 0,
+                            backgroundColor: 'currentColor',
+                            maskImage: 'url(/images/Full-Logo.png)',
+                            WebkitMaskImage: 'url(/images/Full-Logo.png)',
+                            maskSize: 'contain',
+                            WebkitMaskSize: 'contain',
+                            maskRepeat: 'no-repeat',
+                            WebkitMaskRepeat: 'no-repeat',
+                            maskPosition: 'center',
+                            WebkitMaskPosition: 'center',
+                            transition: 'background-color 0.3s ease'
+                        }} />
+                    </div>
                 </Link>
 
-                <button onClick={toggleMenu} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-subtitle)' }}>
-                    <span className="font-subtitle" style={{ textTransform: 'uppercase', textShadow: '2px 2px 4px rgba(0,0,0,0.5)', fontSize: '1.2rem', color: '#ffffff', fontWeight: 'bold' }}>{isOpen ? 'Close' : 'Menu'}</span>
+                <button onClick={toggleMenu} style={{
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    color: menuColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontFamily: 'var(--font-subtitle)',
+                    filter: showShadow ? 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))' : 'none',
+                    transition: 'filter 0.3s ease, color 0.3s ease'
+                }}>
+                    <span className="font-subtitle" style={{ textTransform: 'uppercase', fontSize: '1.2rem', fontWeight: 'bold' }}>{isOpen ? 'Close' : 'Menu'}</span>
                     <div style={{ position: 'relative', width: '24px', height: '24px' }}>
                         <AnimatePresence mode="wait">
                             {isOpen ? (
@@ -135,7 +222,10 @@ export default function Navbar() {
                                 <motion.li key={link.name} variants={itemVariants} style={{ margin: 0, position: 'relative' }}>
                                     <Link
                                         to={link.path}
-                                        onClick={() => setIsOpen(false)}
+                                        onClick={() => {
+                                            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+                                            setIsOpen(false);
+                                        }}
                                         style={{
                                             display: 'flex',
                                             flexDirection: 'column',

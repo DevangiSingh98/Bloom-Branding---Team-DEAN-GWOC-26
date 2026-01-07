@@ -1,8 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { useContent } from '../context/ContentContext';
 import { motion, useScroll, useTransform, animate, useInView } from 'framer-motion';
 import { ArrowRight, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AnimatedButton from '../components/AnimatedButton';
+import ParallaxContent from '../components/ParallaxContent';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -90,10 +92,12 @@ const _UnusedAnimatedButton = ({ to, children, className, style }) => {
     );
 };
 
+
+
 const ServicesCarousel = () => {
     const containerRef = useRef(null);
     const itemsRef = useRef([]);
-    const [activeIndex, setActiveIndex] = useState(0);
+
 
     const originalServices = [
         { title: "Branding", desc: "We build the blueprint for your brand’s future." },
@@ -182,7 +186,9 @@ const ServicesCarousel = () => {
                 // Opacity & Blur
                 let opacity = 1 - Math.pow(absNormalized, 1.5);
                 opacity = Math.max(opacity, 0.2);
-                const blur = absNormalized * 6;
+
+                // Keep center crisp (threshold of 0.15)
+                const blur = absNormalized < 0.15 ? 0 : (absNormalized - 0.15) * 8;
 
                 // INTERACTION LOGIC:
                 const isFocused = absNormalized < 0.15;
@@ -198,9 +204,6 @@ const ServicesCarousel = () => {
                 });
             });
 
-            // Update active index state efficiently
-            const newActiveIndex = closestIndex % originalServices.length;
-            setActiveIndex(prev => prev === newActiveIndex ? prev : newActiveIndex);
         };
 
         container.addEventListener('scroll', updateItems);
@@ -212,26 +215,21 @@ const ServicesCarousel = () => {
     }, []);
 
     return (
-        <div className="container" style={{ height: '70vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-            <h2 style={{ fontSize: '3rem', marginBottom: '2rem', textAlign: 'center', color: 'var(--color-earl-gray)' }}>Our Expertise</h2>
+        <div style={{ width: '100%', overflow: 'hidden', position: 'relative', paddingBottom: '10vh' }}>
+            <h2 style={{
+                fontSize: '4.5rem',
+                lineHeight: 1.1,
+                marginBottom: '8vh',
+                textAlign: 'center',
+                color: 'var(--color-butter-yellow)',
+                textTransform: 'uppercase'
+            }}>
+                Our Expertise
+            </h2>
 
-            <div style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+            <div style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', position: 'relative', height: '60vh' }}>
 
-                {/* Static Description on Left */}
-                <div style={{
-                    position: 'absolute',
-                    left: '5%',
-                    width: '20%',
-                    minWidth: '250px',
-                    textAlign: 'left',
-                    color: 'var(--color-earl-gray)',
-                    fontFamily: 'var(--font-subtitle)', // Lekton
-                    fontSize: '1.1rem',
-                    lineHeight: 1.4,
-                    pointerEvents: 'none'
-                }}>
-                    {originalServices[activeIndex].desc.toUpperCase()}
-                </div>
+
 
                 <div
                     ref={containerRef}
@@ -244,7 +242,9 @@ const ServicesCarousel = () => {
                         perspective: '1500px',
                         transformStyle: 'preserve-3d',
                         scrollBehavior: 'auto',
-                        overscrollBehaviorY: 'none'
+                        overscrollBehaviorY: 'none',
+                        maskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)',
+                        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)'
                     }}
                 >
                     {services.map((service, index) => (
@@ -292,6 +292,7 @@ const ServicesCarousel = () => {
 };
 
 export default function Home() {
+    const { content } = useContent();
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({
         target: containerRef,
@@ -363,151 +364,218 @@ export default function Home() {
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 1, ease: 'easeOut' }}
-                        style={{ width: '450px', maxWidth: '90vw', objectFit: 'contain', marginBottom: '2rem', marginTop: '600px' }}
+                        style={{ width: '450px', maxWidth: '90vw', objectFit: 'contain', marginBottom: '1rem' }}
                     />
+
+
 
                     <motion.p
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.5, duration: 1 }}
                         className="font-subtitle"
-                        style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '500px auto 2rem auto', color: 'var(--color-white)', textShadow: '0 0 10px rgba(0,0,0,0.5)' }}
+                        style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto 2rem auto', color: 'var(--color-white)', textShadow: '0 0 10px rgba(0,0,0,0.5)' }}
                     >
-                        Bringing synergy of aesthetics and expertise to help your brand bloom.
+                        {content.hero.subtitle}
                     </motion.p>
                 </motion.div>
             </section>
 
             {/* Intro / Our Story Snippet */}
-            <section className="section-padding" style={{ backgroundColor: 'var(--color-white)' }}>
-                <div className="container">
-                    <motion.div
-                        variants={staggerContainer}
-                        initial="initial"
-                        whileInView="animate"
-                        viewport={{ once: true }}
-                        className="grid"
-                        style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', alignItems: 'center' }}
-                    >
-                        <motion.div variants={fadeInUp}>
-                            <h2 style={{ fontSize: '3rem', marginBottom: '2rem', color: 'var(--color-electric-blue)' }}>Blooming the Brand</h2>
-                            <motion.p
-                                className="font-subtitle"
-                                style={{ fontSize: '1.1rem', lineHeight: 1.8 }}
-                                initial="hidden"
-                                whileInView="visible"
-                                viewport={{ once: true }}
-                                variants={{
-                                    hidden: { opacity: 1 },
-                                    visible: { opacity: 1, transition: { staggerChildren: 0.02 } }
-                                }}
-                            >
-                                {"We are a creative branding studio that helps brands grow through strategic storytelling, content creation, and high-impact digital experiences. We focus on modern, bold, and growth-driven brand identities.".split("").map((char, index) => (
-                                    <motion.span
-                                        key={index}
-                                        variants={{
-                                            hidden: { opacity: 0 },
-                                            visible: { opacity: 1, transition: { duration: 0 } }
-                                        }}
-                                    >
-                                        {char}
-                                    </motion.span>
-                                ))}
-                            </motion.p>
-                            <br />
-                            <AnimatedButton to="/about" className="btn-primary" style={{ marginTop: '1rem' }}>Our Story</AnimatedButton>
+            <section className="section-padding light-section" style={{ backgroundColor: 'var(--color-white)' }}>
+                <ParallaxContent>
+                    <div className="container">
+                        <motion.div
+                            variants={staggerContainer}
+                            initial="initial"
+                            whileInView="animate"
+                            viewport={{ once: true }}
+                            className="grid"
+                            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', alignItems: 'center' }}
+                        >
+                            <motion.div variants={fadeInUp}>
+                                <h2 style={{ fontSize: '3rem', marginBottom: '2rem', color: 'var(--color-electric-blue)' }}>Blooming the Brand</h2>
+                                <motion.p
+                                    className="font-subtitle"
+                                    style={{ fontSize: '1.1rem', lineHeight: 1.8 }}
+                                    initial="hidden"
+                                    whileInView="visible"
+                                    viewport={{ once: true }}
+                                    variants={{
+                                        hidden: { opacity: 1 },
+                                        visible: { opacity: 1, transition: { staggerChildren: 0.02 } }
+                                    }}
+                                >
+                                    {"We are a creative branding studio that helps brands grow through strategic storytelling, content creation, and high-impact digital experiences. We focus on modern, bold, and growth-driven brand identities.".split("").map((char, index) => (
+                                        <motion.span
+                                            key={index}
+                                            variants={{
+                                                hidden: { opacity: 0 },
+                                                visible: { opacity: 1, transition: { duration: 0 } }
+                                            }}
+                                        >
+                                            {char}
+                                        </motion.span>
+                                    ))}
+                                </motion.p>
+                                <br />
+                                <AnimatedButton to="/about" className="btn-primary" style={{ marginTop: '1rem' }}>Our Story</AnimatedButton>
+                            </motion.div>
+                            <motion.div variants={fadeInUp}>
+                                <div className="img-placeholder" style={{ width: '100%', height: '400px', borderRadius: '20px', overflow: 'hidden' }}>
+                                    <img src="/images/dummy1.png" alt="Blooming the Brand" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                </div>
+                            </motion.div>
                         </motion.div>
-                        <motion.div variants={fadeInUp}>
-                            <div className="img-placeholder" style={{ width: '100%', height: '400px', borderRadius: '20px' }}>
-                                BRAND IMAGE
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                </div>
+                    </div>
+                </ParallaxContent>
             </section>
 
             {/* Services Highlight */}
-            <section className="section-padding" style={{ backgroundColor: 'var(--color-electric-blue)', color: 'var(--color-earl-gray)' }}>
-                <ServicesCarousel />
-
+            <section style={{ backgroundColor: 'var(--color-electric-blue)', color: 'var(--color-earl-gray)', padding: 0 }}>
+                <ParallaxContent>
+                    <ServicesCarousel />
+                </ParallaxContent>
             </section>
 
             {/* Selected Work */}
             <section className="section-padding" style={{ backgroundColor: 'var(--color-dark-choc)', color: 'var(--color-earl-gray)' }}>
-                <div className="container">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
-                        <h2 style={{ fontSize: '3rem', color: 'var(--color-butter-yellow)' }}>Selected Work</h2>
-                        <AnimatedButton to="/work" className="btn-primary" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)' }}>View All Projects</AnimatedButton>
-                    </div>
+                <ParallaxContent>
+                    <div className="container">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
+                            <h2 style={{ fontSize: '3rem', color: 'var(--color-butter-yellow)' }}>Selected Work</h2>
+                            <AnimatedButton to="/work" className="btn-primary" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)' }}>View All Projects</AnimatedButton>
+                        </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
-                        {[1, 2].map((item) => (
-                            <motion.div
-                                key={item}
-                                className="group"
-                                style={{ cursor: 'pointer' }}
-                                whileHover={{ scale: 0.98 }}
-                            >
-                                <div className="img-placeholder" style={{ width: '100%', height: '500px', backgroundColor: '#4a3832', borderRadius: '10px', marginBottom: '1rem' }}>
-                                    PROJECT {item} PREVIEW
-                                </div>
-                                <h3 style={{ fontSize: '2rem' }}>Modern Aesthetics</h3>
-                                <p className="font-subtitle">Branding / Web Design</p>
-                            </motion.div>
-                        ))}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
+                            {content.selectedWork.map((item) => (
+                                <motion.div
+                                    key={item.id}
+                                    className="group"
+                                    style={{ cursor: 'pointer' }}
+                                    whileHover={{ scale: 0.98 }}
+                                >
+                                    {item.image ? (
+                                        <img src={item.image} alt={item.title} style={{ width: '100%', height: '500px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem' }} />
+                                    ) : (
+                                        <div className="img-placeholder" style={{ width: '100%', height: '500px', backgroundColor: '#4a3832', borderRadius: '10px', marginBottom: '1rem' }} />
+                                    )}
+                                    <h3 style={{ fontSize: '2rem' }}>{item.title}</h3>
+                                    <p className="font-subtitle">{item.category}</p>
+                                </motion.div>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                </ParallaxContent>
             </section>
 
             {/* Our Journey */}
-            <section className="section-padding">
-                <div className="container">
-                    <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '2rem', textAlign: 'center' }}>
-                        <Counter to={5} label="Years of Experience" />
-                        <Counter to={50} label="Happy Clients" />
-                        <Counter to={100} label="Projects Delivered" />
+            <section className="section-padding light-section">
+                <ParallaxContent>
+                    <div className="container">
+                        <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '2rem', textAlign: 'center' }}>
+                            <Counter to={5} label="Years of Experience" />
+                            <Counter to={50} label="Happy Clients" />
+                            <Counter to={100} label="Projects Delivered" />
+                        </div>
                     </div>
-                </div>
+                </ParallaxContent>
             </section>
 
             {/* Testimonials */}
-            <section className="section-padding" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)' }}>
-                <div className="container">
-                    <h2 style={{ marginTop: 0, marginBottom: '3rem' }}>Client Love</h2>
-                    <div style={{ display: 'flex', overflowX: 'auto', gap: '2rem', paddingBottom: '2rem' }}>
-                        {[1, 2, 3].map((t) => (
-                            <div key={t} style={{ minWidth: '350px', padding: '2rem', backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '15px' }}>
-                                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-                                    {[1, 2, 3, 4, 5].map(s => <Star key={s} size={16} fill="currentColor" />)}
+            <section className="section-padding light-section" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)' }}>
+                <ParallaxContent>
+                    <div className="container">
+                        <h2 style={{ marginTop: 0, marginBottom: '3rem', textAlign: 'center' }}>Client Love</h2>
+                        <div style={{
+                            display: 'flex',
+                            flexWrap: 'nowrap', // Force single line
+                            justifyContent: 'center', // Center content if it doesn't overflow
+                            overflowX: 'auto', // Allow scroll if screen is too narrow
+                            gap: '3rem',
+                            paddingBottom: '2rem',
+                            paddingTop: '6rem',
+                            paddingRight: '2rem',
+                            paddingLeft: '2rem'
+                        }}>
+                            {content.testimonials.map((item) => (
+                                <div key={item.id} style={{
+                                    flex: '0 0 auto', // Don't shrink, stay fixed width relative to content
+                                    width: '380px', // Slightly smaller to fit better
+                                    height: '340px',
+                                    padding: '2.5rem',
+                                    backgroundColor: 'rgba(255,255,255,0.2)',
+                                    borderRadius: '20px',
+                                    position: 'relative',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
+                                    marginTop: 0
+                                }}>
+                                    <div>
+                                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                                            {[...Array(item.rating)].map((_, i) => <Star key={i} size={18} fill="currentColor" />)}
+                                        </div>
+                                        <p style={{ fontSize: '1.3rem', lineHeight: 1.5, marginBottom: '1.5rem', fontStyle: 'italic', paddingRight: '45px' }}>
+                                            "{item.text}"
+                                        </p>
+                                    </div>
+
+                                    {/* Client Photo - Popping Out */}
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '-65px',
+                                        right: '20px',
+                                        width: '130px',
+                                        height: '130px',
+                                        borderRadius: '50%',
+                                        overflow: 'hidden',
+                                        border: '5px solid var(--color-butter-yellow)',
+                                        boxShadow: '0 15px 30px rgba(0,0,0,0.15)'
+                                    }}>
+                                        {item.image ? (
+                                            <img src={item.image} alt={item.author} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <div style={{ width: '100%', height: '100%', backgroundColor: '#fff', opacity: 0.5 }}></div>
+                                        )}
+                                    </div>
+
+                                    <p className="font-subtitle" style={{ fontWeight: 'bold', fontSize: '1.1rem', margin: 0 }}>- {item.author}</p>
                                 </div>
-                                <p style={{ fontSize: '1.2rem', marginBottom: '1.5rem', fontStyle: 'italic' }}>
-                                    "Bloom Branding completely transformed our digital presence. The team is incredible!"
-                                </p>
-                                <p className="font-subtitle" style={{ fontWeight: 'bold' }}>- Jane Doe, CEO</p>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                </div>
+                </ParallaxContent>
             </section>
 
             {/* Instagram Preview */}
-            <section className="section-padding">
-                <div className="container" style={{ textAlign: 'center' }}>
-                    <h2 style={{ marginBottom: '3rem' }}>@BloomBranding</h2>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-                        {[1, 2, 3, 4].map(i => (
-                            <motion.a
-                                href="#"
-                                key={i}
-                                whileHover={{ opacity: 0.8 }}
-                                className="img-placeholder"
-                                style={{ width: '100%', aspectRatio: '1', borderRadius: '1px' }}
-                            >
-                                INSTA POST {i}
-                            </motion.a>
-                        ))}
+            <section className="section-padding light-section">
+                <ParallaxContent>
+                    <div className="container" style={{ textAlign: 'center' }}>
+                        <a href="https://www.instagram.com/bloom.branding_/?hl=en" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <h2 style={{ marginBottom: '3rem', cursor: 'pointer' }}>@bloom.branding_</h2>
+                        </a>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5rem' }}>
+                            {content.instagram.map(item => (
+                                <motion.a
+                                    href={item.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    key={item.id}
+                                    whileHover={{ opacity: 0.8 }}
+                                    className="img-placeholder"
+                                    style={{ width: '280px', flexGrow: 1, maxWidth: '350px', aspectRatio: '1', borderRadius: '1px', display: 'block', overflow: 'hidden' }}
+                                >
+                                    {item.image ? (
+                                        <img src={item.image} alt="Insta" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    ) : (
+                                        "INSTA POST"
+                                    )}
+                                </motion.a>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                </ParallaxContent>
             </section>
 
         </motion.div >

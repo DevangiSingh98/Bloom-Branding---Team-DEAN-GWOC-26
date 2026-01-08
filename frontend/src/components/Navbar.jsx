@@ -73,15 +73,16 @@ export default function Navbar() {
     };
 
     const isHome = location.pathname === '/';
+    const isServices = location.pathname === '/services';
 
     // Unified Logic:
     // 1. Menu Open -> Butter Yellow (on Blue Overlay)
     // 2. Not Home -> Dark Choc (Static)
     // 3. Home -> Dynamic (Black on Light, Butter Yellow on Dark)
-
     const getColor = () => {
         if (isOpen) return 'var(--color-butter-yellow)';
-        if (!isHome) return 'var(--color-dark-choc)';
+        // Services page uses dynamic logic now (Hero = Dark Bg -> Light Text, Content = Light Bg -> Dark Text)
+        if (!isHome && !isServices) return 'var(--color-dark-choc)';
         return isDarkText ? 'var(--color-black)' : 'var(--color-butter-yellow)';
     };
 
@@ -215,7 +216,7 @@ export default function Navbar() {
                             {[
                                 { name: 'Home', path: '/', img: '/images/home.png', height: '250px', tilt: -10 },
                                 { name: 'Our Story', path: '/about', img: '/images/ourstory.png', height: '220px', tilt: 15 },
-
+                                { name: 'Services', path: '/services', img: '/images/services.png', height: '160px', tilt: 5 },
                                 { name: 'Our Work', path: '/work', img: '/images/Ourwork.png', height: '140px', tilt: 8 },
                                 { name: 'Contact', path: '/contact', img: '/images/tele.png', height: '200px', tilt: -5 },
                             ].map((link) => (

@@ -54,15 +54,15 @@ export default function About() {
                             <div style={{ order: 2 }}>
                                 {/* Use Parallax wrapper directly instead of one-time motion */}
                                 <div>
-                                    <ParallaxContent offset={50}> {/* Increase offset for stronger slide effect */}
-                                        {content.founder.image ? (
-                                            <img src={content.founder.image} alt={content.founder.name} style={{ width: '100%', height: '500px', objectFit: 'cover', objectPosition: 'top center', borderRadius: '200px 200px 0 0', display: 'block' }} />
-                                        ) : (
-                                            <div className="img-placeholder" style={{ width: '100%', height: '500px', borderRadius: '200px 200px 0 0' }}>
-                                                FOUNDER PORTRAIT
-                                            </div>
-                                        )}
-                                    </ParallaxContent>
+                                    {/* <ParallaxContent offset={50}> */}
+                                    {content.founder.image ? (
+                                        <img src={content.founder.image} alt={content.founder.name} style={{ width: '100%', height: '500px', objectFit: 'cover', objectPosition: 'top center', borderRadius: '200px 200px 0 0', display: 'block' }} />
+                                    ) : (
+                                        <div className="img-placeholder" style={{ width: '100%', height: '500px', borderRadius: '200px 200px 0 0' }}>
+                                            FOUNDER PORTRAIT
+                                        </div>
+                                    )}
+                                    {/* </ParallaxContent> */}
                                 </div>
                             </div>
 

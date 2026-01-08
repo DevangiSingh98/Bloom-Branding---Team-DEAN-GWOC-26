@@ -215,7 +215,7 @@ export default function Navbar() {
                             {[
                                 { name: 'Home', path: '/', img: '/images/home.png', height: '250px', tilt: -10 },
                                 { name: 'Our Story', path: '/about', img: '/images/ourstory.png', height: '220px', tilt: 15 },
-                                { name: 'Services', path: '/services', img: '/images/services.png', height: '140px', tilt: -12 },
+
                                 { name: 'Our Work', path: '/work', img: '/images/Ourwork.png', height: '140px', tilt: 8 },
                                 { name: 'Contact', path: '/contact', img: '/images/tele.png', height: '200px', tilt: -5 },
                             ].map((link) => (

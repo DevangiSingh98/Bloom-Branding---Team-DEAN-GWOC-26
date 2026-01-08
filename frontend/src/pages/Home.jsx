@@ -116,7 +116,7 @@ const ServicesCarousel = () => {
             "Influencer Marketing": "#social-media",
             "Creative Design": "#web-&-digital"
         };
-        return "/services" + (map[title] || "");
+        return "#";
     };
 
     // Duplicate list 6 times for a safe buffer

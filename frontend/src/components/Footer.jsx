@@ -21,7 +21,7 @@ export default function Footer() {
                             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 <li><Link to="/">Home</Link></li>
                                 <li><Link to="/about">Story</Link></li>
-                                <li><Link to="/services">Services</Link></li>
+
                                 <li><Link to="/contact">Contact</Link></li>
                                 <li><Link to="/admin">Admin</Link></li>
                             </ul>

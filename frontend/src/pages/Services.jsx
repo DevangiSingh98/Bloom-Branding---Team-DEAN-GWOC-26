@@ -308,24 +308,29 @@ export default function Services() {
 
     const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
 
-    // Hide Body Scrollbar removed to allow native scroll for Navbar detection
-    // useEffect(() => {
-    //     document.body.style.overflow = 'hidden';
-    //     return () => {
-    //         document.body.style.overflow = 'auto';
-    //     };
-    // }, []);
+    // Apply Snap Scroll and Overflow settings directly to HTML/Body
+    useEffect(() => {
+        // Enable Snap and hide horizontal overflow globally to allow sticky children to work
+        document.documentElement.style.scrollSnapType = 'y mandatory';
+        document.documentElement.style.scrollBehavior = 'smooth';
+        document.documentElement.style.overflowX = 'hidden'; // Move hidden overflow here
+        document.body.style.overflowX = 'hidden';
+
+        return () => {
+            document.documentElement.style.scrollSnapType = 'none';
+            document.documentElement.style.scrollBehavior = 'auto';
+            document.documentElement.style.overflowX = 'auto';
+            document.body.style.overflowX = 'auto';
+        };
+    }, []);
 
     return (
-        // MAIN SCROLL CONTAINER - SNAP REMOVED FOR NAVBAR COMPATIBILITY
+        // MAIN SCROLL CONTAINER
         <div
             ref={ref}
             style={{
-                // height: '100vh',
-                // overflowY: 'scroll',
-                // scrollSnapType: 'y mandatory',
                 backgroundColor: '#FAF9F6',
-                overflowX: 'hidden',
+                // overflowX: 'hidden', REMOVED: Breaks position:sticky if on parent
                 paddingBottom: '0',
                 fontFamily: 'var(--font-main)',
                 position: 'relative'
@@ -333,7 +338,7 @@ export default function Services() {
         >
 
             {/* 1. NEW SPLIT HERO SECTION */}
-            <div style={{ height: '100vh', width: '100%', display: 'flex', position: 'relative' }}>
+            <div style={{ height: '100vh', width: '100%', display: 'flex', scrollSnapAlign: 'start', position: 'relative' }}>
 
                 {/* LEFT: DARK TEXT SIDE */}
                 <div style={{
@@ -408,7 +413,7 @@ export default function Services() {
 
             {/* 2. STATS & DIFFERENCE - Start of Single Light Section Wrapper */}
             <div className="light-section" style={{ position: 'relative', backgroundColor: '#FAF9F6' }}>
-                <div style={{ paddingBottom: '100px' }}>
+                <div style={{ paddingBottom: '100px', scrollSnapAlign: 'start' }}>
 
                     {/* STATS BANNER REMOVED */}
 
@@ -466,7 +471,7 @@ export default function Services() {
                 </div>
 
                 {/* CTA */}
-                <div style={{ textAlign: 'center', padding: '100px 20px 50px', minHeight: '50vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                <div style={{ scrollSnapAlign: 'start', textAlign: 'center', padding: '100px 20px 50px', minHeight: '50vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                     <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '3rem', marginBottom: '30px' }}>Ready to create something beautiful?</h2>
                     <button style={{
                         padding: '15px 40px',
@@ -483,7 +488,7 @@ export default function Services() {
                 </div>
 
                 {/* GLOBAL FOOTER */}
-                <div>
+                <div style={{ scrollSnapAlign: 'start' }}>
                     <Footer />
                 </div>
             </div>

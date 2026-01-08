@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import AnimatedButton from '../components/AnimatedButton';
 
+import { useContent } from '../context/ContentContext';
+
 export default function Contact() {
+    const { addEnquiry } = useContent();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -14,7 +17,17 @@ export default function Contact() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        const newEnquiry = {
+            id: Date.now(),
+            date: new Date().toLocaleDateString(),
+            time: new Date().toLocaleTimeString(),
+            ...formData
+        };
+
+        addEnquiry(newEnquiry);
         alert("Thank you for your enquiry! We will bloom together soon.");
+        setFormData({ name: '', email: '', service: '', message: '' });
     };
 
     return (

@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useContent } from '../context/ContentContext';
 import { motion, useScroll, useTransform, animate, useInView } from 'framer-motion';
-import { ArrowRight, Star } from 'lucide-react';
+import { ArrowRight, Star, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AnimatedButton from '../components/AnimatedButton';
 import ParallaxContent from '../components/ParallaxContent';
@@ -39,7 +39,7 @@ const Counter = ({ to, label }) => {
 
     return (
         <div ref={ref}>
-            <h3 style={{ fontSize: '5rem', color: 'var(--color-electric-blue)' }}>{count}+</h3>
+            <h3 style={{ fontSize: '5rem', color: 'var(--color-electric-blue)', lineHeight: 1.2, paddingTop: '10px' }}>{count}+</h3>
             <motion.p
                 className="font-subtitle"
                 initial={{ opacity: 0, y: 20 }}
@@ -110,13 +110,13 @@ const ServicesCarousel = () => {
     // Map titles to Service Page IDs
     const getServiceLink = (title) => {
         const map = {
-            "Branding": "#brand-strategy",
+            "Branding": "#branding",
             "Social Media Marketing": "#social-media",
             "Production": "#production",
-            "Influencer Marketing": "#social-media",
-            "Creative Design": "#web-&-digital"
+            "Influencer Marketing": "#influencer-marketing",
+            "Creative Design": "#creative-design"
         };
-        return "#";
+        return "/services" + (map[title] || "");
     };
 
     // Duplicate list 6 times for a safe buffer
@@ -218,7 +218,7 @@ const ServicesCarousel = () => {
         <div style={{ width: '100%', overflow: 'hidden', position: 'relative', paddingBottom: '10vh' }}>
             <h2 style={{
                 fontSize: '4.5rem',
-                lineHeight: 1.1,
+                lineHeight: 1.3,
                 marginBottom: '8vh',
                 textAlign: 'center',
                 color: 'var(--color-butter-yellow)',
@@ -357,28 +357,28 @@ export default function Home() {
                     ))}
                 </div>
 
-                <motion.div style={{ y: heroY, zIndex: 1, textAlign: 'center', maxWidth: '80%' }}>
-                    <motion.img
-                        src="/images/main logo.png"
-                        alt="Bloom Branding Logo"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 1, ease: 'easeOut' }}
-                        style={{ width: '450px', maxWidth: '90vw', objectFit: 'contain', marginBottom: '1rem' }}
-                    />
+                <ParallaxContent>
+                    <motion.div style={{ zIndex: 1, textAlign: 'center', maxWidth: '80%', margin: '0 auto' }}>
+                        <motion.img
+                            src="/images/main logo.png"
+                            alt="Bloom Branding Logo"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 1, ease: 'easeOut' }}
+                            style={{ width: '450px', maxWidth: '90vw', objectFit: 'contain', marginBottom: '1rem' }}
+                        />
 
-
-
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5, duration: 1 }}
-                        className="font-subtitle"
-                        style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto 2rem auto', color: 'var(--color-white)', textShadow: '0 0 10px rgba(0,0,0,0.5)' }}
-                    >
-                        {content.hero.subtitle}
-                    </motion.p>
-                </motion.div>
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5, duration: 1 }}
+                            className="font-subtitle"
+                            style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto 2rem auto', color: 'var(--color-white)', textShadow: '0 0 10px rgba(0,0,0,0.5)' }}
+                        >
+                            {content.hero.subtitle}
+                        </motion.p>
+                    </motion.div>
+                </ParallaxContent>
             </section>
 
             {/* Intro / Our Story Snippet */}
@@ -423,7 +423,7 @@ export default function Home() {
                             </motion.div>
                             <motion.div variants={fadeInUp}>
                                 <div className="img-placeholder" style={{ width: '100%', height: '400px', borderRadius: '20px', overflow: 'hidden' }}>
-                                    <img src="/images/dummy1.png" alt="Blooming the Brand" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    <img src="/images/bloomingthebrand.png" alt="Blooming the Brand" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
                             </motion.div>
                         </motion.div>
@@ -443,7 +443,7 @@ export default function Home() {
                 <ParallaxContent>
                     <div className="container">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
-                            <h2 style={{ fontSize: '3rem', color: 'var(--color-butter-yellow)' }}>Selected Work</h2>
+                            <h2 style={{ fontSize: '4.5rem', color: 'var(--color-butter-yellow)' }}>Selected Work</h2>
                             <AnimatedButton to="/work" className="btn-primary" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)' }}>View All Projects</AnimatedButton>
                         </div>
 
@@ -483,66 +483,139 @@ export default function Home() {
             </section>
 
             {/* Testimonials */}
-            <section className="section-padding light-section" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)' }}>
+            <section className="section-padding light-section" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)', paddingTop: '0' }}>
                 <ParallaxContent>
                     <div className="container">
-                        <h2 style={{ marginTop: 0, marginBottom: '3rem', textAlign: 'center' }}>Client Love</h2>
+                        <motion.h2
+                            initial={{ y: 100, opacity: 0 }}
+                            whileInView={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                            viewport={{ once: true }}
+                            style={{ marginTop: '-1rem', marginBottom: '3rem', textAlign: 'center', fontSize: '6rem', lineHeight: 1 }}
+                        >
+                            Client Love
+                        </motion.h2>
+                        {/* Horizontal Marquee Container - Pinterest Style */}
                         <div style={{
-                            display: 'flex',
-                            flexWrap: 'nowrap', // Force single line
-                            justifyContent: 'center', // Center content if it doesn't overflow
-                            overflowX: 'auto', // Allow scroll if screen is too narrow
-                            gap: '3rem',
-                            paddingBottom: '2rem',
-                            paddingTop: '6rem',
-                            paddingRight: '2rem',
-                            paddingLeft: '2rem'
+                            width: '100%',
+                            overflow: 'hidden',
+                            position: 'relative',
+                            paddingTop: '2rem',
+                            paddingBottom: '2rem'
                         }}>
-                            {content.testimonials.map((item) => (
-                                <div key={item.id} style={{
-                                    flex: '0 0 auto', // Don't shrink, stay fixed width relative to content
-                                    width: '380px', // Slightly smaller to fit better
-                                    height: '340px',
-                                    padding: '2.5rem',
-                                    backgroundColor: 'rgba(255,255,255,0.2)',
-                                    borderRadius: '20px',
-                                    position: 'relative',
+                            <motion.div
+                                style={{
                                     display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'space-between',
-                                    marginTop: 0
-                                }}>
-                                    <div>
-                                        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                                            {[...Array(item.rating)].map((_, i) => <Star key={i} size={18} fill="currentColor" />)}
-                                        </div>
-                                        <p style={{ fontSize: '1.3rem', lineHeight: 1.5, marginBottom: '1.5rem', fontStyle: 'italic', paddingRight: '45px' }}>
-                                            "{item.text}"
-                                        </p>
-                                    </div>
+                                    gap: '1rem',
+                                    width: 'max-content'
+                                }}
+                                animate={{ x: ["0%", "-50%"] }} // Move entirely to the left
+                                transition={{
+                                    x: {
+                                        repeat: Infinity,
+                                        repeatType: "loop",
+                                        duration: 120, // Very slow scroll for elegance
+                                        ease: "linear"
+                                    }
+                                }}
+                            >
+                                {/* We create a function to generate columns to ensure consistent layout in the loop */}
+                                {(() => {
+                                    // Split items into 6 columns for a dense board layout
+                                    // 12 items / 6 columns = 2 items per column (approx)
+                                    const numCols = 6;
+                                    const columns = Array.from({ length: numCols }, () => []);
+                                    content.testimonials.forEach((t, i) => {
+                                        columns[i % numCols].push(t);
+                                    });
 
-                                    {/* Client Photo - Popping Out */}
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '-65px',
-                                        right: '20px',
-                                        width: '130px',
-                                        height: '130px',
-                                        borderRadius: '50%',
-                                        overflow: 'hidden',
-                                        border: '5px solid var(--color-butter-yellow)',
-                                        boxShadow: '0 15px 30px rgba(0,0,0,0.15)'
-                                    }}>
-                                        {item.image ? (
-                                            <img src={item.image} alt={item.author} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        ) : (
-                                            <div style={{ width: '100%', height: '100%', backgroundColor: '#fff', opacity: 0.5 }}></div>
-                                        )}
-                                    </div>
+                                    // Render a set of columns
+                                    const renderSet = (keyPrefix) => (
+                                        <>
+                                            {columns.map((col, colIndex) => (
+                                                <div key={`${keyPrefix}-col-${colIndex}`} style={{
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    gap: '1.5rem', // Slight gap increase
+                                                    width: '200px', // Strict width to prevent expansion
+                                                    // Stagger every other column to create "up and down" unevenness
+                                                    marginTop: colIndex % 2 === 1 ? '4rem' : '0'
+                                                }}>
+                                                    {col.map((item, itemIndex) => {
+                                                        // Deterministic random height
+                                                        const randomVal = (item.id * 7 + itemIndex * 13) % 4;
+                                                        const height = randomVal === 0 ? '250px'
+                                                            : randomVal === 1 ? '320px'
+                                                                : randomVal === 2 ? '380px'
+                                                                    : '290px';
 
-                                    <p className="font-subtitle" style={{ fontWeight: 'bold', fontSize: '1.1rem', margin: 0 }}>- {item.author}</p>
-                                </div>
-                            ))}
+                                                        return (
+                                                            <motion.div
+                                                                key={`${keyPrefix}-item-${item.id}`}
+                                                                initial={{ scale: 0.1, opacity: 0 }} // Start mainly invisible but exist as a point
+                                                                whileInView={{ scale: 1, opacity: 1 }} // Pop to full size
+                                                                transition={{ type: "spring", stiffness: 120, damping: 20, mass: 1 }} // Subtler spring, less bounce
+                                                                viewport={{ once: false, amount: 0.25, margin: "0px" }} // Explicit 1/4th trigger
+                                                                style={{
+                                                                    width: '100%',
+                                                                    height: height,
+                                                                    borderRadius: '16px',
+                                                                    overflow: 'hidden',
+                                                                    backgroundColor: 'rgba(255,255,255,0.4)',
+                                                                    display: 'flex',
+                                                                    flexDirection: 'column',
+                                                                    boxShadow: '0 4px 15px rgba(0,0,0,0.05)'
+                                                                }}>
+                                                                {/* Media */}
+                                                                <div style={{
+                                                                    flex: 1,
+                                                                    overflow: 'hidden',
+                                                                    position: 'relative'
+                                                                }}>
+                                                                    {item.video ? (
+                                                                        <video
+                                                                            src={item.video}
+                                                                            autoPlay
+                                                                            muted
+                                                                            loop
+                                                                            playsInline
+                                                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                                        />
+                                                                    ) : item.image ? (
+                                                                        <img src={item.image} alt={item.author} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                                    ) : (
+                                                                        <div style={{ width: '100%', height: '100%', backgroundColor: '#fff', opacity: 0.5 }}></div>
+                                                                    )}
+                                                                </div>
+
+                                                                {/* Content */}
+                                                                <div style={{ padding: '1.2rem', background: '#fff' }}>
+                                                                    <div style={{ display: 'flex', gap: '0.2rem', marginBottom: '0.5rem' }}>
+                                                                        {[...Array(item.rating)].map((_, starIndex) => <Star key={starIndex} size={12} fill="#000" />)}
+                                                                    </div>
+                                                                    <p style={{ fontSize: '0.95rem', lineHeight: 1.4, color: '#333', marginBottom: '0.8rem', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                                        "{item.text}"
+                                                                    </p>
+                                                                    <p className="font-subtitle" style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>{item.author}</p>
+                                                                </div>
+                                                            </motion.div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            ))}
+                                        </>
+                                    );
+
+                                    // Return duplicated sets
+                                    return (
+                                        <>
+                                            {renderSet('set1')}
+                                            {renderSet('set2')}
+                                            {renderSet('set3')} {/* Triple buffer for wider screens */}
+                                        </>
+                                    );
+                                })()}
+                            </motion.div>
                         </div>
                     </div>
                 </ParallaxContent>
@@ -553,16 +626,22 @@ export default function Home() {
                 <ParallaxContent>
                     <div className="container" style={{ textAlign: 'center' }}>
                         <a href="https://www.instagram.com/bloom.branding_/?hl=en" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <h2 style={{ marginBottom: '3rem', cursor: 'pointer' }}>@bloom.branding_</h2>
+                            <h2 style={{ marginBottom: '3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                @bloom.branding_ <ArrowUpRight size={48} strokeWidth={0.75} />
+                            </h2>
                         </a>
                         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5rem' }}>
-                            {content.instagram.map(item => (
+                            {content.instagram.map((item, index) => (
                                 <motion.a
                                     href={item.link}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     key={item.id}
-                                    whileHover={{ opacity: 0.8 }}
+                                    initial={{ opacity: 0, y: 50 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.8, delay: index * 0.2, ease: "easeOut" }}
+                                    whileHover={{ opacity: 0.8, scale: 1.02 }}
                                     className="img-placeholder"
                                     style={{ width: '280px', flexGrow: 1, maxWidth: '350px', aspectRatio: '1', borderRadius: '1px', display: 'block', overflow: 'hidden' }}
                                 >

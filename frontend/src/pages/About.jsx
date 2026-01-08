@@ -25,7 +25,7 @@ export default function About() {
                         initial={{ y: 50, opacity: 0 }}
                         whileInView={{ y: 0, opacity: 1 }}
                         transition={{ duration: 0.8 }}
-                        style={{ fontSize: 'clamp(3rem, 6vw, 6rem)', marginBottom: '3rem', color: 'var(--color-electric-blue)' }}
+                        style={{ fontSize: 'clamp(3rem, 6vw, 6rem)', marginBottom: '3rem', color: 'var(--color-electric-blue)', paddingTop: '10px' }}
                     >
                         Curating the <br /> Unconventional
                     </motion.h1>
@@ -40,7 +40,7 @@ export default function About() {
                             </p>
                         </div>
                         <div className="img-placeholder" style={{ width: '100%', height: '400px', borderRadius: '10px', overflow: 'hidden' }}>
-                            <img src="/images/dummy5.png" alt="Agency Culture" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <img src="/images/bloomingthebrand.png" alt="Agency Culture" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </div>
                     </div>
                 </ParallaxContent>
@@ -67,7 +67,7 @@ export default function About() {
                             </div>
 
                             <div style={{ alignSelf: 'center', paddingBottom: '4rem' }}> {/* Lift text up and add some bottom padding to balance */}
-                                <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--color-electric-blue)' }}>Meet the Founder</h2>
+                                <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--color-electric-blue)' }}>Meet the Founders</h2>
                                 <h3 style={{ fontSize: '1.5rem', marginBottom: '2rem', fontFamily: 'var(--font-subtitle)' }}>{content.founder.name}, {content.founder.role}</h3>
 
                                 <p style={{ marginBottom: '1.5rem', lineHeight: 1.8 }}>

@@ -10,7 +10,7 @@ const AnimatedButton = ({ to, children, className, style, onClick, type = "butto
         setHover(true);
         setRandomDirs([1, 2, 3].map(() => {
             const angle = Math.random() * Math.PI * 2;
-            const distance = 80 + Math.random() * 40;
+            const distance = 40 + Math.random() * 20;
             return {
                 x: Math.cos(angle) * distance,
                 y: Math.sin(angle) * distance,

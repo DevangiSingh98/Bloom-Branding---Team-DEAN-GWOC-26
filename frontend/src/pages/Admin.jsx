@@ -6,6 +6,8 @@ const Admin = () => {
     const { content, updateHero, updateSelectedWork, updateTestimonials, updateInstagram, updateFounder, updateValues, resetContent } = useContent();
     const [activeTab, setActiveTab] = useState('hero');
 
+    const [openEnquiryId, setOpenEnquiryId] = useState(null);
+
     const handleHeroChange = (e) => {
         updateHero({ [e.target.name]: e.target.value });
     };
@@ -15,20 +17,25 @@ const Admin = () => {
     };
 
     // Helper to handle array updates
-    // Helper to handle array updates
     const handleArrayChange = (index, field, value, type) => {
         let newArray;
-        if (type === 'work') newArray = [...content.selectedWork];
-        else if (type === 'testimonials') newArray = [...content.testimonials];
-        else if (type === 'instagram') newArray = [...content.instagram];
-        else if (type === 'values') newArray = [...content.values];
-
-        newArray[index][field] = value;
-
-        if (type === 'work') updateSelectedWork(newArray);
-        else if (type === 'testimonials') updateTestimonials(newArray);
-        else if (type === 'instagram') updateInstagram(newArray);
-        else if (type === 'values') updateValues(newArray);
+        if (type === 'work') {
+            newArray = [...content.selectedWork];
+            newArray[index] = { ...newArray[index], [field]: value };
+            updateSelectedWork(newArray);
+        } else if (type === 'testimonials') {
+            newArray = [...content.testimonials];
+            newArray[index] = { ...newArray[index], [field]: value };
+            updateTestimonials(newArray);
+        } else if (type === 'instagram') {
+            newArray = [...content.instagram];
+            newArray[index] = { ...newArray[index], [field]: value };
+            updateInstagram(newArray);
+        } else if (type === 'values') {
+            newArray = [...content.values];
+            newArray[index] = { ...newArray[index], [field]: value };
+            updateValues(newArray);
+        }
     };
 
     const addItem = (type) => {
@@ -58,10 +65,15 @@ const Admin = () => {
 
     return (
         <div className="section-padding container" style={{ minHeight: '80vh', marginTop: '4rem' }}>
-            <h1 style={{ color: 'var(--color-electric-blue)', marginBottom: '2rem' }}>Admin Dashboard</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <h1 style={{ color: 'var(--color-electric-blue)', margin: 0 }}>Admin Dashboard</h1>
+                <span style={{ fontSize: '0.9rem', color: 'green', backgroundColor: '#e6fffa', padding: '0.5rem 1rem', borderRadius: '20px', border: '1px solid #b2f5ea' }}>
+                    ✓ Changes auto-saved to browser
+                </span>
+            </div>
 
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-                {['hero', 'founder', 'values', 'work', 'testimonials', 'instagram'].map(tab => (
+                {['hero', 'enquiries', 'founder', 'values', 'work', 'testimonials', 'instagram'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -96,6 +108,58 @@ const Admin = () => {
                     </div>
                 )}
 
+                {activeTab === 'enquiries' && (
+                    <div>
+                        <h2>Enquiries</h2>
+                        {(!content.enquiries || content.enquiries.length === 0) ? (
+                            <p style={{ color: '#666', fontStyle: 'italic' }}>No enquiries received yet.</p>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                {content.enquiries.map((item) => (
+                                    <div key={item.id} style={{ border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
+                                        {/* Header Row */}
+                                        <div
+                                            onClick={() => setOpenEnquiryId(openEnquiryId === item.id ? null : item.id)}
+                                            style={{
+                                                padding: '1.5rem',
+                                                backgroundColor: '#f9f9f9',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center'
+                                            }}
+                                        >
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>
+                                                    <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--color-electric-blue)' }}>{item.service || 'General Enquiry'}</span>
+                                                    <span style={{ fontSize: '0.9rem', color: '#666', fontFamily: 'monospace' }}>{item.date} &nbsp;|&nbsp; {item.time}</span>
+                                                </div>
+                                                <div style={{ fontSize: '1.1rem' }}>{item.name}</div>
+                                            </div>
+                                            <div style={{ marginLeft: '1.5rem', transform: openEnquiryId === item.id ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', fontSize: '1.5rem', color: '#888' }}>
+                                                ▼
+                                            </div>
+                                        </div>
+
+                                        {/* Expanded Details */}
+                                        {openEnquiryId === item.id && (
+                                            <div style={{ padding: '1.5rem', borderTop: '1px solid #ddd', backgroundColor: 'white' }}>
+                                                <div style={{ marginBottom: '1rem' }}>
+                                                    <strong>Email:</strong> <a href={`mailto:${item.email}`} style={{ color: 'var(--color-electric-blue)' }}>{item.email}</a>
+                                                </div>
+                                                <div>
+                                                    <strong>Message:</strong>
+                                                    <p style={{ backgroundColor: '#f4f4f4', padding: '1rem', borderRadius: '5px', marginTop: '0.5rem', whiteSpace: 'pre-wrap' }}>{item.message}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {activeTab === 'work' && (
                     <div>
                         <h2>Selected Work</h2>
@@ -123,6 +187,10 @@ const Admin = () => {
                                     <input value={item.author} onChange={(e) => handleArrayChange(index, 'author', e.target.value, 'testimonials')} placeholder="Author" style={{ flex: 1, padding: '0.5rem' }} />
                                     <input type="number" max="5" min="1" value={item.rating} onChange={(e) => handleArrayChange(index, 'rating', parseInt(e.target.value), 'testimonials')} placeholder="Rating" style={{ width: '60px', padding: '0.5rem' }} />
                                     <button onClick={() => deleteItem(index, 'testimonials')} style={{ color: 'red' }}>X</button>
+                                </div>
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                                    <input value={item.image || ''} onChange={(e) => handleArrayChange(index, 'image', e.target.value, 'testimonials')} placeholder="Client Photo URL" style={{ flex: 1, padding: '0.5rem' }} />
+                                    <input value={item.video || ''} onChange={(e) => handleArrayChange(index, 'video', e.target.value, 'testimonials')} placeholder="Client Video URL (optional)" style={{ flex: 1, padding: '0.5rem' }} />
                                 </div>
                             </div>
                         ))}

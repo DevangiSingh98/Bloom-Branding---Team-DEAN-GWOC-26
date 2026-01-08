@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 
 import Work from './pages/Work';
+import Services from './pages/Services';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 import { ContentProvider } from './context/ContentContext';
@@ -16,23 +17,16 @@ import { AnimatePresence } from 'framer-motion';
 function ScrollToTop() {
     const { pathname } = useLocation();
 
+    // Set manual scroll restoration once on mount
     React.useEffect(() => {
-        // Prevent browser from restoring scroll position on refresh
         if ('scrollRestoration' in window.history) {
             window.history.scrollRestoration = 'manual';
         }
-    }, []); // Run once on mount
+    }, []);
 
+    // Scroll to top on route change
     React.useLayoutEffect(() => {
-        // Immediate scroll
         window.scrollTo(0, 0);
-
-        // Ensure it sticks (sometimes browsers fight back)
-        const frameId = requestAnimationFrame(() => {
-            window.scrollTo(0, 0);
-        });
-
-        return () => cancelAnimationFrame(frameId);
     }, [pathname]);
 
     return null;
@@ -45,6 +39,7 @@ function AnimatedRoutes() {
             <Routes location={location} key={location.pathname}>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/services" element={<Services />} />
 
                 <Route path="/work" element={<Work />} />
                 <Route path="/contact" element={<Contact />} />

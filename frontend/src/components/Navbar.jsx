@@ -73,22 +73,25 @@ export default function Navbar() {
     };
 
     const isHome = location.pathname === '/';
+    const isServices = location.pathname === '/services';
 
     // Unified Logic:
     // 1. Menu Open -> Butter Yellow (on Blue Overlay)
-    // 2. Not Home -> Dark Choc (Static)
-    // 3. Home -> Dynamic (Black on Light, Butter Yellow on Dark)
+    // 2. Not Home/Services -> Dark Choc (Static)
+    // 3. Home/Services -> Dynamic
 
     const getColor = () => {
         if (isOpen) return 'var(--color-butter-yellow)';
-        if (!isHome) return 'var(--color-dark-choc)';
-        return isDarkText ? 'var(--color-black)' : 'var(--color-butter-yellow)';
+        if (!isHome && !isServices) return 'var(--color-dark-choc)';
+        // Default is Butter Yellow for dark backgrounds (default state for Home/Services)
+        // isDarkText true means we are on a light section -> switch to Dark Choc
+        return isDarkText ? 'var(--color-dark-choc)' : 'var(--color-butter-yellow)';
     };
 
     const logoColor = getColor();
     const menuColor = getColor();
 
-    const showShadow = !isOpen && isHome && !isDarkText;
+    const showShadow = !isOpen && (isHome || isServices) && !isDarkText;
 
     return (
         <>
@@ -215,7 +218,7 @@ export default function Navbar() {
                             {[
                                 { name: 'Home', path: '/', img: '/images/home.png', height: '250px', tilt: -10 },
                                 { name: 'Our Story', path: '/about', img: '/images/ourstory.png', height: '220px', tilt: 15 },
-
+                                { name: 'Services', path: '/services', img: '/images/services.png', height: '130px', tilt: -5 },
                                 { name: 'Our Work', path: '/work', img: '/images/Ourwork.png', height: '140px', tilt: 8 },
                                 { name: 'Contact', path: '/contact', img: '/images/tele.png', height: '200px', tilt: -5 },
                             ].map((link) => (
@@ -281,7 +284,7 @@ export default function Navbar() {
 
                         <motion.div variants={itemVariants} style={{ marginTop: '4rem', fontFamily: 'var(--font-subtitle)' }}>
                             <p>Get in touch</p>
-                            <a href="mailto:hello@bloombranding.com">hello@bloombranding.com</a>
+                            <a href="mailto:hello.bloombranding@gmail.com">hello.bloombranding@gmail.com</a>
                         </motion.div>
 
                     </motion.div>

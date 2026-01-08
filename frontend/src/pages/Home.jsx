@@ -219,6 +219,7 @@ const ServicesCarousel = () => {
             <h2 style={{
                 fontSize: '4.5rem',
                 lineHeight: 1.1,
+                marginTop: '10vh', // Added top margin to push it down
                 marginBottom: '8vh',
                 textAlign: 'center',
                 color: 'var(--color-butter-yellow)',
@@ -433,9 +434,9 @@ export default function Home() {
 
             {/* Services Highlight */}
             <section style={{ backgroundColor: 'var(--color-electric-blue)', color: 'var(--color-earl-gray)', padding: 0 }}>
-                <ParallaxContent>
-                    <ServicesCarousel />
-                </ParallaxContent>
+                {/* <ParallaxContent> */}
+                <ServicesCarousel />
+                {/* </ParallaxContent> */}
             </section>
 
             {/* Selected Work */}

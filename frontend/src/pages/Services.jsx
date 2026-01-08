@@ -308,23 +308,22 @@ export default function Services() {
 
     const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
 
-    // Hide Body Scrollbar (The "Large" one) while on this page
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = 'auto';
-        };
-    }, []);
+    // Hide Body Scrollbar removed to allow native scroll for Navbar detection
+    // useEffect(() => {
+    //     document.body.style.overflow = 'hidden';
+    //     return () => {
+    //         document.body.style.overflow = 'auto';
+    //     };
+    // }, []);
 
     return (
-        // MAIN SCROLL CONTAINER + SNAP
+        // MAIN SCROLL CONTAINER - SNAP REMOVED FOR NAVBAR COMPATIBILITY
         <div
             ref={ref}
-            // className="hide-scrollbar" REMOVED: Keeping internal scrollbar
             style={{
-                height: '100vh',
-                overflowY: 'scroll',
-                scrollSnapType: 'y mandatory', // Enable Snap
+                // height: '100vh',
+                // overflowY: 'scroll',
+                // scrollSnapType: 'y mandatory',
                 backgroundColor: '#FAF9F6',
                 overflowX: 'hidden',
                 paddingBottom: '0',
@@ -333,8 +332,8 @@ export default function Services() {
             }}
         >
 
-            {/* 1. NEW SPLIT HERO SECTION - SNAP START */}
-            <div style={{ height: '100vh', width: '100%', display: 'flex', scrollSnapAlign: 'start', position: 'relative' }}>
+            {/* 1. NEW SPLIT HERO SECTION */}
+            <div style={{ height: '100vh', width: '100%', display: 'flex', position: 'relative' }}>
 
                 {/* LEFT: DARK TEXT SIDE */}
                 <div style={{
@@ -407,84 +406,86 @@ export default function Services() {
                 </div>
             </div>
 
-            {/* 2. STATS & DIFFERENCE - SNAP START */}
-            <div style={{ scrollSnapAlign: 'start', paddingBottom: '100px' }}>
+            {/* 2. STATS & DIFFERENCE - Start of Single Light Section Wrapper */}
+            <div className="light-section" style={{ position: 'relative', backgroundColor: '#FAF9F6' }}>
+                <div style={{ paddingBottom: '100px' }}>
 
-                {/* STATS BANNER REMOVED */}
+                    {/* STATS BANNER REMOVED */}
 
-                {/* THE BLOOM DIFFERENCE (White Cards with Stickers) */}
-                <div style={{ padding: '40px 5%', maxWidth: '1400px', margin: '0 auto' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '80px' }}>
-                        <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '4rem', color: '#333', textTransform: 'uppercase', letterSpacing: '-2px' }}>The Bloom Difference</h2>
-                        <p style={{ fontFamily: 'monospace', fontSize: '1rem', color: '#666', marginTop: '10px' }}>We can't just make things pretty. We build brands that work.</p>
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '30px' }}>
-                        {[
-                            { title: 'STRATEGIC STORYTELLING', desc: 'We turn passive scrollers into loyal customers.', icon: '📖' },
-                            { title: 'BESPOKE AESTHETICS', desc: 'No templates. No cookie-cutter trends. Every pixel is crafted.', icon: '✨' },
-                            { title: 'HOLISTIC GROWTH', desc: 'From logo design to video production, we handle your entire visual presence.', icon: '🌱' }
-                        ].map((item, i) => (
-                            <ParallaxItem key={i} yOffset={(i + 1) * 20} style={{ zIndex: 2 }} containerRef={ref}>
-                                <motion.div
-                                    whileHover={{ y: -10 }}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: i * 0.2 }}
-                                    style={{
-                                        width: '350px',
-                                        padding: '60px 40px',
-                                        backgroundColor: '#fff',
-                                        boxShadow: '0 20px 50px rgba(0,0,0,0.08)',
-                                        position: 'relative',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        textAlign: 'center'
-                                    }}
-                                >
-                                    {/* Tape at top */}
-                                    <div style={{ position: 'absolute', top: '-15px', left: '50%', transform: 'translateX(-50%)', width: '100px', height: '30px', backgroundColor: 'rgba(255,255,255,0.8)', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}></div>
+                    {/* THE BLOOM DIFFERENCE (White Cards with Stickers) */}
+                    <div style={{ padding: '40px 5%', maxWidth: '1400px', margin: '0 auto' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+                            <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '4rem', color: '#333', textTransform: 'uppercase', letterSpacing: '-2px' }}>The Bloom Difference</h2>
+                            <p style={{ fontFamily: 'monospace', fontSize: '1rem', color: '#666', marginTop: '10px' }}>We can't just make things pretty. We build brands that work.</p>
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '30px' }}>
+                            {[
+                                { title: 'STRATEGIC STORYTELLING', desc: 'We turn passive scrollers into loyal customers.', icon: '📖' },
+                                { title: 'BESPOKE AESTHETICS', desc: 'No templates. No cookie-cutter trends. Every pixel is crafted.', icon: '✨' },
+                                { title: 'HOLISTIC GROWTH', desc: 'From logo design to video production, we handle your entire visual presence.', icon: '🌱' }
+                            ].map((item, i) => (
+                                <ParallaxItem key={i} yOffset={(i + 1) * 20} style={{ zIndex: 2 }} containerRef={ref}>
+                                    <motion.div
+                                        whileHover={{ y: -10 }}
+                                        initial={{ opacity: 0, y: 30 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.2 }}
+                                        style={{
+                                            width: '350px',
+                                            padding: '60px 40px',
+                                            backgroundColor: '#fff',
+                                            boxShadow: '0 20px 50px rgba(0,0,0,0.08)',
+                                            position: 'relative',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            textAlign: 'center'
+                                        }}
+                                    >
+                                        {/* Tape at top */}
+                                        <div style={{ position: 'absolute', top: '-15px', left: '50%', transform: 'translateX(-50%)', width: '100px', height: '30px', backgroundColor: 'rgba(255,255,255,0.8)', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}></div>
 
-                                    {/* Icon / Sticker */}
-                                    <div style={{ fontSize: '3rem', marginBottom: '20px' }}>{item.icon}</div>
+                                        {/* Icon / Sticker */}
+                                        <div style={{ fontSize: '3rem', marginBottom: '20px' }}>{item.icon}</div>
 
-                                    <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '1.8rem', marginBottom: '20px', lineHeight: 1.1 }}>{item.title}</h3>
-                                    <p style={{ color: '#666', lineHeight: 1.6, fontSize: '1rem' }}>{item.desc}</p>
-                                </motion.div>
-                            </ParallaxItem>
-                        ))}
+                                        <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '1.8rem', marginBottom: '20px', lineHeight: 1.1 }}>{item.title}</h3>
+                                        <p style={{ color: '#666', lineHeight: 1.6, fontSize: '1rem' }}>{item.desc}</p>
+                                    </motion.div>
+                                </ParallaxItem>
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
-            {/* END INTRO WRAPPER */}
+                {/* END INTRO WRAPPER */}
 
-            {/* 4. MAIN SERVICES LIST (Sticky Stacking Layout with Entry Animation) */}
-            <div style={{ position: 'relative' }}>
-                {services.map((service, index) => (
-                    <ServiceCard key={index} service={service} index={index} containerRef={ref} />
-                ))}
-            </div>
+                {/* 4. MAIN SERVICES LIST */}
+                <div style={{ position: 'relative' }}>
+                    {services.map((service, index) => (
+                        <ServiceCard key={index} service={service} index={index} containerRef={ref} />
+                    ))}
+                </div>
 
-            {/* CTA - SNAP TO */}
-            <div style={{ scrollSnapAlign: 'start', textAlign: 'center', padding: '100px 20px 50px', height: '50vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '3rem', marginBottom: '30px' }}>Ready to create something beautiful?</h2>
-                <button style={{
-                    padding: '15px 40px',
-                    fontSize: '1.1rem',
-                    backgroundColor: '#333',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '50px',
-                    cursor: 'pointer',
-                    fontFamily: 'var(--font-main)'
-                }}>
-                    Start a Project
-                </button>
-            </div>
+                {/* CTA */}
+                <div style={{ textAlign: 'center', padding: '100px 20px 50px', minHeight: '50vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                    <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '3rem', marginBottom: '30px' }}>Ready to create something beautiful?</h2>
+                    <button style={{
+                        padding: '15px 40px',
+                        fontSize: '1.1rem',
+                        backgroundColor: '#333',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '50px',
+                        cursor: 'pointer',
+                        fontFamily: 'var(--font-main)'
+                    }}>
+                        Start a Project
+                    </button>
+                </div>
 
-            {/* GLOBAL FOOTER - SNAP START */}
-            <div style={{ scrollSnapAlign: 'start' }}>
-                <Footer />
+                {/* GLOBAL FOOTER */}
+                <div>
+                    <Footer />
+                </div>
             </div>
 
         </div >

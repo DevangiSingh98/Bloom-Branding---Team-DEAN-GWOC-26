@@ -188,6 +188,7 @@ button {
 .no-smooth-scroll {
   scroll-behavior: auto !important;
   overscroll-behavior-y: none;
+<<<<<<< HEAD
 }
 
 /* --- Magazine / Scrapbook Effects --- */
@@ -269,4 +270,6 @@ button {
   mask-size: 20px 10px;
   mask-repeat: repeat-x;
   mask-position: bottom;
+=======
+>>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
 }

@@ -4,15 +4,14 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
-
 import Work from './pages/Work';
 import Services from './pages/Services';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 import { ContentProvider } from './context/ContentContext';
 import { AnimatePresence } from 'framer-motion';
+import Chatbot from './components/Chatbot';
 
-// Scroll to top on route change
 // Scroll to top on route change and refresh
 function ScrollToTop() {
     const { pathname } = useLocation();
@@ -40,7 +39,6 @@ function AnimatedRoutes() {
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/services" element={<Services />} />
-
                 <Route path="/work" element={<Work />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/admin" element={<Admin />} />
@@ -56,6 +54,7 @@ function App() {
                 <ScrollToTop />
                 <Navbar />
                 <AnimatedRoutes />
+                <Chatbot />
                 <Footer />
             </Router>
         </ContentProvider>

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,6 +38,18 @@ export default function Navbar() {
         return () => ctx.revert();
     }, [location]);
 
+=======
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
+
+export default function Navbar() {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const toggleMenu = () => setIsOpen(!isOpen);
+
+>>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
     const menuVariants = {
         closed: {
             opacity: 0,
@@ -72,6 +85,7 @@ export default function Navbar() {
         open: { opacity: 1, y: 0, transition: { duration: 0.5 } }
     };
 
+<<<<<<< HEAD
     const isHome = location.pathname === '/';
     const isServices = location.pathname === '/services';
 
@@ -93,6 +107,8 @@ export default function Navbar() {
 
     const showShadow = !isOpen && (isHome || isServices) && !isDarkText;
 
+=======
+>>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
     return (
         <>
             <header style={{
@@ -105,6 +121,7 @@ export default function Navbar() {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 zIndex: 100,
+<<<<<<< HEAD
                 // Removed mixBlendMode and color (handled individually)
                 transition: 'color 0.3s ease'
             }}>
@@ -154,6 +171,17 @@ export default function Navbar() {
                     transition: 'filter 0.3s ease, color 0.3s ease'
                 }}>
                     <span className="font-subtitle" style={{ textTransform: 'uppercase', fontSize: '1.2rem', fontWeight: 'bold' }}>{isOpen ? 'Close' : 'Menu'}</span>
+=======
+                mixBlendMode: 'difference',
+                color: 'white'
+            }}>
+                <Link to="/" style={{ display: 'block', width: '200px' }}>
+                    <img src="/images/Full-Logo.png" alt="Bloom Branding" style={{ width: '100%', height: 'auto', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+                </Link>
+
+                <button onClick={toggleMenu} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'white', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-subtitle)' }}>
+                    <span className="font-subtitle" style={{ textTransform: 'uppercase', textShadow: '2px 2px 4px rgba(0,0,0,0.5)', fontSize: '1.2rem', color: '#ffffff', fontWeight: 'bold' }}>{isOpen ? 'Close' : 'Menu'}</span>
+>>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
                     <div style={{ position: 'relative', width: '24px', height: '24px' }}>
                         <AnimatePresence mode="wait">
                             {isOpen ? (
@@ -218,17 +246,25 @@ export default function Navbar() {
                             {[
                                 { name: 'Home', path: '/', img: '/images/home.png', height: '250px', tilt: -10 },
                                 { name: 'Our Story', path: '/about', img: '/images/ourstory.png', height: '220px', tilt: 15 },
+<<<<<<< HEAD
                                 { name: 'Services', path: '/services', img: '/images/services.png', height: '130px', tilt: -5 },
+=======
+                                { name: 'Services', path: '/services', img: '/images/services.png', height: '140px', tilt: -12 },
+>>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
                                 { name: 'Our Work', path: '/work', img: '/images/Ourwork.png', height: '140px', tilt: 8 },
                                 { name: 'Contact', path: '/contact', img: '/images/tele.png', height: '200px', tilt: -5 },
                             ].map((link) => (
                                 <motion.li key={link.name} variants={itemVariants} style={{ margin: 0, position: 'relative' }}>
                                     <Link
                                         to={link.path}
+<<<<<<< HEAD
                                         onClick={() => {
                                             window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
                                             setIsOpen(false);
                                         }}
+=======
+                                        onClick={() => setIsOpen(false)}
+>>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
                                         style={{
                                             display: 'flex',
                                             flexDirection: 'column',
@@ -284,7 +320,11 @@ export default function Navbar() {
 
                         <motion.div variants={itemVariants} style={{ marginTop: '4rem', fontFamily: 'var(--font-subtitle)' }}>
                             <p>Get in touch</p>
+<<<<<<< HEAD
                             <a href="mailto:hello.bloombranding@gmail.com">hello.bloombranding@gmail.com</a>
+=======
+                            <a href="mailto:hello@bloombranding.com">hello@bloombranding.com</a>
+>>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
                         </motion.div>
 
                     </motion.div>

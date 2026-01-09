@@ -21,28 +21,16 @@ export default function Footer() {
                             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 <li><Link to="/">Home</Link></li>
                                 <li><Link to="/about">Story</Link></li>
-<<<<<<< HEAD
-
-                                <li><Link to="/contact">Contact</Link></li>
-                                <li><Link to="/admin" target="_blank" rel="noopener noreferrer">Admin</Link></li>
-=======
                                 <li><Link to="/services">Services</Link></li>
                                 <li><Link to="/contact">Contact</Link></li>
->>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
+                                <li><Link to="/admin" target="_blank" rel="noopener noreferrer">Admin</Link></li>
                             </ul>
                         </div>
                         <div>
                             <h4 style={{ color: 'var(--color-butter-yellow)', marginBottom: '1.5rem', textTransform: 'uppercase' }}>Connect</h4>
                             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-<<<<<<< HEAD
                                 <li><a href="https://www.instagram.com/bloom.branding_/?hl=en" target="_blank" rel="noopener noreferrer">Instagram</a></li>
                                 <li><a href="https://www.linkedin.com/company/bloombranding-digital-media-marketing-branding-agency/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-
-=======
-                                <li><a href="#">Instagram</a></li>
-                                <li><a href="#">LinkedIn</a></li>
-                                <li><a href="#">Behance</a></li>
->>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
                             </ul>
                         </div>
                     </div>

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import AnimatedButton from '../components/AnimatedButton';
-
-<<<<<<< HEAD
 import { useContent } from '../context/ContentContext';
 
 export default function Contact() {
@@ -23,14 +21,6 @@ export default function Contact() {
         if (name === 'message') {
             const words = value.trim().split(/\s+/);
             if (words.length > 200) {
-                // Allow deleting but not adding more words (rough check)
-                // Better: just cut it off? Or simple return?
-                // Simple return prevents pasting large text.
-                // Let's check if the new value has more words than allowed.
-                // Actually, if we just return, the user can't type.
-                // Let's just limit the state update if it exceeds.
-                // But we need to handle backspace.
-                // Actually, if we just calculate words of the *new* value:
                 if (words.length > 200) return;
             }
         }
@@ -53,21 +43,6 @@ export default function Contact() {
         addEnquiry(newEnquiry);
         alert("Thank you for your enquiry! We will bloom together soon.");
         setFormData({ name: '', email: '', company: '', service: '', budget: '', timeline: '', message: '' });
-=======
-export default function Contact() {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        service: '',
-        message: ''
-    });
-
-    const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        alert("Thank you for your enquiry! We will bloom together soon.");
->>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
     };
 
     return (
@@ -79,7 +54,6 @@ export default function Contact() {
         >
             <div className="container">
                 <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-<<<<<<< HEAD
                     <h1 style={{ fontSize: 'clamp(3rem, 7vw, 7rem)', color: 'var(--color-electric-blue)', fontFamily: 'var(--font-brand)', lineHeight: 1 }}>Start a Project</h1>
                     <p className="font-subtitle" style={{ fontSize: '1.2rem', marginTop: '1rem', color: '#666' }}>
                         Ready to make your brand bloom? Fill out the form below to get started.
@@ -209,72 +183,8 @@ export default function Contact() {
                     <div style={{ position: 'absolute', bottom: -50, right: -50, width: 150, height: 150, backgroundColor: '#fff', borderRadius: '50%', opacity: 0.3 }}></div>
                 </div>
 
-=======
-                    <h1 style={{ fontSize: 'clamp(3rem, 7vw, 7rem)', color: 'var(--color-electric-blue)' }}>Start a Project</h1>
-                    <p className="font-subtitle" style={{ fontSize: '1.2rem', marginTop: '1rem' }}>
-                        Ready to make your brand bloom? Tell us about your vision.
-                    </p>
-                </div>
-
-                <div style={{ maxWidth: '800px', margin: '0 auto', backgroundColor: 'var(--color-white)', padding: '4rem', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label className="font-subtitle" htmlFor="name">Name</label>
-                                <input
-                                    type="text"
-                                    name="name"
-                                    required
-                                    onChange={handleChange}
-                                    style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '10px' }}
-                                />
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <label className="font-subtitle" htmlFor="email">Email</label>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    required
-                                    onChange={handleChange}
-                                    style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '10px' }}
-                                />
-                            </div>
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label className="font-subtitle" htmlFor="service">Interested Service</label>
-                            <select
-                                name="service"
-                                onChange={handleChange}
-                                style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#fff' }}
-                            >
-                                <option value="">Select a service...</option>
-                                <option value="strategy">Brand Strategy</option>
-                                <option value="content">Content Creation</option>
-                                <option value="web">Web & Digital</option>
-                                <option value="social">Social Media</option>
-                            </select>
-                        </div>
-
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                            <label className="font-subtitle" htmlFor="message">Tell us about your project</label>
-                            <textarea
-                                name="message"
-                                rows="5"
-                                onChange={handleChange}
-                                style={{ padding: '1rem', border: '1px solid #ccc', borderRadius: '10px' }}
-                            ></textarea>
-                        </div>
-
-                        <AnimatedButton type="submit" className="btn-primary" style={{ alignSelf: 'start', marginTop: '1rem' }}>
-                            Send Enquiry
-                        </AnimatedButton>
-
-                    </form>
-                </div>
->>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
             </div>
         </motion.div>
     );
 }
+

@@ -8,7 +8,6 @@ const AnimatedButton = ({ to, children, className, style, onClick, type = "butto
 
     const handleEnter = () => {
         setHover(true);
-<<<<<<< HEAD
         setRandomDirs([1, 2, 3].map(() => {
             const angle = Math.random() * Math.PI * 2;
             const distance = 40 + Math.random() * 20;
@@ -18,22 +17,11 @@ const AnimatedButton = ({ to, children, className, style, onClick, type = "butto
                 r: (Math.random() - 0.5) * 360
             };
         }));
-=======
-        setRandomDirs([1, 2, 3].map(() => ({
-            x: (Math.random() - 0.5) * 250,
-            y: (Math.random() - 0.5) * 150,
-            r: (Math.random() - 0.5) * 360
-        })));
->>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
     };
 
     return (
         <div style={{ position: 'relative', display: 'inline-block' }} onMouseEnter={handleEnter} onMouseLeave={() => setHover(false)}>
-<<<<<<< HEAD
             <div style={{ position: 'absolute', top: '50%', left: '50%', width: 0, height: 0, zIndex: 2, pointerEvents: 'none' }}>
-=======
-            <div style={{ position: 'absolute', top: '50%', left: '50%', width: 0, height: 0, zIndex: 0, pointerEvents: 'none' }}>
->>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
                 {[1, 2, 3].map((i, index) => (
                     <motion.img
                         key={i}
@@ -52,20 +40,24 @@ const AnimatedButton = ({ to, children, className, style, onClick, type = "butto
                 ))}
             </div>
             {to ? (
-<<<<<<< HEAD
                 <Link
                     to={to}
                     className={className}
                     style={{ position: 'relative', zIndex: 1, ...style }}
-                    onClick={() => window.scrollTo(0, 0)}
+                    onClick={() => {
+                        window.scrollTo(0, 0);
+                        if (onClick) onClick();
+                    }}
                 >
-=======
-                <Link to={to} className={className} style={{ position: 'relative', zIndex: 1, ...style }}>
->>>>>>> 2dfe213 (feat: Add Chatbot component with FAQ support)
                     {children}
                 </Link>
             ) : (
-                <button type={type} onClick={onClick} className={className} style={{ position: 'relative', zIndex: 1, ...style }}>
+                <button
+                    type={type}
+                    onClick={onClick}
+                    className={className}
+                    style={{ position: 'relative', zIndex: 1, ...style }}
+                >
                     {children}
                 </button>
             )}

@@ -3,7 +3,7 @@ import { useContent } from '../context/ContentContext';
 import { motion } from 'framer-motion';
 
 const Admin = () => {
-    const { content, updateHero, updateSelectedWork, updateTestimonials, updateInstagram, updateFounder, updateValues, resetContent } = useContent();
+    const { content, updateHero, updateSelectedWork, updateTestimonials, updateInstagram, updateFounders, updateValues, resetContent } = useContent();
     const [activeTab, setActiveTab] = useState('hero');
 
     const [openEnquiryId, setOpenEnquiryId] = useState(null);
@@ -12,8 +12,17 @@ const Admin = () => {
         updateHero({ [e.target.name]: e.target.value });
     };
 
-    const handleFounderChange = (e) => {
-        updateFounder({ [e.target.name]: e.target.value });
+    const handleFoundersChange = (section, field, value) => {
+        if (section === 'main') {
+            updateFounders({ [field]: value });
+        } else {
+            updateFounders({
+                [section]: {
+                    ...content.founders[section],
+                    [field]: value
+                }
+            });
+        }
     };
 
     // Helper to handle array updates
@@ -219,14 +228,40 @@ const Admin = () => {
                 )}
 
                 {activeTab === 'founder' && (
-                    <div>
-                        <h2>Founder Details</h2>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <input name="name" value={content.founder.name} onChange={handleFounderChange} placeholder="Name" style={{ padding: '0.5rem' }} />
-                            <input name="role" value={content.founder.role} onChange={handleFounderChange} placeholder="Role" style={{ padding: '0.5rem' }} />
-                            <input name="image" value={content.founder.image} onChange={handleFounderChange} placeholder="Image URL / Placeholder Text" style={{ padding: '0.5rem' }} />
-                            <textarea name="bio1" value={content.founder.bio1} onChange={handleFounderChange} placeholder="Bio Paragraph 1" style={{ padding: '0.5rem', minHeight: '100px' }} />
-                            <textarea name="bio2" value={content.founder.bio2} onChange={handleFounderChange} placeholder="Bio Paragraph 2" style={{ padding: '0.5rem', minHeight: '100px' }} />
+                    <div style={{ display: 'grid', gap: '2rem' }}>
+                        <div>
+                            <h2>Shared Assets</h2>
+                            <label style={{ display: 'block', marginBottom: '0.5rem' }}>Central Image</label>
+                            <input
+                                value={content.founders.image}
+                                onChange={(e) => handleFoundersChange('main', 'image', e.target.value)}
+                                placeholder="Image URL / Placeholder Text"
+                                style={{ width: '100%', padding: '0.5rem' }}
+                            />
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                            {/* Left Founder */}
+                            <div style={{ border: '1px solid #ddd', padding: '1.5rem', borderRadius: '8px' }}>
+                                <h3>Left Founder</h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                    <input value={content.founders.left.name} onChange={(e) => handleFoundersChange('left', 'name', e.target.value)} placeholder="Name" style={{ padding: '0.5rem' }} />
+                                    <input value={content.founders.left.role} onChange={(e) => handleFoundersChange('left', 'role', e.target.value)} placeholder="Role" style={{ padding: '0.5rem' }} />
+                                    <textarea value={content.founders.left.bio1} onChange={(e) => handleFoundersChange('left', 'bio1', e.target.value)} placeholder="Bio Paragraph 1" style={{ padding: '0.5rem', minHeight: '100px' }} />
+                                    <textarea value={content.founders.left.bio2} onChange={(e) => handleFoundersChange('left', 'bio2', e.target.value)} placeholder="Bio Paragraph 2" style={{ padding: '0.5rem', minHeight: '100px' }} />
+                                </div>
+                            </div>
+
+                            {/* Right Founder */}
+                            <div style={{ border: '1px solid #ddd', padding: '1.5rem', borderRadius: '8px' }}>
+                                <h3>Right Founder</h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                    <input value={content.founders.right.name} onChange={(e) => handleFoundersChange('right', 'name', e.target.value)} placeholder="Name" style={{ padding: '0.5rem' }} />
+                                    <input value={content.founders.right.role} onChange={(e) => handleFoundersChange('right', 'role', e.target.value)} placeholder="Role" style={{ padding: '0.5rem' }} />
+                                    <textarea value={content.founders.right.bio1} onChange={(e) => handleFoundersChange('right', 'bio1', e.target.value)} placeholder="Bio Paragraph 1" style={{ padding: '0.5rem', minHeight: '100px' }} />
+                                    <textarea value={content.founders.right.bio2} onChange={(e) => handleFoundersChange('right', 'bio2', e.target.value)} placeholder="Bio Paragraph 2" style={{ padding: '0.5rem', minHeight: '100px' }} />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}

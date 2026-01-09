@@ -94,199 +94,98 @@ const _UnusedAnimatedButton = ({ to, children, className, style }) => {
 
 
 
-const ServicesCarousel = () => {
+const ServiceList = () => {
     const containerRef = useRef(null);
-    const itemsRef = useRef([]);
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start end", "center center"]
+    });
 
+    // Parallax Reveal: Starts "higher" (negative Y) behind the previous section and slides down to 0
+    const titleY = useTransform(scrollYProgress, [0, 1], [-300, 0]);
 
-    const originalServices = [
-        { title: "Branding", desc: "We build the blueprint for your brand’s future." },
-        { title: "Social Media Marketing", desc: "Building communities around your brand." },
-        { title: "Production", desc: "Bringing your vision to life through high-end production." },
-        { title: "Influencer Marketing", desc: "Connecting your brand with authentic voices." },
-        { title: "Creative Design", desc: "Immersive digital experiences that convert." }
+    const services = [
+        { title: "Branding", link: "/services#branding" },
+        { title: "Social Media", link: "/services#social-media" },
+        { title: "Production", link: "/services#production" },
+        { title: "Influencer Marketing", link: "/services#influencer-marketing" },
+        { title: "Creative Design", link: "/services#creative-design" }
     ];
 
-    // Map titles to Service Page IDs
-    const getServiceLink = (title) => {
-        const map = {
-            "Branding": "#branding",
-            "Social Media Marketing": "#social-media",
-            "Production": "#production",
-            "Influencer Marketing": "#influencer-marketing",
-            "Creative Design": "#creative-design"
-        };
-        return "/services" + (map[title] || "");
-    };
-
-    // Duplicate list 6 times for a safe buffer
-    const services = [...originalServices, ...originalServices, ...originalServices, ...originalServices, ...originalServices, ...originalServices];
-
-    useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
-
-        // Initialize scroll to the middle (Set 3)
-        const initializeScroll = () => {
-            const setHeight = container.scrollHeight / 6;
-            if (container.scrollTop === 0) {
-                container.scrollTop = setHeight * 3;
-            }
-        };
-
-        initializeScroll();
-        setTimeout(initializeScroll, 50);
-
-        const updateItems = () => {
-            if (!container) return;
-
-            const scrollHeight = container.scrollHeight;
-            const setHeight = scrollHeight / 6;
-            const scrollTop = container.scrollTop;
-
-            // Infinite Scroll Loop Logic
-            if (scrollTop < setHeight) {
-                container.scrollTop = scrollTop + (setHeight * 3);
-                return;
-            } else if (scrollTop > setHeight * 5) {
-                container.scrollTop = scrollTop - (setHeight * 3);
-                return;
-            }
-
-            const center = container.scrollTop + container.clientHeight / 2;
-            let minDistance = Infinity;
-            let closestIndex = 0;
-
-            itemsRef.current.forEach((item, index) => {
-                if (!item) return;
-
-                const itemCenter = item.offsetTop + item.offsetHeight / 2;
-                const distance = Math.abs(center - itemCenter);
-
-                // Track closest item for active state
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestIndex = index;
-                }
-
-                const maxDistance = container.clientHeight;
-
-                // Normalized position (-1 Top, 0 Center, 1 Bottom)
-                let normalizedPos = (distance / maxDistance);
-                if (itemCenter < center) normalizedPos *= -1;
-                normalizedPos = Math.max(Math.min(normalizedPos, 1.0), -1.0);
-
-                const absNormalized = Math.abs(normalizedPos);
-
-                // 3D Effects
-                const rotateX = normalizedPos * -15;
-                const translateZ = -Math.abs(normalizedPos) * 100;
-                const scale = Math.max(1.1 - (absNormalized * 0.25), 0.85);
-
-                // Opacity & Blur
-                let opacity = 1 - Math.pow(absNormalized, 1.5);
-                opacity = Math.max(opacity, 0.2);
-
-                // Keep center crisp (threshold of 0.15)
-                const blur = absNormalized < 0.15 ? 0 : (absNormalized - 0.15) * 8;
-
-                // INTERACTION LOGIC:
-                const isFocused = absNormalized < 0.15;
-                item.style.pointerEvents = isFocused ? 'auto' : 'none';
-
-                gsap.set(item, {
-                    transform: `perspective(1000px) rotateX(${rotateX}deg) translateZ(${translateZ}px) scale(${scale})`,
-                    opacity: opacity,
-                    filter: `blur(${blur}px)`,
-                    // color removed to prevent overwriting white/hover styles
-                    zIndex: 100 - Math.round(distance),
-                    overwrite: 'auto'
-                });
-            });
-
-        };
-
-        container.addEventListener('scroll', updateItems);
-        updateItems();
-
-        return () => {
-            container.removeEventListener('scroll', updateItems);
-        };
-    }, []);
-
     return (
-        <div style={{ width: '100%', overflow: 'hidden', position: 'relative', paddingBottom: '10vh' }}>
-            <h2 style={{
-                fontSize: '4.5rem',
-                lineHeight: 1.3,
-                marginBottom: '8vh',
-                textAlign: 'center',
-                color: 'var(--color-butter-yellow)',
-                textTransform: 'uppercase'
-            }}>
+        <div ref={containerRef} style={{ width: '100%', padding: '15vh 0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+            <motion.h2
+                style={{
+                    y: titleY,
+                    fontSize: 'clamp(3rem, 9vw, 10rem)',
+                    fontFamily: 'var(--font-brand)',
+                    marginBottom: '5rem',
+                    textAlign: 'center',
+                    color: 'var(--color-butter-yellow)',
+                    textTransform: 'uppercase',
+                    lineHeight: 0.9,
+                    zIndex: 0,
+                    position: 'relative',
+                    whiteSpace: 'nowrap'
+                }}
+            >
                 Our Expertise
-            </h2>
+            </motion.h2>
 
-            <div style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', position: 'relative', height: '60vh' }}>
-
-
-
-                <div
-                    ref={containerRef}
-                    className="hide-scrollbar no-smooth-scroll"
-                    style={{
-                        height: '50vh', // Constrain height within flex container
-                        width: '700px',
-                        overflowY: 'auto',
-                        padding: '25vh 0',
-                        perspective: '1500px',
-                        transformStyle: 'preserve-3d',
-                        scrollBehavior: 'auto',
-                        overscrollBehaviorY: 'none',
-                        maskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)',
-                        WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%)'
-                    }}
-                >
-                    {services.map((service, index) => (
-                        <div
-                            key={index}
-                            ref={el => itemsRef.current[index] = el}
-                            style={{
-                                height: '14vh',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                transformOrigin: 'center center',
-                                backfaceVisibility: 'hidden',
-                                willChange: 'transform, opacity, filter',
-                                pointerEvents: 'none'
-                            }}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3rem', paddingLeft: '5vw', zIndex: 1, position: 'relative' }}>
+                {services.map((service, index) => (
+                    <Link
+                        key={index}
+                        to={service.link}
+                        style={{ textDecoration: 'none' }}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: index * 0.1, duration: 0.8, ease: "easeOut" }}
+                            whileHover={{ scale: 1.05, x: 10 }}
+                            style={{ position: 'relative' }}
                         >
-                            <Link to={getServiceLink(service.title)} style={{ textDecoration: 'none' }}>
-                                <motion.div
-                                    whileHover={{ scale: 1.1, color: 'var(--color-butter-yellow)' }}
-                                    transition={{ duration: 0.2 }}
-                                    style={{ color: '#ffffff' }}
-                                >
-                                    <h3
-                                        className="font-brand"
-                                        style={{
-                                            fontSize: '3.5rem',
-                                            margin: 0,
-                                            textAlign: 'center',
-                                            color: 'inherit',
-                                            whiteSpace: 'nowrap',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        {service.title}
-                                    </h3>
-                                </motion.div>
-                            </Link>
-                        </div>
-                    ))}
-                </div>
+                            <h3
+                                className="service-item-title"
+                                style={{
+                                    fontSize: 'clamp(2.5rem, 4vw, 4.5rem)',
+                                    fontFamily: 'var(--font-brand)',
+                                    color: 'var(--color-butter-yellow)',
+                                    margin: 0,
+                                    lineHeight: 1.1,
+                                    cursor: 'pointer',
+                                    transition: 'color 0.3s ease',
+                                    letterSpacing: '0.15em'
+                                }}
+                            >
+                                {service.title}
+                                <span style={{
+                                    opacity: 0,
+                                    marginLeft: '20px',
+                                    fontSize: '0.4em',
+                                    verticalAlign: 'middle',
+                                    transition: 'opacity 0.3s ease'
+                                }} className="arrow-indicator">
+                                    ➜
+                                </span>
+                            </h3>
+                        </motion.div>
+                    </Link>
+                ))}
             </div>
+
+            <style>
+                {`
+                    .service-item-title:hover {
+                        color: #ffffff !important;
+                    }
+                    .service-item-title:hover .arrow-indicator {
+                        opacity: 1 !important;
+                    }
+                `}
+            </style>
         </div>
     );
 };
@@ -382,7 +281,7 @@ export default function Home() {
             </section>
 
             {/* Intro / Our Story Snippet */}
-            <section className="section-padding light-section" style={{ backgroundColor: 'var(--color-white)' }}>
+            <section className="section-padding light-section" style={{ backgroundColor: 'var(--color-white)', position: 'relative', zIndex: 10 }}>
                 <ParallaxContent>
                     <div className="container">
                         <motion.div
@@ -432,10 +331,8 @@ export default function Home() {
             </section>
 
             {/* Services Highlight */}
-            <section style={{ backgroundColor: 'var(--color-electric-blue)', color: 'var(--color-earl-gray)', padding: 0 }}>
-                <ParallaxContent>
-                    <ServicesCarousel />
-                </ParallaxContent>
+            <section style={{ backgroundColor: 'var(--color-electric-blue)', color: 'var(--color-earl-gray)', padding: 0, position: 'relative', zIndex: 1 }}>
+                <ServiceList />
             </section>
 
             {/* Selected Work */}

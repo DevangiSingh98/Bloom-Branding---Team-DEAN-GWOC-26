@@ -115,12 +115,20 @@ const defaultContent = {
         { id: 3, link: "https://www.instagram.com/p/DBd_RZBy7JS/?hl=en", image: "/images/insta3.png" },
         { id: 4, link: "https://www.instagram.com/p/C_5lTgmByDn/?hl=en&img_index=1", image: "/images/insta4.png" }
     ],
-    founder: {
-        name: "Founder Name",
-        role: "Co-founder",
+    founders: {
         image: "/images/founders.png",
-        bio1: "Bio Paragraph 1",
-        bio2: "Bio Paragraph 2"
+        left: {
+            name: "Founder Name 1",
+            role: "Co-founder",
+            bio1: "Bio Paragraph 1 for Founder 1. They are an expert in branding and strategy.",
+            bio2: "Bio Paragraph 2 for Founder 1. They love creating meaningful connections."
+        },
+        right: {
+            name: "Founder Name 2",
+            role: "Co-founder",
+            bio1: "Bio Paragraph 1 for Founder 2. They specialize in motion graphics and design.",
+            bio2: "Bio Paragraph 2 for Founder 2. They bring brands to life with animation."
+        }
     },
     values: [
         { id: 1, title: "Authenticity", text: "We believe in brands that are true to themselves." },
@@ -133,13 +141,13 @@ const defaultContent = {
 export const ContentProvider = ({ children }) => {
     // Initialize state from localStorage if available, else default
     const [content, setContent] = useState(() => {
-        const savedContent = localStorage.getItem('bloomContent_v9'); // Changed key to force reset
+        const savedContent = localStorage.getItem('bloomContent_v10'); // Changed key to force reset
         return savedContent ? JSON.parse(savedContent) : defaultContent;
     });
 
     // Save to localStorage whenever content changes
     useEffect(() => {
-        localStorage.setItem('bloomContent_v9', JSON.stringify(content));
+        localStorage.setItem('bloomContent_v10', JSON.stringify(content));
     }, [content]);
 
     const updateHero = (updates) => {
@@ -161,10 +169,10 @@ export const ContentProvider = ({ children }) => {
         setContent(prev => ({ ...prev, instagram: newInsta }));
     };
 
-    const updateFounder = (updates) => {
+    const updateFounders = (updates) => {
         setContent(prev => ({
             ...prev,
-            founder: { ...prev.founder, ...updates }
+            founders: { ...prev.founders, ...updates }
         }));
     };
 
@@ -190,7 +198,7 @@ export const ContentProvider = ({ children }) => {
             updateSelectedWork,
             updateTestimonials,
             updateInstagram,
-            updateFounder,
+            updateFounders,
             updateValues,
             addEnquiry,
             resetContent

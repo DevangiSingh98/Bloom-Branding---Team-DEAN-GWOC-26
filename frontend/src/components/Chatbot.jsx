@@ -49,9 +49,8 @@ const faqData = [
 export default function Chatbot() {
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
-    const [inputValue, setInputValue] = useState('');
     const [messages, setMessages] = useState([
-        { role: 'bot', text: "Hi! I'm Bloom Bot. How can I help you bloom today? Type a question or pick one from the sidebar!" }
+        { role: 'bot', text: "Hi! I'm Bloom Bot. How can I help you bloom today? Pick a question from the sidebar!" }
     ]);
     const messagesEndRef = useRef(null);
 
@@ -74,56 +73,7 @@ export default function Chatbot() {
         setMessages(newMessages);
     };
 
-    const handleSendMessage = (e) => {
-        if (e) e.preventDefault();
-        if (!inputValue.trim()) return;
 
-        const userText = inputValue.toLowerCase();
-        setMessages(prev => [...prev, { role: 'user', text: inputValue }]);
-        setInputValue('');
-
-        setTimeout(() => {
-            // Greeting Check
-            const greetings = ["hello", "hi", "hey", "hola", "greetings"];
-            if (greetings.some(g => userText.includes(g))) {
-                setMessages(prev => [...prev, {
-                    role: 'bot',
-                    text: "Hi, my name is Bloom Bot. How can I help you?"
-                }]);
-                return;
-            }
-
-            // Keyword Scoring Logic
-            let bestMatch = null;
-            let maxScore = 0;
-
-            for (const item of faqData) {
-                let score = 0;
-                for (const kw of item.keywords) {
-                    if (userText.includes(kw)) {
-                        score++;
-                    }
-                }
-                if (score > maxScore) {
-                    maxScore = score;
-                    bestMatch = item;
-                }
-            }
-
-            if (bestMatch) {
-                setMessages(prev => [...prev, {
-                    role: 'bot',
-                    text: bestMatch.answer,
-                    type: bestMatch.type
-                }]);
-            } else {
-                setMessages(prev => [...prev, {
-                    role: 'bot',
-                    text: "I'm not quite sure about that. Try asking about our 'services', 'pricing', or how to 'start a project'!"
-                }]);
-            }
-        }, 500);
-    };
 
     return (
         <div style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 1000 }}>
@@ -297,56 +247,17 @@ export default function Chatbot() {
                             </div>
 
                             {/* Input Area */}
-                            <form
-                                onSubmit={handleSendMessage}
-                                style={{
-                                    padding: '20px 25px',
-                                    borderTop: '1px solid rgba(0,0,0,0.06)',
-                                    backgroundColor: 'white',
-                                    display: 'flex',
-                                    gap: '12px'
-                                }}
-                            >
-                                <input
-                                    type="text"
-                                    value={inputValue}
-                                    onChange={(e) => setInputValue(e.target.value)}
-                                    placeholder="Type your message..."
-                                    style={{
-                                        flex: 1,
-                                        border: '1px solid #f0f0f0',
-                                        borderRadius: '25px',
-                                        padding: '12px 22px',
-                                        fontSize: '0.95rem',
-                                        outline: 'none',
-                                        backgroundColor: '#f8f9fa',
-                                        transition: 'all 0.2s'
-                                    }}
-                                    onFocus={(e) => e.currentTarget.style.borderColor = 'var(--color-electric-blue)'}
-                                    onBlur={(e) => e.currentTarget.style.borderColor = '#f0f0f0'}
-                                />
-                                <button
-                                    type="submit"
-                                    style={{
-                                        backgroundColor: 'var(--color-electric-blue)',
-                                        color: 'white',
-                                        width: '48px',
-                                        height: '48px',
-                                        borderRadius: '50%',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                                        border: 'none',
-                                        fontSize: '1.2rem'
-                                    }}
-                                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1) rotate(-10deg)'}
-                                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1) rotate(0)'}
-                                >
-                                    →
-                                </button>
-                            </form>
+                            {/* Footer / Input Area (Removed) */}
+                            <div style={{
+                                padding: '15px 25px',
+                                borderTop: '1px solid rgba(0,0,0,0.06)',
+                                backgroundColor: 'white',
+                                textAlign: 'center',
+                                fontSize: '0.85rem',
+                                color: '#888'
+                            }}>
+                                <span style={{ opacity: 0.7 }}>Select a question to start chatting ✨</span>
+                            </div>
                         </div>
                     </motion.div>
                 )}

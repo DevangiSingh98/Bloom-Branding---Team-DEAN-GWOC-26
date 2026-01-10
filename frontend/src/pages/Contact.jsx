@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import api from '../api';
 import { motion } from 'framer-motion';
 import AnimatedButton from '../components/AnimatedButton';
 
@@ -12,9 +13,21 @@ export default function Contact() {
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        alert("Thank you for your enquiry! We will bloom together soon.");
+        try {
+            await api.post('/api/messages', {
+                name: formData.name,
+                email: formData.email,
+                subject: formData.service, // Mapping service to subject
+                message: formData.message
+            });
+            alert("Thank you for your enquiry! We will bloom together soon.");
+            setFormData({ name: '', email: '', service: '', message: '' });
+        } catch (error) {
+            console.error("Failed to send message", error);
+            alert("Something went wrong. Please try again later.");
+        }
     };
 
     return (

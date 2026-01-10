@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import api from '../api';
 import { motion, useScroll, useTransform, animate, useInView } from 'framer-motion';
 import { ArrowRight, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -95,13 +96,41 @@ const ServicesCarousel = () => {
     const itemsRef = useRef([]);
     const [activeIndex, setActiveIndex] = useState(0);
 
-    const originalServices = [
-        { title: "Branding", desc: "We build the blueprint for your brand’s future." },
-        { title: "Social Media Marketing", desc: "Building communities around your brand." },
-        { title: "Production", desc: "Bringing your vision to life through high-end production." },
-        { title: "Influencer Marketing", desc: "Connecting your brand with authentic voices." },
-        { title: "Creative Design", desc: "Immersive digital experiences that convert." }
-    ];
+    const [originalServices, setOriginalServices] = useState([]);
+
+    useEffect(() => {
+        const fetchServices = async () => {
+            try {
+                const data = await api.get('/api/services');
+                if (data.length > 0) {
+                    setOriginalServices(data);
+                } else {
+                    // Fallback if DB is empty
+                    setOriginalServices([
+                        { title: "Branding", desc: "We build the blueprint for your brand’s future." },
+                        { title: "Social Media Marketing", desc: "Building communities around your brand." },
+                        { title: "Production", desc: "Bringing your vision to life through high-end production." },
+                        { title: "Influencer Marketing", desc: "Connecting your brand with authentic voices." },
+                        { title: "Creative Design", desc: "Immersive digital experiences that convert." }
+                    ]);
+                }
+            } catch (error) {
+                console.error("Failed to fetch services", error);
+                // Fallback
+                setOriginalServices([
+                    { title: "Branding", desc: "We build the blueprint for your brand’s future." },
+                    { title: "Social Media Marketing", desc: "Building communities around your brand." },
+                    { title: "Production", desc: "Bringing your vision to life through high-end production." },
+                    { title: "Influencer Marketing", desc: "Connecting your brand with authentic voices." },
+                    { title: "Creative Design", desc: "Immersive digital experiences that convert." }
+                ]);
+            }
+        };
+        fetchServices();
+    }, []);
+
+    // Wait for data
+    if (originalServices.length === 0) return null;
 
     // Map titles to Service Page IDs
     const getServiceLink = (title) => {
@@ -291,6 +320,67 @@ const ServicesCarousel = () => {
     );
 };
 
+
+const ProjectsList = () => {
+    const [projects, setProjects] = useState([]);
+
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const data = await api.get('/api/projects');
+                setProjects(data);
+            } catch (error) {
+                console.error("Failed to fetch projects");
+            }
+        };
+        fetchProjects();
+    }, []);
+
+    if (projects.length === 0) {
+        return (
+            <>
+                {[1, 2].map((item) => (
+                    <motion.div
+                        key={item}
+                        className="group"
+                        style={{ cursor: 'pointer' }}
+                        whileHover={{ scale: 0.98 }}
+                    >
+                        <div className="img-placeholder" style={{ width: '100%', height: '500px', backgroundColor: '#4a3832', borderRadius: '10px', marginBottom: '1rem' }}>
+                            PROJECT {item} PREVIEW (Placeholder)
+                        </div>
+                        <h3 style={{ fontSize: '2rem' }}>Modern Aesthetics</h3>
+                        <p className="font-subtitle">Branding / Web Design</p>
+                    </motion.div>
+                ))}
+            </>
+        );
+    }
+
+    return (
+        <>
+            {projects.map((project) => (
+                <motion.div
+                    key={project._id}
+                    className="group"
+                    style={{ cursor: 'pointer' }}
+                    whileHover={{ scale: 0.98 }}
+                >
+                    {project.imageUrl ? (
+                        <img src={project.imageUrl} alt={project.title} style={{ width: '100%', height: '500px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem' }} />
+                    ) : (
+                        <div className="img-placeholder" style={{ width: '100%', height: '500px', backgroundColor: '#4a3832', borderRadius: '10px', marginBottom: '1rem' }}>
+                            No Image
+                        </div>
+                    )}
+                    <h3 style={{ fontSize: '2rem' }}>{project.title}</h3>
+                    <p className="font-subtitle">{project.category}</p>
+                </motion.div>
+            ))}
+        </>
+    );
+};
+
 export default function Home() {
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({
@@ -441,20 +531,7 @@ export default function Home() {
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
-                        {[1, 2].map((item) => (
-                            <motion.div
-                                key={item}
-                                className="group"
-                                style={{ cursor: 'pointer' }}
-                                whileHover={{ scale: 0.98 }}
-                            >
-                                <div className="img-placeholder" style={{ width: '100%', height: '500px', backgroundColor: '#4a3832', borderRadius: '10px', marginBottom: '1rem' }}>
-                                    PROJECT {item} PREVIEW
-                                </div>
-                                <h3 style={{ fontSize: '2rem' }}>Modern Aesthetics</h3>
-                                <p className="font-subtitle">Branding / Web Design</p>
-                            </motion.div>
-                        ))}
+                        <ProjectsList />
                     </div>
                 </div>
             </section>

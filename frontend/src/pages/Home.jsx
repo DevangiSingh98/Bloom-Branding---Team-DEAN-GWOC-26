@@ -105,21 +105,21 @@ const ServiceList = () => {
     const titleY = useTransform(scrollYProgress, [0, 1], [-300, 0]);
 
     const services = [
-        { title: "Branding", link: "/services#branding" },
-        { title: "Social Media", link: "/services#social-media" },
-        { title: "Production", link: "/services#production" },
-        { title: "Influencer Marketing", link: "/services#influencer-marketing" },
-        { title: "Creative Design", link: "/services#creative-design" }
+        { title: "Branding", link: "/services#branding", img: "/images/service_branding.png" },
+        { title: "Social Media", link: "/services#social-media", img: "/images/service_jewellery.png" },
+        { title: "Production", link: "/services#production", img: "/images/service_decor.png" },
+        { title: "Influencer", link: "/services#influencer-marketing", img: "/images/service_fashion.png" }, // Shortened title for layout balance
+        { title: "Creative", link: "/services#creative-design", img: "/images/service_lifestyle.png" } // Shortened title
     ];
 
     return (
-        <div ref={containerRef} style={{ width: '100%', padding: '15vh 0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        <div ref={containerRef} style={{ width: '100%', padding: '10vh 5%', backgroundColor: 'var(--color-electric-blue)' }}>
             <motion.h2
                 style={{
                     y: titleY,
                     fontSize: 'clamp(3rem, 9vw, 10rem)',
                     fontFamily: 'var(--font-brand)',
-                    marginBottom: '5rem',
+                    marginBottom: '60px',
                     textAlign: 'center',
                     color: 'var(--color-butter-yellow)',
                     textTransform: 'uppercase',
@@ -132,7 +132,15 @@ const ServiceList = () => {
                 Our Expertise
             </motion.h2>
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3rem', paddingLeft: '5vw', zIndex: 1, position: 'relative' }}>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(5, 1fr)', // Force 5 columns side-by-side
+                gap: '20px',
+                maxWidth: '1400px',
+                margin: '0 auto',
+                position: 'relative',
+                zIndex: 1
+            }}>
                 {services.map((service, index) => (
                     <Link
                         key={index}
@@ -140,52 +148,89 @@ const ServiceList = () => {
                         style={{ textDecoration: 'none' }}
                     >
                         <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1, duration: 0.8, ease: "easeOut" }}
-                            whileHover={{ scale: 1.05, x: 10 }}
-                            style={{ position: 'relative' }}
+                            whileHover="hover"
+                            initial="rest"
+                            animate="rest"
+                            style={{
+                                // Minimalist: No background, no border, no shadow
+                                height: '420px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                cursor: 'pointer',
+                                padding: '20px 0'
+                            }}
+                            variants={{
+                                rest: { y: 0 },
+                                hover: { y: -10 }
+                            }}
+                            transition={{ duration: 0.3, ease: 'easeOut' }}
                         >
-                            <h3
-                                className="service-item-title"
+                            {/* Top Title */}
+                            <h3 style={{
+                                fontSize: '1.8rem', // Adjusted for balance
+                                margin: 0,
+                                fontFamily: 'var(--font-brand)',
+                                color: 'var(--color-butter-yellow)',
+                                textAlign: 'center',
+                                fontWeight: 'normal'
+                            }}>
+                                {service.title}
+                            </h3>
+
+                            {/* Service Image (Large Circular Focus) */}
+                            <motion.div
                                 style={{
-                                    fontSize: 'clamp(2.5rem, 4vw, 4.5rem)',
-                                    fontFamily: 'var(--font-brand)',
+                                    width: '220px',
+                                    height: '220px',
+                                    borderRadius: '50%',
+                                    overflow: 'hidden',
+                                    border: '2px solid var(--color-butter-yellow)',
+                                    boxShadow: '0 0 0 4px rgba(246, 241, 181, 0.1)'
+                                }}
+                                variants={{
+                                    rest: { scale: 1, borderColor: 'var(--color-butter-yellow)' },
+                                    hover: { scale: 1.05, borderColor: 'var(--color-white)' }
+                                }}
+                                transition={{ duration: 0.4 }}
+                            >
+                                <img
+                                    src={service.img}
+                                    alt={service.title}
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'cover'
+                                    }}
+                                />
+                            </motion.div>
+
+                            {/* Bottom Pill */}
+                            <motion.div
+                                style={{
+                                    padding: '10px 30px',
+                                    borderRadius: '50px',
+                                    border: '1px solid var(--color-butter-yellow)',
                                     color: 'var(--color-butter-yellow)',
-                                    margin: 0,
-                                    lineHeight: 1.1,
-                                    cursor: 'pointer',
-                                    transition: 'color 0.3s ease',
-                                    letterSpacing: '0.15em'
+                                    fontFamily: 'var(--font-subtitle)',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 'bold',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '1px'
+                                }}
+                                variants={{
+                                    rest: { backgroundColor: 'transparent', color: 'var(--color-butter-yellow)' },
+                                    hover: { backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-electric-blue)' }
                                 }}
                             >
-                                {service.title}
-                                <span style={{
-                                    opacity: 0,
-                                    marginLeft: '20px',
-                                    fontSize: '0.4em',
-                                    verticalAlign: 'middle',
-                                    transition: 'opacity 0.3s ease'
-                                }} className="arrow-indicator">
-                                    ➜
-                                </span>
-                            </h3>
+                                Explore
+                            </motion.div>
+
                         </motion.div>
                     </Link>
                 ))}
             </div>
-
-            <style>
-                {`
-                    .service-item-title:hover {
-                        color: #ffffff !important;
-                    }
-                    .service-item-title:hover .arrow-indicator {
-                        opacity: 1 !important;
-                    }
-                `}
-            </style>
         </div>
     );
 };

@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
+import { BookOpen, Sparkles, TrendingUp } from 'lucide-react';
 import Footer from '../components/Footer';
 import AnimatedButton from '../components/AnimatedButton';
 
@@ -140,17 +141,7 @@ const ServiceCard = ({ service, index, containerRef, id }) => {
                 flexWrap: 'wrap',
                 position: 'relative'
             }}>
-                {/* DECORATIVE TRIANGLE ARROW */}
-                <div style={{
-                    position: 'absolute',
-                    [isEven ? 'left' : 'right']: '-40px',
-                    top: '50%',
-                    width: 0,
-                    height: 0,
-                    borderTop: '15px solid transparent',
-                    borderBottom: '15px solid transparent',
-                    [isEven ? 'borderRight' : 'borderLeft']: `25px solid #004AAD`
-                }}></div>
+                {/* DECORATIVE TRIANGLE ARROW REMOVED */}
 
                 {/* A. TEXT CARD SIDE */}
                 <div style={{ flex: '1 1 450px', position: 'relative', zIndex: 5 }}>
@@ -170,24 +161,7 @@ const ServiceCard = ({ service, index, containerRef, id }) => {
                             }}
                         />
                     )}
-                    {service.title === 'Social Media' && (
-                        <div style={{
-                            position: 'absolute',
-                            bottom: '-20px',
-                            right: '-20px',
-                            width: '50px',
-                            height: '50px',
-                            backgroundColor: '#004AAD',
-                            borderRadius: '50%',
-                            zIndex: 10,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
-                        }}>
-                            <span style={{ color: '#fff', fontSize: '1.2rem', transform: 'rotate(-45deg)' }}>➜</span>
-                        </div>
-                    )}
+                    {/* SOCIAL MEDIA ARROW STICKER REMOVED */}
                     {/* DIAMOND STICKER */}
                     {service.title === 'Social Media' && (
                         <motion.div
@@ -432,15 +406,15 @@ export default function Services() {
 
                     {/* THE BLOOM DIFFERENCE (White Cards with Stickers) */}
                     <div style={{ padding: '40px 5%', maxWidth: '1400px', margin: '0 auto' }}>
-                        <div style={{ textAlign: 'center', marginBottom: '80px' }}>
-                            <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '4rem', color: '#333', textTransform: 'uppercase', letterSpacing: '-2px' }}>The Bloom Difference</h2>
-                            <p style={{ fontFamily: 'monospace', fontSize: '1rem', color: '#666', marginTop: '10px' }}>We can't just make things pretty. We build brands that work.</p>
+                        <div style={{ textAlign: 'center', marginBottom: '90px' }}>
+                            <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '5.5rem', color: '#333', textTransform: 'uppercase', letterSpacing: '-2px' }}>The Bloom Difference</h2>
+                            <p style={{ fontFamily: 'var(--font-subtitle)', fontSize: '1.2rem', color: '#666', marginTop: '10px' }}>We can't just make things pretty. We build brands that work.</p>
                         </div>
                         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '30px' }}>
                             {[
-                                { title: 'STRATEGIC STORYTELLING', desc: 'We turn passive scrollers into loyal customers.', icon: '📖' },
-                                { title: 'BESPOKE AESTHETICS', desc: 'No templates. No cookie-cutter trends. Every pixel is crafted.', icon: '✨' },
-                                { title: 'HOLISTIC GROWTH', desc: 'From logo design to video production, we handle your entire visual presence.', icon: '🌱' }
+                                { title: 'STRATEGIC STORYTELLING', desc: 'We turn passive scrollers into loyal customers.', icon: <BookOpen size={48} strokeWidth={1} /> },
+                                { title: 'BESPOKE AESTHETICS', desc: 'No templates. No cookie-cutter trends. Every pixel is crafted.', icon: <Sparkles size={48} strokeWidth={1} /> },
+                                { title: 'HOLISTIC GROWTH', desc: 'From logo design to video production, we handle your entire visual presence.', icon: <TrendingUp size={48} strokeWidth={1} /> }
                             ].map((item, i) => (
                                 <ParallaxItem key={i} yOffset={(i + 1) * 20} style={{ zIndex: 2 }} containerRef={ref}>
                                     <motion.div
@@ -464,10 +438,10 @@ export default function Services() {
                                         <div style={{ position: 'absolute', top: '-15px', left: '50%', transform: 'translateX(-50%)', width: '100px', height: '30px', backgroundColor: 'rgba(255,255,255,0.8)', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}></div>
 
                                         {/* Icon / Sticker */}
-                                        <div style={{ fontSize: '3rem', marginBottom: '20px' }}>{item.icon}</div>
+                                        <div style={{ marginBottom: '30px', color: '#1a1a1a' }}>{item.icon}</div>
 
-                                        <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '1.8rem', marginBottom: '20px', lineHeight: 1.1 }}>{item.title}</h3>
-                                        <p style={{ color: '#666', lineHeight: 1.6, fontSize: '1rem' }}>{item.desc}</p>
+                                        <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '2.2rem', marginBottom: '20px', lineHeight: 1.1 }}>{item.title}</h3>
+                                        <p style={{ color: '#666', lineHeight: 1.6, fontSize: '1.15rem' }}>{item.desc}</p>
                                     </motion.div>
                                 </ParallaxItem>
                             ))}

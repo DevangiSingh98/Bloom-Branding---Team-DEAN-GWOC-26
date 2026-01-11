@@ -11,22 +11,47 @@ import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 import { ContentProvider } from './context/ContentContext';
 import { AnimatePresence } from 'framer-motion';
+import Chatbot from './components/Chatbot';
 
 // Scroll to top on route change
 // Scroll to top on route change and refresh
 function ScrollToTop() {
     const { pathname } = useLocation();
 
-    // Set manual scroll restoration once on mount
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
+        // Disable smooth scroll for instant jump
+        const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = 'auto';
+
+        // Manual restoration setting to prevent browser interference
         if ('scrollRestoration' in window.history) {
             window.history.scrollRestoration = 'manual';
         }
-    }, []);
 
-    // Scroll to top on route change
-    React.useLayoutEffect(() => {
-        window.scrollTo(0, 0);
+        const resetScroll = () => {
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTo(0, 0);
+            document.body.scrollTo(0, 0);
+        };
+
+        // Attempt 1: Immediate
+        resetScroll();
+
+        // Attempt 2: Short delay to catch React render/paint
+        const t1 = setTimeout(resetScroll, 10);
+
+        // Attempt 3: Longer delay for browser restoration quirks
+        const t2 = setTimeout(() => {
+            resetScroll();
+            // Restore original behavior
+            document.documentElement.style.scrollBehavior = originalScrollBehavior;
+        }, 100);
+
+        return () => {
+            clearTimeout(t1);
+            clearTimeout(t2);
+            document.documentElement.style.scrollBehavior = originalScrollBehavior;
+        };
     }, [pathname]);
 
     return null;
@@ -49,6 +74,20 @@ function AnimatedRoutes() {
     );
 }
 
+function ConditionalFooter() {
+    const location = useLocation();
+    // Check if the current path starts with /work since there might be sub-routes like /work/project-name, 
+    // BUT the user specifically said "for the works page". 
+    // Assuming they mean the main work listing page. 
+    // However, usually detailed pages also might want this or not. 
+    // Let's stick to strict equality for now or strict equality to /work.
+    // The user said "remove the footer from THIS page".
+    if (location.pathname === '/work' || location.pathname === '/about') {
+        return null;
+    }
+    return <Footer />;
+}
+
 function App() {
     return (
         <ContentProvider>
@@ -56,7 +95,8 @@ function App() {
                 <ScrollToTop />
                 <Navbar />
                 <AnimatedRoutes />
-                <Footer />
+                <Chatbot />
+                <ConditionalFooter />
             </Router>
         </ContentProvider>
     );

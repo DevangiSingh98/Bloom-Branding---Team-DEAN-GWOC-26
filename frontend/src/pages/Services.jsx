@@ -141,16 +141,22 @@ const ServiceCard = ({ service, index, containerRef, id }) => {
                 position: 'relative'
             }}>
                 {/* DECORATIVE TRIANGLE ARROW */}
-                <div style={{
-                    position: 'absolute',
-                    [isEven ? 'left' : 'right']: '-40px',
-                    top: '50%',
-                    width: 0,
-                    height: 0,
-                    borderTop: '15px solid transparent',
-                    borderBottom: '15px solid transparent',
-                    [isEven ? 'borderRight' : 'borderLeft']: `25px solid #004AAD`
-                }}></div>
+                {/* DECORATIVE TRIANGLE ARROW */}
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+                    style={{
+                        position: 'absolute',
+                        [isEven ? 'left' : 'right']: '-40px',
+                        top: '50%',
+                        width: 0,
+                        height: 0,
+                        borderTop: '15px solid transparent',
+                        borderBottom: '15px solid transparent',
+                        [isEven ? 'borderRight' : 'borderLeft']: `25px solid #004AAD`,
+                        transformOrigin: 'center'
+                    }}
+                ></motion.div>
 
                 {/* A. TEXT CARD SIDE */}
                 <div style={{ flex: '1 1 450px', position: 'relative', zIndex: 5 }}>
@@ -191,8 +197,11 @@ const ServiceCard = ({ service, index, containerRef, id }) => {
                     {/* DIAMOND STICKER */}
                     {service.title === 'Social Media' && (
                         <motion.div
-                            animate={{ y: [0, -10, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                            animate={{ y: [0, -10, 0], rotate: 360 }}
+                            transition={{
+                                y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+                                rotate: { duration: 10, repeat: Infinity, ease: "linear" }
+                            }}
                             style={{
                                 position: 'absolute',
                                 top: '-15px',
@@ -273,27 +282,6 @@ const ServiceCard = ({ service, index, containerRef, id }) => {
                         <div style={{ position: 'absolute', bottom: '25px', right: '30px', fontFamily: 'var(--font-brand)', fontSize: '1.2rem', color: '#333' }}>
                             bloom branding // 2024
                         </div>
-
-                        {/* View Work Sticker */}
-                        <motion.div
-                            style={{
-                                position: 'absolute',
-                                bottom: '-30px',
-                                right: '-30px',
-                                width: '100px',
-                                height: '100px',
-                                backgroundColor: '#F4E99B',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                boxShadow: '0 5px 15px rgba(0,0,0,0.1)',
-                                border: '1px dashed #333',
-                                zIndex: 10
-                            }}
-                        >
-                            <span style={{ fontFamily: 'monospace', fontSize: '0.8rem', fontWeight: 'bold', transform: 'rotate(-15deg)' }}>VIEW WORK</span>
-                        </motion.div>
                     </motion.div>
                 </div>
             </div>
@@ -466,7 +454,7 @@ export default function Services() {
                                         {/* Icon / Sticker */}
                                         <div style={{ fontSize: '3rem', marginBottom: '20px' }}>{item.icon}</div>
 
-                                        <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '1.8rem', marginBottom: '20px', lineHeight: 1.1 }}>{item.title}</h3>
+                                        <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '2.2rem', marginBottom: '20px', lineHeight: 1.1 }}>{item.title}</h3>
                                         <p style={{ color: '#666', lineHeight: 1.6, fontSize: '1rem' }}>{item.desc}</p>
                                     </motion.div>
                                 </ParallaxItem>

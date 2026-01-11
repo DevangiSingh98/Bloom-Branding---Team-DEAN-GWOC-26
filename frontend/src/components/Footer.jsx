@@ -17,18 +17,18 @@ export default function Footer() {
 
                     <div style={{ flex: 1, display: 'flex', gap: '4rem', fontFamily: 'var(--font-subtitle)', paddingTop: '1rem' }}>
                         <div>
-                            <h4 style={{ color: 'var(--color-butter-yellow)', marginBottom: '1.5rem', textTransform: 'uppercase' }}>Explore</h4>
-                            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <h4 style={{ color: 'var(--color-butter-yellow)', marginBottom: '1.5rem', textTransform: 'uppercase', fontSize: '1.4rem' }}>Explore</h4>
+                            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '1.2rem' }}>
                                 <li><Link to="/">Home</Link></li>
                                 <li><Link to="/about">Story</Link></li>
-
+                                <li><Link to="/work">Work</Link></li>
                                 <li><Link to="/contact">Contact</Link></li>
                                 <li><Link to="/admin" target="_blank" rel="noopener noreferrer">Admin</Link></li>
                             </ul>
                         </div>
                         <div>
-                            <h4 style={{ color: 'var(--color-butter-yellow)', marginBottom: '1.5rem', textTransform: 'uppercase' }}>Connect</h4>
-                            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <h4 style={{ color: 'var(--color-butter-yellow)', marginBottom: '1.5rem', textTransform: 'uppercase', fontSize: '1.4rem' }}>Connect</h4>
+                            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '1.2rem' }}>
                                 <li><a href="https://www.instagram.com/bloom.branding_/?hl=en" target="_blank" rel="noopener noreferrer">Instagram</a></li>
                                 <li><a href="https://www.linkedin.com/company/bloombranding-digital-media-marketing-branding-agency/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
 

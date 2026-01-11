@@ -74,14 +74,17 @@ export default function Navbar() {
 
     const isHome = location.pathname === '/';
     const isServices = location.pathname === '/services';
+    const isWork = location.pathname === '/work';
 
     // Unified Logic:
     // 1. Menu Open -> Butter Yellow (on Blue Overlay)
-    // 2. Not Home/Services -> Dark Choc (Static)
-    // 3. Home/Services -> Dynamic
+    // 2. Work Page -> Butter Yellow
+    // 3. Not Home/Services/Work -> Dark Choc (Static)
+    // 4. Home/Services -> Dynamic (based on scroll)
 
     const getColor = () => {
         if (isOpen) return 'var(--color-butter-yellow)';
+        if (isWork) return 'var(--color-butter-yellow)';
         if (!isHome && !isServices) return 'var(--color-dark-choc)';
         // Default is Butter Yellow for dark backgrounds (default state for Home/Services)
         // isDarkText true means we are on a light section -> switch to Dark Choc
@@ -91,7 +94,7 @@ export default function Navbar() {
     const logoColor = getColor();
     const menuColor = getColor();
 
-    const showShadow = !isOpen && (isHome || isServices) && !isDarkText;
+    const showShadow = !isOpen && (isHome || isServices || isWork) && !isDarkText;
 
     return (
         <>
@@ -148,13 +151,13 @@ export default function Navbar() {
                     color: menuColor,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.5rem',
+                    gap: '0.8rem',
                     fontFamily: 'var(--font-subtitle)',
                     filter: showShadow ? 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))' : 'none',
                     transition: 'filter 0.3s ease, color 0.3s ease'
                 }}>
-                    <span className="font-subtitle" style={{ textTransform: 'uppercase', fontSize: '1.2rem', fontWeight: 'bold' }}>{isOpen ? 'Close' : 'Menu'}</span>
-                    <div style={{ position: 'relative', width: '24px', height: '24px' }}>
+                    <span className="font-subtitle" style={{ textTransform: 'uppercase', fontSize: '1.5rem', fontWeight: 'bold' }}>{isOpen ? 'Close' : 'Menu'}</span>
+                    <div style={{ position: 'relative', width: '32px', height: '32px' }}>
                         <AnimatePresence mode="wait">
                             {isOpen ? (
                                 <motion.div
@@ -164,7 +167,7 @@ export default function Navbar() {
                                     exit={{ opacity: 0, rotate: 90 }}
                                     style={{ position: 'absolute' }}
                                 >
-                                    <X size={24} />
+                                    <X size={32} />
                                 </motion.div>
                             ) : (
                                 <motion.div
@@ -174,7 +177,7 @@ export default function Navbar() {
                                     exit={{ opacity: 0, rotate: -90 }}
                                     style={{ position: 'absolute' }}
                                 >
-                                    <Menu size={24} />
+                                    <Menu size={32} />
                                 </motion.div>
                             )}
                         </AnimatePresence>

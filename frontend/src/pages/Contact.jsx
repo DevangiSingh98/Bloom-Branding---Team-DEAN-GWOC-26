@@ -45,7 +45,7 @@ export default function Contact() {
         const newEnquiry = {
             id: Date.now(),
             date: new Date().toLocaleDateString(),
-            time: new Date().toLocaleTimeString(),
+            time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
             ...formData
         };
 
@@ -190,6 +190,42 @@ export default function Contact() {
                     {/* Decor */}
                     <div style={{ position: 'absolute', top: -50, left: -50, width: 200, height: 200, backgroundColor: '#fff', borderRadius: '50%', opacity: 0.3 }}></div>
                     <div style={{ position: 'absolute', bottom: -50, right: -50, width: 150, height: 150, backgroundColor: '#fff', borderRadius: '50%', opacity: 0.3 }}></div>
+                </div>
+
+                {/* GOOGLE MAP & ADDRESS */}
+                <div style={{ marginTop: '6rem' }}>
+                    <div style={{ marginBottom: '2rem', textAlign: 'center', fontFamily: 'var(--font-subtitle)' }}>
+                        <h4 style={{ fontSize: '2rem', color: 'var(--color-dark-choc)', fontWeight: 'bold', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '2px' }}>
+                            Visit Our Office
+                        </h4>
+                        <p style={{ color: '#666', fontSize: '1rem', lineHeight: '1.6' }}>
+                            Solarium Business Centre, 515, beside Times Corner<br />
+                            Surat, Gujarat 395007
+                            <br />
+                            <a
+                                href="https://www.google.com/maps/search/?api=1&query=Bloom+Branding,+Solarium+Business+Centre,+515,+Surat"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: 'var(--color-electric-blue)', textDecoration: 'underline', fontSize: '0.9rem', marginTop: '10px', display: 'inline-block' }}
+                            >
+                                View on Google Maps
+                            </a>
+                        </p>
+                    </div>
+
+                    <div style={{ width: '100%', height: '300px', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', position: 'relative' }}>
+                        <iframe
+                            title="Office Location"
+                            width="100%"
+                            height="100%"
+                            style={{ border: 0 }}
+                            loading="lazy"
+                            allowFullScreen
+                            src="https://maps.google.com/maps?q=Bloom+Branding,+Solarium+Business+Centre,+515,+Surat&z=15&output=embed"
+                        ></iframe>
+                        {/* Overlay to ensure map style matches branding slightly or just clean look */}
+                        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', boxShadow: 'inset 0 0 20px rgba(0,0,0,0.1)' }}></div>
+                    </div>
                 </div>
 
             </div>

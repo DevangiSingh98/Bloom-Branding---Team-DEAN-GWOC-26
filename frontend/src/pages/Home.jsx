@@ -104,12 +104,18 @@ const ServiceList = () => {
     // Parallax Reveal: Starts "higher" (negative Y) behind the previous section and slides down to 0
     const titleY = useTransform(scrollYProgress, [0, 1], [-300, 0]);
 
-    const services = [
-        { title: "Branding", link: "/services#branding" },
-        { title: "Social Media", link: "/services#social-media" },
-        { title: "Production", link: "/services#production" },
-        { title: "Influencer Marketing", link: "/services#influencer-marketing" },
-        { title: "Creative Design", link: "/services#creative-design" }
+    const servicesRows = [
+        [
+            { title: "Branding", link: "/services#branding" },
+            { title: "Social Media", link: "/services#social-media" }
+        ],
+        [
+            { title: "Influencer Marketing", link: "/services#influencer-marketing" }
+        ],
+        [
+            { title: "Production", link: "/services#production" },
+            { title: "Creative Design", link: "/services#creative-design" }
+        ]
     ];
 
     return (
@@ -132,57 +138,61 @@ const ServiceList = () => {
                 Our Expertise
             </motion.h2>
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3rem', paddingLeft: '5vw', zIndex: 1, position: 'relative' }}>
-                {services.map((service, index) => (
-                    <Link
-                        key={index}
-                        to={service.link}
-                        style={{ textDecoration: 'none' }}
-                    >
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: index * 0.1, duration: 0.8, ease: "easeOut" }}
-                            whileHover={{ scale: 1.05, x: 10 }}
-                            style={{ position: 'relative' }}
-                        >
-                            <h3
-                                className="service-item-title"
-                                style={{
-                                    fontSize: 'clamp(2.5rem, 4vw, 4.5rem)',
-                                    fontFamily: 'var(--font-brand)',
-                                    color: 'var(--color-butter-yellow)',
-                                    margin: 0,
-                                    lineHeight: 1.1,
-                                    cursor: 'pointer',
-                                    transition: 'color 0.3s ease',
-                                    letterSpacing: '0.15em'
-                                }}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3rem', paddingLeft: '5vw', zIndex: 1, position: 'relative', width: '100%' }}>
+                {servicesRows.map((row, rowIndex) => (
+                    <div key={rowIndex} style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        justifyContent: 'center',
+                        gap: rowIndex === 0 || rowIndex === 2 ? '15rem' : '3rem', // Wider gap for 1st and 3rd rows
+                        width: '100%'
+                    }}>
+                        {row.map((service, colIndex) => (
+                            <Link
+                                key={service.title}
+                                to={service.link}
+                                style={{ textDecoration: 'none' }}
                             >
-                                {service.title}
-                                <span style={{
-                                    opacity: 0,
-                                    marginLeft: '20px',
-                                    fontSize: '0.4em',
-                                    verticalAlign: 'middle',
-                                    transition: 'opacity 0.3s ease'
-                                }} className="arrow-indicator">
-                                    ➜
-                                </span>
-                            </h3>
-                        </motion.div>
-                    </Link>
+                                <motion.div
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{
+                                        opacity: { delay: (rowIndex * 2 + colIndex) * 0.1, duration: 0.8, ease: "easeOut" },
+                                        y: { delay: (rowIndex * 2 + colIndex) * 0.1, duration: 0.8, ease: "easeOut" },
+                                        scale: { duration: 0.1, ease: "easeOut" }
+                                    }}
+                                    whileHover={{ scale: 1.02 }}
+                                    style={{ position: 'relative' }}
+                                >
+                                    <h3
+                                        className="service-item-title"
+                                        style={{
+                                            fontSize: 'clamp(2.5rem, 4vw, 4.5rem)',
+                                            fontFamily: "var(--font-subtitle)",
+                                            fontWeight: 'bold',
+                                            fontStretch: 'condensed',
+                                            color: 'var(--color-earl-gray)',
+                                            margin: 0,
+                                            lineHeight: 0.95,
+                                            cursor: 'pointer',
+                                            transition: 'color 0.3s ease',
+                                            letterSpacing: 'normal'
+                                        }}
+                                    >
+                                        {service.title}
+                                    </h3>
+                                </motion.div>
+                            </Link>
+                        ))}
+                    </div>
                 ))}
             </div>
 
             <style>
                 {`
                     .service-item-title:hover {
-                        color: #ffffff !important;
-                    }
-                    .service-item-title:hover .arrow-indicator {
-                        opacity: 1 !important;
+                        color: var(--color-butter-yellow) !important;
                     }
                 `}
             </style>
@@ -226,7 +236,7 @@ export default function Home() {
                 {/* Thrown Magazines Animation - Layered Behind */}
                 <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {[
-                        { src: "/images/page1.png", start: { x: -1800, y: -1200 }, end: { x: -600, y: -200 }, rotate: -15, delay: 0.2, z: 1, finalScale: 1.2 },
+                        { src: "/images/page1.png", start: { x: -1800, y: -1200 }, end: { x: -580, y: -180 }, rotate: -25, delay: 0.2, z: 1, finalScale: 1.0, scaleX: -1, scaleY: -1 },
                         { src: "/images/page2.png", start: { x: 1800, y: -1200 }, end: { x: 600, y: -300 }, rotate: 10, delay: 0.0, z: 2, scaleY: -1, scaleX: -1 },
                         { src: "/images/page3.png", start: { x: -1800, y: 1200 }, end: { x: -600, y: 300 }, rotate: 5, delay: 0.3, z: 3 },
                         { src: "/images/page4.png", start: { x: 1800, y: 1200 }, end: { x: 600, y: 300 }, rotate: -10, delay: 0.1, z: 4 },
@@ -296,26 +306,13 @@ export default function Home() {
                                 <h2 style={{ fontSize: '3rem', marginBottom: '2rem', color: 'var(--color-electric-blue)' }}>Blooming the Brand</h2>
                                 <motion.p
                                     className="font-subtitle"
-                                    style={{ fontSize: '1.1rem', lineHeight: 1.8 }}
-                                    initial="hidden"
-                                    whileInView="visible"
+                                    style={{ fontSize: '1.1rem', lineHeight: 1.8, textAlign: 'justify' }}
+                                    initial={{ opacity: 0, y: -30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
-                                    variants={{
-                                        hidden: { opacity: 1 },
-                                        visible: { opacity: 1, transition: { staggerChildren: 0.02 } }
-                                    }}
+                                    transition={{ duration: 0.8, ease: "easeOut" }}
                                 >
-                                    {"We are a creative branding studio that helps brands grow through strategic storytelling, content creation, and high-impact digital experiences. We focus on modern, bold, and growth-driven brand identities.".split("").map((char, index) => (
-                                        <motion.span
-                                            key={index}
-                                            variants={{
-                                                hidden: { opacity: 0 },
-                                                visible: { opacity: 1, transition: { duration: 0 } }
-                                            }}
-                                        >
-                                            {char}
-                                        </motion.span>
-                                    ))}
+                                    We are a creative branding studio that helps brands grow through strategic storytelling, content creation, and high-impact digital experiences. We focus on modern, bold, and growth-driven brand identities.
                                 </motion.p>
                                 <br />
                                 <AnimatedButton to="/about" className="btn-primary" style={{ marginTop: '1rem' }}>Our Story</AnimatedButton>
@@ -380,15 +377,15 @@ export default function Home() {
             </section>
 
             {/* Testimonials */}
-            <section className="section-padding light-section" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)', paddingTop: '0' }}>
+            <section className="section-padding light-section" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)', padding: '0' }}>
                 <ParallaxContent>
-                    <div className="container">
+                    <div className="container" style={{ maxWidth: '100%' }}>
                         <motion.h2
                             initial={{ y: 100, opacity: 0 }}
                             whileInView={{ y: 0, opacity: 1 }}
                             transition={{ duration: 0.8, ease: "easeOut" }}
                             viewport={{ once: true }}
-                            style={{ marginTop: '-1rem', marginBottom: '3rem', textAlign: 'center', fontSize: '6rem', lineHeight: 1 }}
+                            style={{ marginTop: '4rem', marginBottom: '2rem', textAlign: 'center', fontSize: '6rem', lineHeight: 1 }}
                         >
                             Client Love
                         </motion.h2>
@@ -397,8 +394,8 @@ export default function Home() {
                             width: '100%',
                             overflow: 'hidden',
                             position: 'relative',
-                            paddingTop: '2rem',
-                            paddingBottom: '2rem'
+                            paddingTop: '0',
+                            paddingBottom: '4rem'
                         }}>
                             <motion.div
                                 style={{
@@ -411,105 +408,99 @@ export default function Home() {
                                     x: {
                                         repeat: Infinity,
                                         repeatType: "loop",
-                                        duration: 120, // Very slow scroll for elegance
+                                        duration: 600, // Extremely slow scroll
                                         ease: "linear"
                                     }
                                 }}
                             >
-                                {/* We create a function to generate columns to ensure consistent layout in the loop */}
                                 {(() => {
-                                    // Split items into 6 columns for a dense board layout
-                                    // 12 items / 6 columns = 2 items per column (approx)
-                                    const numCols = 6;
-                                    const columns = Array.from({ length: numCols }, () => []);
-                                    content.testimonials.forEach((t, i) => {
-                                        columns[i % numCols].push(t);
-                                    });
+                                    // Duplicate the array to ensure seamless infinite scroll
+                                    const allTestimonials = [
+                                        ...content.testimonials,
+                                        ...content.testimonials,
+                                        ...content.testimonials,
+                                        ...content.testimonials,
+                                        ...content.testimonials // Extra buffer
+                                    ];
 
-                                    // Render a set of columns
-                                    const renderSet = (keyPrefix) => (
-                                        <>
-                                            {columns.map((col, colIndex) => (
-                                                <div key={`${keyPrefix}-col-${colIndex}`} style={{
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    gap: '1.5rem', // Slight gap increase
-                                                    width: '200px', // Strict width to prevent expansion
-                                                    // Stagger every other column to create "up and down" unevenness
-                                                    marginTop: colIndex % 2 === 1 ? '4rem' : '0'
-                                                }}>
-                                                    {col.map((item, itemIndex) => {
-                                                        // Deterministic random height
-                                                        const randomVal = (item.id * 7 + itemIndex * 13) % 4;
-                                                        const height = randomVal === 0 ? '250px'
-                                                            : randomVal === 1 ? '320px'
-                                                                : randomVal === 2 ? '380px'
-                                                                    : '290px';
-
-                                                        return (
-                                                            <motion.div
-                                                                key={`${keyPrefix}-item-${item.id}`}
-                                                                initial={{ scale: 0.1, opacity: 0 }} // Start mainly invisible but exist as a point
-                                                                whileInView={{ scale: 1, opacity: 1 }} // Pop to full size
-                                                                transition={{ type: "spring", stiffness: 120, damping: 20, mass: 1 }} // Subtler spring, less bounce
-                                                                viewport={{ once: false, amount: 0.25, margin: "0px" }} // Explicit 1/4th trigger
-                                                                style={{
-                                                                    width: '100%',
-                                                                    height: height,
-                                                                    borderRadius: '16px',
-                                                                    overflow: 'hidden',
-                                                                    backgroundColor: 'rgba(255,255,255,0.4)',
-                                                                    display: 'flex',
-                                                                    flexDirection: 'column',
-                                                                    boxShadow: '0 4px 15px rgba(0,0,0,0.05)'
-                                                                }}>
-                                                                {/* Media */}
-                                                                <div style={{
-                                                                    flex: 1,
-                                                                    overflow: 'hidden',
-                                                                    position: 'relative'
-                                                                }}>
-                                                                    {item.video ? (
-                                                                        <video
-                                                                            src={item.video}
-                                                                            autoPlay
-                                                                            muted
-                                                                            loop
-                                                                            playsInline
-                                                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                                        />
-                                                                    ) : item.image ? (
-                                                                        <img src={item.image} alt={item.author} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                                    ) : (
-                                                                        <div style={{ width: '100%', height: '100%', backgroundColor: '#fff', opacity: 0.5 }}></div>
-                                                                    )}
-                                                                </div>
-
-                                                                {/* Content */}
-                                                                <div style={{ padding: '1.2rem', background: '#fff' }}>
-                                                                    <div style={{ display: 'flex', gap: '0.2rem', marginBottom: '0.5rem' }}>
-                                                                        {[...Array(item.rating)].map((_, starIndex) => <Star key={starIndex} size={12} fill="#000" />)}
-                                                                    </div>
-                                                                    <p style={{ fontSize: '0.95rem', lineHeight: 1.4, color: '#333', marginBottom: '0.8rem', display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                                                        "{item.text}"
-                                                                    </p>
-                                                                    <p className="font-subtitle" style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>{item.author}</p>
-                                                                </div>
-                                                            </motion.div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            ))}
-                                        </>
-                                    );
-
-                                    // Return duplicated sets
                                     return (
-                                        <>
-                                            {renderSet('set1')}
-                                            {renderSet('set2')}
-                                            {renderSet('set3')} {/* Triple buffer for wider screens */}
-                                        </>
+                                        <div style={{ display: 'flex', gap: '3rem', alignItems: 'flex-start', paddingLeft: '1rem', paddingRight: '1rem' }}>
+                                            {allTestimonials.map((item, index) => {
+                                                // Asymmetrical layout: Alternating up and down
+                                                const marginTop = index % 2 === 1 ? '6rem' : '0rem';
+
+                                                // Varying heights, smaller than before
+                                                const height = index % 3 === 0 ? '400px' : index % 3 === 1 ? '350px' : '450px';
+
+                                                return (
+                                                    <motion.div
+                                                        key={`t-${index}`}
+                                                        initial={{ scale: 0.5, opacity: 0 }}
+                                                        whileInView={{ scale: 1, opacity: 1 }}
+                                                        viewport={{ once: false, margin: "-10px" }}
+                                                        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                                                        whileHover={{ scale: 1.05, zIndex: 10 }}
+                                                        style={{
+                                                            marginTop: marginTop,
+                                                            width: '300px', // Smaller size
+                                                            height: height,
+                                                            flexShrink: 0,
+                                                            borderRadius: '16px',
+                                                            overflow: 'hidden',
+                                                            backgroundColor: 'rgba(255,255,255,0.9)',
+                                                            display: 'flex',
+                                                            flexDirection: 'column',
+                                                            boxShadow: '0 8px 25px rgba(0,0,0,0.08)',
+                                                            border: '1px solid rgba(0,0,0,0.05)'
+                                                        }}
+                                                    >
+                                                        {/* Media Section */}
+                                                        <div style={{
+                                                            flex: 1, // Takes up remaining space
+                                                            minHeight: '40%',
+                                                            overflow: 'hidden',
+                                                            position: 'relative'
+                                                        }}>
+                                                            {item.video ? (
+                                                                <video
+                                                                    src={item.video}
+                                                                    autoPlay
+                                                                    muted
+                                                                    loop
+                                                                    playsInline
+                                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                                                />
+                                                            ) : item.image ? (
+                                                                <img src={item.image} alt={item.author} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                            ) : (
+                                                                <div style={{ width: '100%', height: '100%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                                    <span style={{ opacity: 0.3, fontSize: '1.5rem' }}>No Image</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Text Content */}
+                                                        <div style={{ padding: '1.5rem', backgroundColor: '#fff' }}>
+                                                            <div style={{ display: 'flex', gap: '0.2rem', marginBottom: '0.8rem' }}>
+                                                                {[...Array(item.rating || 5)].map((_, starIndex) => <Star key={starIndex} size={14} fill="#000" />)}
+                                                            </div>
+                                                            <p style={{
+                                                                fontSize: '0.95rem',
+                                                                lineHeight: 1.5,
+                                                                color: '#222',
+                                                                marginBottom: '1rem',
+                                                                fontFamily: '"Arial Nova", sans-serif',
+                                                            }}>
+                                                                "{item.text}"
+                                                            </p>
+                                                            <p className="font-subtitle" style={{ fontWeight: 'bold', fontSize: '0.9rem', color: '#666', textTransform: 'uppercase' }}>
+                                                                — {item.author}
+                                                            </p>
+                                                        </div>
+                                                    </motion.div>
+                                                );
+                                            })}
+                                        </div>
                                     );
                                 })()}
                             </motion.div>

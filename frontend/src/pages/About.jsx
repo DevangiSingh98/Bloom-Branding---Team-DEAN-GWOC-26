@@ -1,9 +1,10 @@
 import React, { useRef } from 'react';
 import { useContent } from '../context/ContentContext';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion'; // Added useSpring
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import Footer from '../components/Footer';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -26,6 +27,11 @@ export default function About() {
         const visionItem = container.querySelector('.vision-item');
         const valuesItem = container.querySelector('.values-item');
         const approachItem = container.querySelector('.approach-item');
+
+        // Images
+        const imgVision = container.querySelector('.img-vision');
+        const imgValues = container.querySelector('.img-values');
+        const imgApproach = container.querySelector('.img-approach');
 
         // Calculate scroll distance to bring Image Section to viewport
         function getScrollDistance() {
@@ -57,30 +63,32 @@ export default function About() {
             )
             .fromTo(storySection, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.5 }, "<")
 
-            // Phase 3: Story Exit -> Vision Entry
+            // Phase 3: Story Exit -> Vision Entry (+ Image Change)
             .to(storySection, { yPercent: -100, opacity: 0, duration: 0.8, ease: "power2.inOut" }, "+=0.2") // Shorter pause
             .fromTo(visionItem,
                 { yPercent: 100, opacity: 0 },
                 { yPercent: 0, opacity: 1, duration: 0.8, ease: "power2.inOut" },
                 "<" // Perfect Overlap
             )
+            .fromTo(imgVision, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.inOut" }, "<")
 
-            // Phase 4: Vision Exit -> Values Entry
-            // Removed pauses, flowing directly
+            // Phase 4: Vision Exit -> Values Entry (+ Image Change)
             .to(visionItem, { yPercent: -100, opacity: 0, duration: 0.8, ease: "power2.inOut" }, ">")
             .fromTo(valuesItem,
                 { yPercent: 100, opacity: 0 },
                 { yPercent: 0, opacity: 1, duration: 0.8, ease: "power2.inOut" },
                 "<"
             )
+            .fromTo(imgValues, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.inOut" }, "<")
 
-            // Phase 5: Values Exit -> Approach Entry
+            // Phase 5: Values Exit -> Approach Entry (+ Image Change)
             .to(valuesItem, { yPercent: -100, opacity: 0, duration: 0.8, ease: "power2.inOut" }, ">")
             .fromTo(approachItem,
                 { yPercent: 100, opacity: 0 },
                 { yPercent: 0, opacity: 1, duration: 0.8, ease: "power2.inOut" },
                 "<"
             )
+            .fromTo(imgApproach, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: "power2.inOut" }, "<")
 
             // Hold final state briefly
             .to({}, { duration: 0.5 });
@@ -92,9 +100,16 @@ export default function About() {
         offset: ["start end", "end start"]
     });
 
-    const titleY = useTransform(scrollYProgress, [0, 1], [150, -250]);
-    const xLeft = useTransform(scrollYProgress, [0.1, 0.4], [80, 0]);
-    const xRight = useTransform(scrollYProgress, [0.1, 0.4], [-80, 0]);
+    const smoothProgress = useSpring(scrollYProgress, {
+        mass: 0.1,
+        stiffness: 100,
+        damping: 20,
+        restDelta: 0.001
+    });
+
+    const titleY = useTransform(smoothProgress, [0, 1], [150, -250]);
+    const xLeft = useTransform(smoothProgress, [0.1, 0.4], [80, 0]);
+    const xRight = useTransform(smoothProgress, [0.1, 0.4], [-80, 0]);
 
     // Reusable style for slideshow items
     const slideItemStyle = {
@@ -203,9 +218,27 @@ export default function About() {
                             }}
                         >
                             <img
-                                src="/images/bloomingthebrand.png"
+                                src="/images/dummy9.png"
                                 alt="Blooming"
-                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0, zIndex: 1 }}
+                            />
+                            <img
+                                className="img-vision"
+                                src="/images/dummy6.png"
+                                alt="Vision"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0, zIndex: 2, opacity: 0 }}
+                            />
+                            <img
+                                className="img-values"
+                                src="/images/dummy8.png"
+                                alt="Values"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0, zIndex: 3, opacity: 0 }}
+                            />
+                            <img
+                                className="img-approach"
+                                src="/images/dummy7.png"
+                                alt="Approach"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0, zIndex: 4, opacity: 0 }}
                             />
                         </div>
 
@@ -314,74 +347,116 @@ export default function About() {
                 </div>
             </section>
 
-            {/* Journey & Philosophy Section */}
-            <section className="section-padding" style={{ backgroundColor: '#fff', position: 'relative', zIndex: 10 }}>
+            {/* JOURNEY & PHILOSOPHY ARCHED PORTALS */}
+            <section style={{ backgroundColor: '#fff', padding: '150px 5%', overflow: 'hidden' }}>
                 <div className="container">
-                    <motion.h2
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        style={{ fontSize: '3.5rem', textAlign: 'center', marginBottom: '5rem', color: 'var(--color-dark-choc)' }}
-                    >
-                        Our Journey & Philosophy
-                    </motion.h2>
-
-                    {/* Row 1: Journey */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', marginBottom: '6rem', alignItems: 'center' }}>
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+                        gap: '20px',
+                        alignItems: 'start'
+                    }}>
+                        {/* ARCH 1: OUR JOURNEY */}
                         <motion.div
-                            initial={{ opacity: 0, x: -50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8 }}
-                            className="img-placeholder"
-                            style={{ height: '400px', borderRadius: '10px', overflow: 'hidden' }}
+                            style={{
+                                backgroundColor: 'transparent',
+                                borderRadius: '500px 500px 0 0',
+                                padding: '120px 40px 60px',
+                                border: '2.5px solid var(--color-dark-choc)',
+                                color: 'var(--color-dark-choc)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                height: '700px',
+                                position: 'relative'
+                            }}
                         >
-                            {/* Placeholder for Video/Image */}
-                            <div style={{ width: '100%', height: '100%', backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
-                                Journey Video/Image Placeholder
+                            {/* Decorative Star */}
+                            <div style={{ position: 'absolute', top: '40px', left: '50%', transform: 'translateX(-50%)', color: 'var(--color-dark-choc)' }}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+                                </svg>
                             </div>
-                        </motion.div>
 
-                        <motion.div
-                            initial={{ opacity: 0, x: 50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8 }}
-                        >
-                            <h3 style={{ fontSize: '2rem', marginBottom: '1.5rem', color: 'var(--color-electric-blue)' }}>A Path Less Traveled</h3>
-                            <p className="font-subtitle" style={{ fontSize: '1.1rem', lineHeight: '1.6' }}>
-                                Our journey didn't begin in a boardroom. It started with a passion for art, a curiosity for technology, and a belief that business can be beautiful. We've navigated the evolving digital landscape by staying true to our core: authentic connection. Every project is a stepping stone, every client a partner in our shared story of growth and discovery.
+                            <h3 style={{
+                                fontFamily: 'var(--font-brand)',
+                                fontSize: '3.5rem',
+                                textAlign: 'center',
+                                marginBottom: '2rem',
+                                lineHeight: 1.1,
+                                letterSpacing: '1px'
+                            }}>
+                                OUR <br /> JOURNEY
+                            </h3>
+
+                            <p style={{
+                                fontFamily: 'var(--font-subtitle)',
+                                fontSize: '1.5rem',
+                                fontWeight: 'bold',
+                                lineHeight: 1.6,
+                                textAlign: 'center',
+                                marginTop: 'auto',
+                                marginBottom: 'auto',
+                                padding: '0 20px'
+                            }}>
+                                OUR JOURNEY DIDN'T BEGIN IN A BOARDROOM. IT STARTED WITH A PASSION FOR ART, A CURIOSITY FOR TECHNOLOGY, AND A BELIEF THAT BUSINESS CAN BE BEAUTIFUL. WE'VE NAVIGATED THE EVOLVING DIGITAL LANDSCAPE BY STAYING TRUE TO OUR CORE: AUTHENTIC CONNECTION.
                             </p>
                         </motion.div>
-                    </div>
 
-                    {/* Row 2: Philosophy */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', alignItems: 'center' }}>
+                        {/* ARCH 2: PHILOSOPHY */}
                         <motion.div
-                            initial={{ opacity: 0, x: -50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8 }}
-                            style={{ order: 2 }}
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, delay: 0.2 }}
+                            style={{
+                                backgroundColor: 'transparent',
+                                borderRadius: '500px 500px 0 0',
+                                padding: '120px 40px 60px',
+                                border: '2.5px solid var(--color-dark-choc)',
+                                color: 'var(--color-dark-choc)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                height: '700px',
+                                position: 'relative'
+                            }}
                         >
-                            <h3 style={{ fontSize: '2rem', marginBottom: '1.5rem', color: 'var(--color-electric-blue)' }}>Motion & Emotion</h3>
-                            <p className="font-subtitle" style={{ fontSize: '1.1rem', lineHeight: '1.6' }}>
-                                We don't just design; we move. Motion is at the heart of our philosophy because life doesn't stand still. By integrating fluid animations and dynamic visuals, we breathe life into static brands. We create digital ecosystems where users don't just visit—they feel, interact, and remember.
-                            </p>
-                        </motion.div>
-
-                        <motion.div
-                            initial={{ opacity: 0, x: 50 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.8 }}
-                            className="img-placeholder"
-                            style={{ height: '400px', borderRadius: '10px', overflow: 'hidden', order: 1 }}
-                        >
-                            {/* Placeholder for Video/Image */}
-                            <div style={{ width: '100%', height: '100%', backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
-                                Philosophy Video/Image Placeholder
+                            {/* Decorative Star */}
+                            <div style={{ position: 'absolute', top: '40px', left: '50%', transform: 'translateX(-50%)', color: 'var(--color-dark-choc)' }}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
+                                </svg>
                             </div>
+
+                            <h3 style={{
+                                fontFamily: 'var(--font-brand)',
+                                fontSize: '3.5rem',
+                                textAlign: 'center',
+                                marginBottom: '2rem',
+                                lineHeight: 1.1,
+                                letterSpacing: '1px'
+                            }}>
+                                OUR <br /> PHILOSOPHY
+                            </h3>
+
+                            <p style={{
+                                fontFamily: 'var(--font-subtitle)',
+                                fontSize: '1.5rem',
+                                fontWeight: 'bold',
+                                lineHeight: 1.4,
+                                textAlign: 'center',
+                                marginTop: 'auto',
+                                marginBottom: 'auto',
+                                padding: '0 20px'
+                            }}>
+                                MOTION IS AT THE HEART OF OUR PHILOSOPHY BECAUSE LIFE DOESN'T STAND STILL. BY INTEGRATING FLUID ANIMATIONS AND DYNAMIC VISUALS, WE BREATHE LIFE INTO STATIC BRANDS. WE CREATE DIGITAL ECOSYSTEMS WHERE USERS DON'T JUST VISIT—THEY FEEL, INTERACT, AND REMEMBER.
+                            </p>
                         </motion.div>
                     </div>
                 </div>
             </section>
+            <Footer />
         </motion.div>
     );
 }

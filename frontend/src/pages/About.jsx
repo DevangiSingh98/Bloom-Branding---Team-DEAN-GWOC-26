@@ -52,14 +52,34 @@ export default function About() {
         // Phase 1: Horizontal Scroll -> Moves Track Left until Image is flush Left
         tl.to(track, {
             x: () => -getScrollDistance(),
-            ease: "power1.inOut", // Smoother easing than linear
             duration: 2 // Increased duration relative to total timeline
         })
+            .call(() => {
+                // If going backwards past this point (Phase 1), revert to Dark (Title Card)
+                // Note: .call() in a timeline fires on playIn and playReverse usually depending on position.
+                // We need to ensure logic holds. 
+            })
 
-            // Phase 2: Reveal "Rooted in Authenticity"
+            // Phase 2: Reveal "Rooted in Authenticity" -> Trigger NAV YELLOW
+            .call(() => {
+                // Play Forward: Yellow
+                window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: false } }));
+            }, null, ">") // Ensure position is correct
+            .call(() => {
+                // This is a hacked way to detect reverse using a second tween or just onReverseComplete on the animation below
+            })
             .fromTo(rightContent,
                 { xPercent: -100, opacity: 0 },
-                { xPercent: 0, opacity: 1, duration: 0.8, ease: "power2.out" }
+                {
+                    xPercent: 0,
+                    opacity: 1,
+                    duration: 0.8,
+                    ease: "power2.out",
+                    onReverseComplete: () => {
+                        // Play Reverse: Dark (When this section hides back to nothing)
+                        window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: true } }));
+                    }
+                }
             )
             .fromTo(storySection, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.5 }, "<")
 
@@ -358,6 +378,16 @@ export default function About() {
                     }}>
                         {/* ARCH 1: OUR JOURNEY */}
                         <motion.div
+                            id="journey-section"
+                            onViewportEnter={() => {
+                                window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: true } }));
+                            }}
+                            onViewportLeave={(entry) => {
+                                // If leaving to the top (scrolling back up), go back to Yellow (Founder layout)
+                                if (entry.boundingClientRect.y > 0) {
+                                    window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: false } }));
+                                }
+                            }}
                             initial={{ opacity: 0, y: 50 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8 }}

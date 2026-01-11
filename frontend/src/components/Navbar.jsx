@@ -94,17 +94,39 @@ export default function Navbar() {
     const isWork = location.pathname === '/work';
 
     // Unified Logic:
-    // 1. Menu Open -> Butter Yellow (on Blue Overlay)
+    // 1. Menu Open -> Butter Yellow
     // 2. Work Page -> Butter Yellow
-    // 3. Not Home/Services/Work -> Dark Choc (Static)
-    // 4. Home/Services -> Dynamic (based on scroll)
+    // 3. Home Page -> ALWAYS Butter Yellow (User Request)
+    // 4. Services -> Dynamic (Hero Yellow, Content Dark)
+    // 5. About -> Dynamic via Events (Starts Dark, becomes Yellow, then Dark)
+    // 6. Others -> Dark
+
+    useEffect(() => {
+        const handleColorChange = (e) => {
+            if (location.pathname === '/about') {
+                setIsDarkText(e.detail.isDark);
+            }
+        };
+
+        window.addEventListener('bloom-navbar-change', handleColorChange);
+        return () => window.removeEventListener('bloom-navbar-change', handleColorChange);
+    }, [location.pathname]);
 
     const getColor = () => {
         if (isOpen) return 'var(--color-butter-yellow)';
         if (isWork) return 'var(--color-butter-yellow)';
-        if (!isHome && !isServices) return 'var(--color-dark-choc)';
-        // Default is Butter Yellow for dark backgrounds (default state for Home/Services)
-        // isDarkText true means we are on a light section -> switch to Dark Choc
+
+        // Home Page Logic: Now dynamic via events (passed from Home.jsx)
+        // We removed the forced "if (isHome) return Yellow" check.
+
+        if (location.pathname === '/' || location.pathname === '/about') {
+            // For Home & About, we rely on isDarkText state which is driven by events
+            return isDarkText ? 'var(--color-dark-choc)' : 'var(--color-butter-yellow)';
+        }
+
+        if (!isServices) return 'var(--color-dark-choc)';
+
+        // Services Page Logic (already handled by ScrollTrigger setting isDarkText)
         return isDarkText ? 'var(--color-dark-choc)' : 'var(--color-butter-yellow)';
     };
 

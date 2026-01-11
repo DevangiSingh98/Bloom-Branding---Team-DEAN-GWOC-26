@@ -245,6 +245,40 @@ export default function Home() {
 
     const heroY = useTransform(scrollYProgress, [0, 0.2], [0, 200]);
 
+    // Independent Navbar Color Triggers for Home Page
+    useEffect(() => {
+        // 1. Initial State: Yellow (Hero)
+        window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: false } }));
+
+        const ctx = gsap.context(() => {
+            // "Blooming the Brand" -> Dark
+            ScrollTrigger.create({
+                trigger: "#blooming-section",
+                start: "top 100px",
+                onEnter: () => window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: true } })),
+                onLeaveBack: () => window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: false } }))
+            });
+
+            // "Our Expertise" & "Selected Work" -> Yellow
+            ScrollTrigger.create({
+                trigger: "#expertise-section",
+                start: "top 100px",
+                onEnter: () => window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: false } })),
+                onLeaveBack: () => window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: true } }))
+            });
+
+            // "Our Journey" / Rest of Page -> Dark
+            ScrollTrigger.create({
+                trigger: "#journey-stats",
+                start: "top 100px",
+                onEnter: () => window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: true } })),
+                onLeaveBack: () => window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: false } }))
+            });
+        }, containerRef);
+
+        return () => ctx.revert();
+    }, []);
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -326,7 +360,7 @@ export default function Home() {
             </section>
 
             {/* Intro / Our Story Snippet */}
-            <section className="section-padding light-section" style={{ backgroundColor: 'var(--color-white)', position: 'relative', zIndex: 10 }}>
+            <section id="blooming-section" className="section-padding light-section" style={{ backgroundColor: 'var(--color-white)', position: 'relative', zIndex: 10 }}>
                 <ParallaxContent>
                     <div className="container">
                         <motion.div
@@ -363,7 +397,7 @@ export default function Home() {
             </section>
 
             {/* Services Highlight */}
-            <section style={{ backgroundColor: 'var(--color-electric-blue)', color: 'var(--color-earl-gray)', padding: 0, position: 'relative', zIndex: 1 }}>
+            <section id="expertise-section" style={{ backgroundColor: 'var(--color-electric-blue)', color: 'var(--color-earl-gray)', padding: 0, position: 'relative', zIndex: 1 }}>
                 <ServiceList />
             </section>
 
@@ -399,7 +433,7 @@ export default function Home() {
             </section>
 
             {/* Our Journey */}
-            <section className="section-padding light-section">
+            <section id="journey-stats" className="section-padding light-section">
                 <ParallaxContent>
                     <div className="container">
                         <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '2rem', textAlign: 'center' }}>

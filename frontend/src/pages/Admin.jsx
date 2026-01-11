@@ -71,26 +71,179 @@ const FileUpload = ({ label, value, onFileSelect, type = "image" }) => {
     );
 };
 
-const Admin = () => {
-    const { content, updateHero, updateAllProjects, updateSelectedWork, updateTestimonials, updateClientLogos, updateInstagram, updateFounders, updateValues, resetContent } = useContent();
-    const [activeTab, setActiveTab] = useState('enquiries');
+const CustomModal = ({ show, title, message, type = 'info', onConfirm, onCancel, confirmText, confirmColor }) => {
+    if (!show) return null;
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            style={{
+                position: 'fixed',
+                inset: 0,
+                backgroundColor: 'rgba(0,0,0,0.6)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000,
+                backdropFilter: 'blur(4px)'
+            }}
+        >
+            <motion.div
+                initial={{ scale: 0.9, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                style={{
+                    backgroundColor: 'white',
+                    padding: '2.5rem',
+                    borderRadius: '24px',
+                    maxWidth: '450px',
+                    width: '90%',
+                    textAlign: 'center',
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.2)'
+                }}
+            >
+                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+                    {type === 'confirm' ? '❓' : type === 'success' ? '✨' : '⚠️'}
+                </div>
+                <h3 style={{ fontSize: '1.5rem', marginBottom: '0.8rem', color: 'var(--color-electric-blue)' }}>{title}</h3>
+                <p style={{ color: '#666', lineHeight: 1.6, marginBottom: '2rem' }}>{message}</p>
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                    {type === 'confirm' && (
+                        <button
+                            onClick={onCancel}
+                            style={{ padding: '0.8rem 1.8rem', borderRadius: '30px', border: '1px solid #ddd', backgroundColor: 'transparent', cursor: 'pointer', fontWeight: '500' }}
+                        >
+                            Cancel
+                        </button>
+                    )}
+                    <button
+                        onClick={onConfirm}
+                        style={{
+                            padding: '0.8rem 2.2rem',
+                            borderRadius: '30px',
+                            border: 'none',
+                            backgroundColor: confirmColor || (type === 'confirm' ? '#5D4037' : 'var(--color-electric-blue)'),
+                            color: 'white',
+                            cursor: 'pointer',
+                            fontWeight: '600',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                        }}
+                    >
+                        {confirmText || (type === 'confirm' ? 'Delete' : 'Got it')}
+                    </button>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+};
 
+const Admin = () => {
+    const {
+        content,
+        syncProject, removeProject,
+        syncTestimonial, removeTestimonial,
+        syncInstagram, removeInstagram,
+        syncFounder, removeFounder,
+        syncValue, removeValue,
+        syncClient, removeClient,
+        syncSelectedWork, removeSelectedWork,
+        updateHero, updateAllProjects, updateSelectedWork, updateTestimonials, updateClientLogos, updateInstagram, updateFounders, updateValues, resetContent
+    } = useContent();
+    const [activeTab, setActiveTab] = useState('enquiries');
     const [openEnquiryId, setOpenEnquiryId] = useState(null);
+    const [isInitializing, setIsInitializing] = useState(false);
+
+    // Custom Modal State
+    const [modal, setModal] = useState({ show: false, title: '', message: '', type: 'info', onConfirm: () => { }, confirmText: '', confirmColor: '' });
+
+    const showAlert = (title, message, type = 'info', onConfirm = null, confirmText = '', confirmColor = '') => {
+        setModal({
+            show: true,
+            title,
+            message,
+            type,
+            confirmText,
+            confirmColor,
+            onConfirm: () => {
+                if (onConfirm) onConfirm();
+                setModal(prev => ({ ...prev, show: false }));
+            },
+            onCancel: () => setModal(prev => ({ ...prev, show: false }))
+        });
+    };
+
+    const showConfirm = (title, message, onConfirm, confirmText = '', confirmColor = '') => {
+        showAlert(title, message, 'confirm', onConfirm, confirmText, confirmColor);
+    };
+
+    const initializeDatabase = async () => {
+        showConfirm(
+            "Initialize Database",
+            "This will sync all your current local content (Projects, Testimonials, etc.) to the database. Ready to bloom?",
+            async () => {
+                setIsInitializing(true);
+                try {
+                    // Sync Hero
+                    await updateHero(content.hero);
+                    // ... (rest of sync logic remains same)
+
+                    // Sync All Projects
+                    for (const item of content.allProjects) {
+                        if (!item._id) await syncProject(item);
+                    }
+                    // Sync Selected Work (Projects on Work page)
+                    for (const item of content.selectedWork) {
+                        if (!item._id) await syncSelectedWork(item);
+                    }
+                    // Sync Testimonials
+                    for (const item of content.testimonials) {
+                        if (!item._id) await syncTestimonial(item);
+                    }
+                    // Sync Instagram
+                    for (const item of content.instagram) {
+                        if (!item._id) await syncInstagram(item);
+                    }
+                    // Sync Values
+                    for (const item of content.values) {
+                        if (!item._id) await syncValue(item);
+                    }
+                    // Sync Clients
+                    for (const item of content.clientLogos) {
+                        if (!item._id) await syncClient(item);
+                    }
+
+                    // Sync Founders
+                    if (content.founders.left) await syncFounder({ ...content.founders.left, key: 'left' });
+                    if (content.founders.right) await syncFounder({ ...content.founders.right, key: 'right' });
+                    if (content.founders.image) await syncFounder({ image: content.founders.image, key: 'main' });
+
+                    showAlert("Success!", "Database initialization complete! Everything is now synced and safely stored.", "success");
+                } catch (error) {
+                    console.error("Initialization failed:", error);
+                    showAlert("Error", "Initialization failed. Please check your connection and try again.", "error");
+                } finally {
+                    setIsInitializing(false);
+                }
+            },
+            "Sync Now",
+            "var(--color-electric-blue)"
+        );
+    };
 
     const handleHeroChange = (e) => {
         updateHero({ [e.target.name]: e.target.value });
     };
 
     const handleFoundersChange = (section, field, value) => {
+        const newFounders = { ...content.founders };
         if (section === 'main') {
-            updateFounders({ [field]: value });
+            newFounders[field] = value;
+            updateFounders(newFounders);
+            // If it's the central image, we might want a special sync or just use 'main' key
+            syncFounder({ [field]: value, key: 'main' });
         } else {
-            updateFounders({
-                [section]: {
-                    ...content.founders[section],
-                    [field]: value
-                }
-            });
+            newFounders[section] = { ...newFounders[section], [field]: value };
+            updateFounders(newFounders);
+            syncFounder({ ...newFounders[section], key: section });
         }
     };
 
@@ -101,60 +254,101 @@ const Admin = () => {
             newArray = [...content.selectedWork];
             newArray[index] = { ...newArray[index], [field]: value };
             updateSelectedWork(newArray);
+            syncSelectedWork(newArray[index]);
         } else if (type === 'projects') {
             newArray = [...content.allProjects];
             newArray[index] = { ...newArray[index], [field]: value };
             updateAllProjects(newArray);
+            syncProject(newArray[index]);
         } else if (type === 'testimonials') {
             newArray = [...content.testimonials];
             newArray[index] = { ...newArray[index], [field]: value };
             updateTestimonials(newArray);
+            syncTestimonial(newArray[index]);
         } else if (type === 'instagram') {
             newArray = [...content.instagram];
             newArray[index] = { ...newArray[index], [field]: value };
             updateInstagram(newArray);
+            syncInstagram(newArray[index]);
         } else if (type === 'values') {
             newArray = [...content.values];
             newArray[index] = { ...newArray[index], [field]: value };
             updateValues(newArray);
+            syncValue(newArray[index]);
         } else if (type === 'clients') {
             newArray = [...content.clientLogos];
             newArray[index] = { ...newArray[index], [field]: value };
             updateClientLogos(newArray);
+            syncClient(newArray[index]);
         }
     };
 
-    const addItem = (type) => {
+    const addItem = async (type) => {
+        const tempId = Date.now() + Math.random();
         if (type === 'work') {
-            updateSelectedWork([...content.selectedWork, { id: Date.now(), title: "New Project", category: "Category", image: "" }]);
+            const newItem = { id: tempId, title: "New Project", category: "Category", image: "" };
+            updateSelectedWork([...content.selectedWork, newItem]);
         } else if (type === 'projects') {
-            updateAllProjects([...content.allProjects, { title: "New Project", category: "Category", image: "", description: "Description" }]);
+            const newProject = { id: tempId, title: "New Project", category: "Category", image: "", description: "Description" };
+            updateAllProjects([...content.allProjects, newProject]);
         } else if (type === 'testimonials') {
-            updateTestimonials([...content.testimonials, { id: Date.now(), text: "New testimonial", author: "Author", rating: 5 }]);
+            const newItem = { id: tempId, text: "New testimonial", author: "Author", rating: 5 };
+            updateTestimonials([...content.testimonials, newItem]);
         } else if (type === 'instagram') {
-            updateInstagram([...content.instagram, { id: Date.now(), image: "", link: "#" }]);
+            const newItem = { id: tempId, image: "", link: "#" };
+            updateInstagram([...content.instagram, newItem]);
         } else if (type === 'values') {
-            updateValues([...content.values, { id: Date.now(), title: "New Value", text: "Description" }]);
+            const newItem = { id: tempId, title: "New Value", text: "Description" };
+            updateValues([...content.values, newItem]);
         } else if (type === 'clients') {
-            updateClientLogos([...content.clientLogos, { id: Date.now(), name: "Client Name", logo: "" }]);
+            const newItem = { id: tempId, name: "Client Name", logo: "" };
+            updateClientLogos([...content.clientLogos, newItem]);
         }
     };
 
-    const deleteItem = (index, type) => {
-        let newArray;
-        if (type === 'work') newArray = content.selectedWork.filter((_, i) => i !== index);
-        else if (type === 'projects') newArray = content.allProjects.filter((_, i) => i !== index);
-        else if (type === 'testimonials') newArray = content.testimonials.filter((_, i) => i !== index);
-        else if (type === 'instagram') newArray = content.instagram.filter((_, i) => i !== index);
-        else if (type === 'values') newArray = content.values.filter((_, i) => i !== index);
-        else if (type === 'clients') newArray = content.clientLogos.filter((_, i) => i !== index);
+    const deleteItem = async (index, type) => {
+        showConfirm(
+            "Confirm Deletion",
+            `Are you sure you want to delete this ${type.slice(0, -1)}? This cannot be undone.`,
+            async () => {
+                let newArray;
+                if (type === 'projects') {
+                    const item = content.allProjects[index];
+                    if (item._id) await removeProject(item._id);
+                } else if (type === 'testimonials') {
+                    const item = content.testimonials[index];
+                    if (item._id) await removeTestimonial(item._id);
+                } else if (type === 'instagram') {
+                    const item = content.instagram[index];
+                    if (item._id) await removeInstagram(item._id);
+                } else if (type === 'work') {
+                    const item = content.selectedWork[index];
+                    if (item._id) await removeSelectedWork(item._id);
+                } else if (type === 'values') {
+                    const item = content.values[index];
+                    if (item._id) await removeValue(item._id);
+                } else if (type === 'clients') {
+                    const item = content.clientLogos[index];
+                    if (item._id) await removeClient(item._id);
+                }
 
-        if (type === 'work') updateSelectedWork(newArray);
-        else if (type === 'projects') updateAllProjects(newArray);
-        else if (type === 'testimonials') updateTestimonials(newArray);
-        else if (type === 'instagram') updateInstagram(newArray);
-        else if (type === 'values') updateValues(newArray);
-        else if (type === 'clients') updateClientLogos(newArray);
+                if (type === 'work') newArray = content.selectedWork.filter((_, i) => i !== index);
+                else if (type === 'projects') newArray = content.allProjects.filter((_, i) => i !== index);
+                else if (type === 'testimonials') newArray = content.testimonials.filter((_, i) => i !== index);
+                else if (type === 'instagram') newArray = content.instagram.filter((_, i) => i !== index);
+                else if (type === 'values') newArray = content.values.filter((_, i) => i !== index);
+                else if (type === 'clients') newArray = content.clientLogos.filter((_, i) => i !== index);
+
+                if (type === 'work') updateSelectedWork(newArray);
+                else if (type === 'projects') updateAllProjects(newArray);
+                else if (type === 'testimonials') updateTestimonials(newArray);
+                else if (type === 'instagram') updateInstagram(newArray);
+                else if (type === 'values') updateValues(newArray);
+                else if (type === 'clients') updateClientLogos(newArray);
+            },
+            "Delete",
+            "#5D4037"
+        );
     };
 
     return (
@@ -162,7 +356,7 @@ const Admin = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h1 style={{ color: 'var(--color-electric-blue)', margin: 0 }}>Admin Dashboard</h1>
                 <span style={{ fontSize: '0.9rem', color: 'green', backgroundColor: '#e6fffa', padding: '0.5rem 1rem', borderRadius: '20px', border: '1px solid #b2f5ea' }}>
-                    ✓ Changes auto-saved to browser
+                    ✓ Changes auto-saved to Database
                 </span>
             </div>
 
@@ -183,7 +377,61 @@ const Admin = () => {
                         {tab}
                     </button>
                 ))}
-                <button onClick={() => { if (window.confirm('Reset all content?')) resetContent() }} style={{ marginLeft: 'auto', backgroundColor: '#ffcccc', color: 'red' }}>Reset Defaults</button>
+                <button
+                    onClick={initializeDatabase}
+                    disabled={isInitializing}
+                    style={{
+                        marginLeft: 'auto',
+                        backgroundColor: isInitializing ? '#ccc' : 'var(--color-electric-blue)',
+                        color: 'white',
+                        border: 'none',
+                        padding: '0.6rem 1.5rem',
+                        borderRadius: '30px',
+                        cursor: isInitializing ? 'not-allowed' : 'pointer',
+                        fontWeight: '600',
+                        fontSize: '0.85rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px',
+                        transition: 'all 0.3s ease',
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                    }}
+                    onMouseOver={(e) => !isInitializing && (e.currentTarget.style.transform = 'translateY(-2px)', e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)')}
+                    onMouseOut={(e) => !isInitializing && (e.currentTarget.style.transform = 'translateY(0)', e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)')}
+                >
+                    {isInitializing ? (
+                        <>
+                            <motion.span
+                                animate={{ rotate: 360 }}
+                                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                                style={{ display: 'inline-block' }}
+                            >
+                                ⏳
+                            </motion.span>
+                            Syncing...
+                        </>
+                    ) : 'Initialize Database'}
+                </button>
+                <button
+                    onClick={() => showConfirm("Reset Content", "Reset all content to defaults? This will clear your current customizations.", () => resetContent())}
+                    style={{
+                        backgroundColor: 'transparent',
+                        color: '#5D4037',
+                        padding: '0.6rem 1.2rem',
+                        borderRadius: '30px',
+                        cursor: 'pointer',
+                        border: '1px solid #D7CCC8',
+                        fontSize: '0.8rem',
+                        fontWeight: '500',
+                        transition: 'all 0.2s ease'
+                    }}
+                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#EFEBE9', e.currentTarget.style.borderColor = '#5D4037')}
+                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent', e.currentTarget.style.borderColor = '#D7CCC8')}
+                >
+                    Reset Defaults
+                </button>
             </div>
 
             <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.05)' }}>
@@ -265,7 +513,7 @@ const Admin = () => {
                         <h2>Manage All Projects</h2>
                         <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>Add, edit, or remove projects from the global portfolio.</p>
                         {content.allProjects.map((item, index) => (
-                            <div key={index} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
+                            <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
                                     <input
                                         value={item.title}
@@ -273,7 +521,7 @@ const Admin = () => {
                                         placeholder="Project Title"
                                         style={{ flex: 1, padding: '0.5rem', fontWeight: 'bold' }}
                                     />
-                                    <button onClick={() => deleteItem(index, 'projects')} style={{ color: 'red' }}>X</button>
+                                    <button onClick={() => deleteItem(index, 'projects')} style={{ color: '#5D4037' }}>X</button>
                                 </div>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
                                     <input
@@ -341,7 +589,7 @@ const Admin = () => {
                                         placeholder="Category"
                                         style={{ flex: 1, padding: '0.5rem' }}
                                     />
-                                    <button onClick={() => deleteItem(index, 'work')} style={{ color: 'red' }}>X</button>
+                                    <button onClick={() => deleteItem(index, 'work')} style={{ color: '#5D4037' }}>X</button>
                                 </div>
                                 <FileUpload
                                     label="Override Image"
@@ -374,7 +622,7 @@ const Admin = () => {
                                         <input type="number" max="5" min="1" value={item.rating} onChange={(e) => handleArrayChange(index, 'rating', parseInt(e.target.value), 'testimonials')} placeholder="Rating" style={{ width: '100%', padding: '0.5rem' }} />
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                                        <button onClick={() => deleteItem(index, 'testimonials')} style={{ color: 'red', padding: '0.5rem' }}>Remove</button>
+                                        <button onClick={() => deleteItem(index, 'testimonials')} style={{ color: '#5D4037', padding: '0.5rem' }}>Remove</button>
                                     </div>
                                 </div>
 
@@ -414,7 +662,7 @@ const Admin = () => {
                                     <label>Link</label>
                                     <input value={item.link} onChange={(e) => handleArrayChange(index, 'link', e.target.value, 'instagram')} placeholder="Link URL" style={{ width: '100%', padding: '0.5rem' }} />
                                 </div>
-                                <button onClick={() => deleteItem(index, 'instagram')} style={{ color: 'red' }}>X</button>
+                                <button onClick={() => deleteItem(index, 'instagram')} style={{ color: '#5D4037' }}>X</button>
                             </div>
                         ))}
                         <button onClick={() => addItem('instagram')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add Post</button>
@@ -458,8 +706,8 @@ const Admin = () => {
                     </div>
                 )}
 
-
             </div>
+            <CustomModal {...modal} />
         </div>
     );
 };

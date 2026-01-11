@@ -83,6 +83,42 @@ const WorkModal = ({ projects, initialIndex, onClose }) => {
     const rafRef = useRef(null);
     const snapTimeout = useRef(null);
 
+    const loop = () => {
+        const state = scrollState.current;
+        if (!state.isActive || !scrollRef.current) return;
+
+        // Linear interpolation for smoothness (0.08 = very smooth/heavy, 0.2 = snappy)
+        // Using 0.08 for a "cinematic" smooth feel as requested
+        const diff = state.target - state.current;
+
+        // Stop if close enough
+        if (Math.abs(diff) < 0.5) {
+            state.current = state.target;
+            scrollRef.current.scrollLeft = state.current;
+            rafRef.current = requestAnimationFrame(loop); // Keep running to catch updates, or optimized: continue only if moved
+            // Optimization: we keep running is fine for simple modals, but better to stop if idle?
+            // For now, consistent loop ensures responsiveness.
+            return;
+        }
+
+        state.current += diff * 0.08;
+        scrollRef.current.scrollLeft = state.current;
+        rafRef.current = requestAnimationFrame(loop);
+    };
+
+    const startLoop = () => {
+        if (!rafRef.current) {
+            loop();
+        }
+    };
+
+    const stopLoop = () => {
+        if (rafRef.current) {
+            cancelAnimationFrame(rafRef.current);
+            rafRef.current = null;
+        }
+    };
+
     // Initialize Scroll Position
     useEffect(() => {
         if (scrollRef.current) {
@@ -107,42 +143,6 @@ const WorkModal = ({ projects, initialIndex, onClose }) => {
         }
         return () => stopLoop();
     }, [initialIndex]);
-
-    const startLoop = () => {
-        if (!rafRef.current) {
-            loop();
-        }
-    };
-
-    const stopLoop = () => {
-        if (rafRef.current) {
-            cancelAnimationFrame(rafRef.current);
-            rafRef.current = null;
-        }
-    };
-
-    const loop = () => {
-        const state = scrollState.current;
-        if (!state.isActive || !scrollRef.current) return;
-
-        // Linear interpolation for smoothness (0.08 = very smooth/heavy, 0.2 = snappy)
-        // Using 0.08 for a "cinematic" smooth feel as requested
-        const diff = state.target - state.current;
-
-        // Stop if close enough
-        if (Math.abs(diff) < 0.5) {
-            state.current = state.target;
-            scrollRef.current.scrollLeft = state.current;
-            rafRef.current = requestAnimationFrame(loop); // Keep running to catch updates, or optimized: continue only if moved
-            // Optimization: we keep running is fine for simple modals, but better to stop if idle?
-            // For now, consistent loop ensures responsiveness.
-            return;
-        }
-
-        state.current += diff * 0.08;
-        scrollRef.current.scrollLeft = state.current;
-        rafRef.current = requestAnimationFrame(loop);
-    };
 
     // Ensure loop keeps running or restarts on interaction
     useEffect(() => {
@@ -213,10 +213,6 @@ const WorkModal = ({ projects, initialIndex, onClose }) => {
                     top: '2rem',
                     right: '2rem',
                     zIndex: 10000,
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#fdfd96',
-                    fontSize: '1.5rem',
                     cursor: 'pointer',
                     padding: '1rem',
                     border: '1px solid #fdfd96',
@@ -263,7 +259,6 @@ export default function Work() {
     // Modal State
     const [modalOpen, setModalOpen] = useState(false);
     const [initialSlide, setInitialSlide] = useState(0);
-    const modalScrollRef = useRef(null);
 
     // Scroll Logic for Main Page
     const containerRef = useRef(null);
@@ -318,7 +313,6 @@ export default function Work() {
             style={{
                 height: '100vh',
                 width: '100vw',
-                overflowY: 'auto',
                 overflowY: 'auto',
                 overflowX: 'hidden',
                 backgroundColor: '#3b2f2f',

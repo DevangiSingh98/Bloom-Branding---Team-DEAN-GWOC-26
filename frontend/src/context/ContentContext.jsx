@@ -206,16 +206,123 @@ export const ContentProvider = ({ children }) => {
         return savedContent ? JSON.parse(savedContent) : defaultContent;
     });
 
+    // 1. Fetch live projects from MongoDB on mount
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/projects');
+                if (response.ok) {
+                    const projects = await response.json();
+                    if (projects && projects.length > 0) {
+                        const mappedProjects = projects.map(p => ({
+                            _id: p._id,
+                            id: p._id, // Add id for consistency
+                            title: p.title,
+                            category: p.category,
+                            image: p.imageUrl,
+                            description: p.description
+                        }));
+                        setContent(prev => ({ ...prev, allProjects: mappedProjects }));
+                    }
+                }
+
+                // Fetch Hero
+                const hResponse = await fetch('http://localhost:5000/api/hero');
+                if (hResponse.ok) {
+                    const hero = await hResponse.json();
+                    if (hero && hero.subtitle) {
+                        setContent(prev => ({ ...prev, hero: hero }));
+                    }
+                }
+
+                // Fetch Testimonials
+                const tResponse = await fetch('http://localhost:5000/api/testimonials');
+                if (tResponse.ok) {
+                    const testimonials = await tResponse.json();
+                    if (testimonials && testimonials.length > 0) {
+                        const mappedTestimonials = testimonials.map(t => ({ ...t, id: t._id }));
+                        setContent(prev => ({ ...prev, testimonials: mappedTestimonials }));
+                    }
+                }
+
+                // Fetch Instagram
+                const iResponse = await fetch('http://localhost:5000/api/instagram');
+                if (iResponse.ok) {
+                    const insta = await iResponse.json();
+                    if (insta && insta.length > 0) {
+                        const mappedInsta = insta.map(i => ({ ...i, id: i._id }));
+                        setContent(prev => ({ ...prev, instagram: mappedInsta }));
+                    }
+                }
+
+                // Fetch Founders
+                const fResponse = await fetch('http://localhost:5000/api/founders');
+                if (fResponse.ok) {
+                    const foundersArr = await fResponse.json();
+                    if (foundersArr && foundersArr.length > 0) {
+                        const foundersObj = { ...content.founders };
+                        foundersArr.forEach(f => {
+                            if (f.key) foundersObj[f.key] = f;
+                        });
+                        setContent(prev => ({ ...prev, founders: foundersObj }));
+                    }
+                }
+
+                // Fetch Values
+                const vResponse = await fetch('http://localhost:5000/api/values');
+                if (vResponse.ok) {
+                    const values = await vResponse.json();
+                    if (values && values.length > 0) {
+                        const mappedValues = values.map(v => ({ ...v, id: v._id }));
+                        setContent(prev => ({ ...prev, values: mappedValues }));
+                    }
+                }
+
+                // Fetch Clients
+                const cResponse = await fetch('http://localhost:5000/api/clients');
+                if (cResponse.ok) {
+                    const clients = await cResponse.json();
+                    if (clients && clients.length > 0) {
+                        const mappedClients = clients.map(c => ({ ...c, id: c._id }));
+                        setContent(prev => ({ ...prev, clientLogos: mappedClients }));
+                    }
+                }
+
+                // Fetch Selected Work
+                const wResponse = await fetch('http://localhost:5000/api/selected-work');
+                if (wResponse.ok) {
+                    const work = await wResponse.json();
+                    if (work && work.length > 0) {
+                        const mappedWork = work.map(w => ({ ...w, id: w._id }));
+                        setContent(prev => ({ ...prev, selectedWork: mappedWork }));
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching data from backend:', error);
+            }
+        };
+
+        fetchProjects();
+    }, []);
+
     // Save to localStorage whenever content changes
     useEffect(() => {
         localStorage.setItem('bloomContent_v23', JSON.stringify(content));
     }, [content]);
 
-    const updateHero = (updates) => {
+    const updateHero = async (updates) => {
         setContent(prev => ({
             ...prev,
             hero: { ...prev.hero, ...updates }
         }));
+        // Sync to backend
+        try {
+            await fetch('http://localhost:5000/api/hero', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...content.hero, ...updates })
+            });
+        } catch (e) { console.error(e); }
     };
 
     const updateAllProjects = (newProjects) => {
@@ -260,11 +367,244 @@ export const ContentProvider = ({ children }) => {
         setContent(defaultContent);
     };
 
+    const syncProject = async (project) => {
+        try {
+            const body = {
+                title: project.title,
+                description: project.description,
+                category: project.category,
+                imageUrl: project.image || project.imageUrl
+            };
+
+            const url = project._id
+                ? `http://localhost:5000/api/projects/${project._id}`
+                : 'http://localhost:5000/api/projects';
+
+            const method = project._id ? 'PUT' : 'POST'; // Assuming PUT exists for update
+
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            if (response.ok) {
+                const savedProject = await response.json();
+                // Refresh local state with backend data (especially for new projects with IDs)
+                if (!project._id) {
+                    setContent(prev => ({
+                        ...prev,
+                        allProjects: prev.allProjects.map(p =>
+                            (p.id === project.id && !p._id) ? { ...p, _id: savedProject._id, id: savedProject._id } : p
+                        )
+                    }));
+                }
+                return savedProject;
+            }
+        } catch (error) {
+            console.error('Error syncing project to backend:', error);
+        }
+    };
+
+    const removeProject = async (id) => {
+        if (!id) return;
+        try {
+            const response = await fetch(`http://localhost:5000/api/projects/${id}`, {
+                method: 'DELETE'
+            });
+            return response.ok;
+        } catch (error) {
+            console.error('Error deleting project from backend:', error);
+        }
+    };
+
+    const syncTestimonial = async (t) => {
+        try {
+            const url = t._id ? `http://localhost:5000/api/testimonials/${t._id}` : 'http://localhost:5000/api/testimonials';
+            const method = t._id ? 'PUT' : 'POST';
+            const response = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(t)
+            });
+            if (response.ok) {
+                const saved = await response.json();
+                if (!t._id) {
+                    setContent(prev => ({
+                        ...prev,
+                        testimonials: prev.testimonials.map(item =>
+                            (item.id === t.id && !item._id) ? { ...saved, id: saved._id } : item
+                        )
+                    }));
+                }
+                return saved;
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    const removeTestimonial = async (id) => {
+        if (!id) return;
+        try {
+            await fetch(`http://localhost:5000/api/testimonials/${id}`, { method: 'DELETE' });
+        } catch (e) { console.error(e); }
+    };
+
+    const syncInstagram = async (post) => {
+        try {
+            const url = post._id ? `http://localhost:5000/api/instagram/${post._id}` : 'http://localhost:5000/api/instagram';
+            const method = post._id ? 'PUT' : 'POST';
+            const response = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(post)
+            });
+            if (response.ok) {
+                const saved = await response.json();
+                if (!post._id) {
+                    setContent(prev => ({
+                        ...prev,
+                        instagram: prev.instagram.map(item =>
+                            (item.id === post.id && !item._id) ? { ...saved, id: saved._id } : item
+                        )
+                    }));
+                }
+                return saved;
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    const removeInstagram = async (id) => {
+        if (!id) return;
+        try {
+            await fetch(`http://localhost:5000/api/instagram/${id}`, { method: 'DELETE' });
+        } catch (e) { console.error(e); }
+    };
+
+    const syncFounder = async (f) => {
+        try {
+            const url = f._id ? `http://localhost:5000/api/founders/${f._id}` : 'http://localhost:5000/api/founders';
+            const response = await fetch(url, {
+                method: f._id ? 'PUT' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(f)
+            });
+            if (response.ok) {
+                const saved = await response.json();
+                if (!f._id) {
+                    setContent(prev => {
+                        const newFounders = { ...prev.founders };
+                        if (f.key) {
+                            newFounders[f.key] = { ...newFounders[f.key], _id: saved._id };
+                        } else {
+                            // If no key, maybe it's the main image or something else
+                            Object.assign(newFounders, saved);
+                        }
+                        return { ...prev, founders: newFounders };
+                    });
+                }
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    const removeFounder = async (id) => {
+        if (!id) return;
+        try { await fetch(`http://localhost:5000/api/founders/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+    };
+
+    const syncValue = async (v) => {
+        try {
+            const url = v._id ? `http://localhost:5000/api/values/${v._id}` : 'http://localhost:5000/api/values';
+            const response = await fetch(url, {
+                method: v._id ? 'PUT' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(v)
+            });
+            if (response.ok) {
+                const saved = await response.json();
+                if (!v._id) {
+                    setContent(prev => ({
+                        ...prev,
+                        values: prev.values.map(item => (item.id === v.id && !item._id) ? { ...saved, id: saved._id } : item)
+                    }));
+                }
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    const removeValue = async (id) => {
+        if (!id) return;
+        try { await fetch(`http://localhost:5000/api/values/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+    };
+
+    const syncClient = async (c) => {
+        try {
+            const url = c._id ? `http://localhost:5000/api/clients/${c._id}` : 'http://localhost:5000/api/clients';
+            const response = await fetch(url, {
+                method: c._id ? 'PUT' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(c)
+            });
+            if (response.ok) {
+                const saved = await response.json();
+                if (!c._id) {
+                    setContent(prev => ({
+                        ...prev,
+                        clientLogos: prev.clientLogos.map(item => (item.id === c.id && !item._id) ? { ...saved, id: saved._id } : item)
+                    }));
+                }
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    const removeClient = async (id) => {
+        if (!id) return;
+        try { await fetch(`http://localhost:5000/api/clients/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+    };
+
+    const syncSelectedWork = async (w) => {
+        try {
+            const url = w._id ? `http://localhost:5000/api/selected-work/${w._id}` : 'http://localhost:5000/api/selected-work';
+            const response = await fetch(url, {
+                method: w._id ? 'PUT' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(w)
+            });
+            if (response.ok) {
+                const saved = await response.json();
+                if (!w._id) {
+                    setContent(prev => ({
+                        ...prev,
+                        selectedWork: prev.selectedWork.map(item => (item.id === w.id && !item._id) ? { ...saved, id: saved._id } : item)
+                    }));
+                }
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    const removeSelectedWork = async (id) => {
+        if (!id) return;
+        try { await fetch(`http://localhost:5000/api/selected-work/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+    };
+
     return (
         <ContentContext.Provider value={{
             content,
             updateHero,
             updateAllProjects,
+            syncProject,
+            removeProject,
+            syncTestimonial,
+            removeTestimonial,
+            syncInstagram,
+            removeInstagram,
+            syncFounder,
+            removeFounder,
+            syncValue,
+            removeValue,
+            syncClient,
+            removeClient,
+            syncSelectedWork,
+            removeSelectedWork,
             updateSelectedWork,
             updateTestimonials,
             updateClientLogos,

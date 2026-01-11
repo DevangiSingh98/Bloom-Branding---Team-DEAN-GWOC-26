@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useContent } from '../context/ContentContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const FileUpload = ({ label, value, onFileSelect, type = "image" }) => {
     const [fileName, setFileName] = useState("No file chosen");
@@ -71,11 +71,105 @@ const FileUpload = ({ label, value, onFileSelect, type = "image" }) => {
     );
 };
 
+const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+            backdropFilter: 'none' // Explicitly no glassmorphism
+        }}>
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                transition={{ duration: 0.2 }}
+                style={{
+                    backgroundColor: 'white',
+                    padding: '2.5rem',
+                    borderRadius: '12px',
+                    width: '90%',
+                    maxWidth: '450px',
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
+                    textAlign: 'center',
+                    border: '1px solid #eee'
+                }}
+            >
+                <h3 style={{
+                    marginTop: 0,
+                    marginBottom: '1rem',
+                    fontSize: '1.8rem',
+                    color: '#333',
+                    fontFamily: 'Bigilla, serif'
+                }}>
+                    {title || "Are you sure?"}
+                </h3>
+                <p style={{
+                    color: '#666',
+                    marginBottom: '2rem',
+                    fontSize: '1.1rem',
+                    lineHeight: 1.5
+                }}>
+                    {message || "This action cannot be undone."}
+                </p>
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                    <button
+                        onClick={onClose}
+                        style={{
+                            padding: '0.8rem 2rem',
+                            borderRadius: '50px',
+                            border: '1px solid #ccc',
+                            backgroundColor: 'transparent',
+                            cursor: 'pointer',
+                            fontSize: '1rem',
+                            fontWeight: 'bold',
+                            color: '#555'
+                        }}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        style={{
+                            padding: '0.8rem 2rem',
+                            borderRadius: '50px',
+                            border: 'none',
+                            backgroundColor: '#ff4d4f',
+                            color: 'white',
+                            cursor: 'pointer',
+                            fontSize: '1rem',
+                            fontWeight: 'bold',
+                            boxShadow: '0 4px 15px rgba(255, 77, 79, 0.3)'
+                        }}
+                    >
+                        Delete
+                    </button>
+                </div>
+            </motion.div>
+        </div>
+    );
+};
+
 const Admin = () => {
     const { content, updateHero, updateAllProjects, updateSelectedWork, updateTestimonials, updateClientLogos, updateInstagram, updateFounders, updateValues, resetContent } = useContent();
     const [activeTab, setActiveTab] = useState('enquiries');
-
     const [openEnquiryId, setOpenEnquiryId] = useState(null);
+
+    // Delete Modal State
+    const [deleteModal, setDeleteModal] = useState({
+        isOpen: false,
+        type: null,
+        index: null
+    });
 
     const handleHeroChange = (e) => {
         updateHero({ [e.target.name]: e.target.value });
@@ -140,7 +234,14 @@ const Admin = () => {
         }
     };
 
-    const deleteItem = (index, type) => {
+    const confirmDelete = (index, type) => {
+        setDeleteModal({ isOpen: true, index, type });
+    };
+
+    const executeDelete = () => {
+        const { index, type } = deleteModal;
+        if (index === null || !type) return;
+
         let newArray;
         if (type === 'work') newArray = content.selectedWork.filter((_, i) => i !== index);
         else if (type === 'projects') newArray = content.allProjects.filter((_, i) => i !== index);
@@ -155,10 +256,24 @@ const Admin = () => {
         else if (type === 'instagram') updateInstagram(newArray);
         else if (type === 'values') updateValues(newArray);
         else if (type === 'clients') updateClientLogos(newArray);
+
+        setDeleteModal({ isOpen: false, index: null, type: null });
     };
 
     return (
         <div className="section-padding container" style={{ minHeight: '80vh', marginTop: '4rem' }}>
+            <AnimatePresence>
+                {deleteModal.isOpen && (
+                    <ConfirmationModal
+                        isOpen={deleteModal.isOpen}
+                        title="Delete Item"
+                        message="Are you sure you want to delete this? This action cannot be undone."
+                        onClose={() => setDeleteModal({ ...deleteModal, isOpen: false })}
+                        onConfirm={executeDelete}
+                    />
+                )}
+            </AnimatePresence>
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h1 style={{ color: 'var(--color-electric-blue)', margin: 0 }}>Admin Dashboard</h1>
                 <span style={{ fontSize: '0.9rem', color: 'green', backgroundColor: '#e6fffa', padding: '0.5rem 1rem', borderRadius: '20px', border: '1px solid #b2f5ea' }}>
@@ -273,7 +388,7 @@ const Admin = () => {
                                         placeholder="Project Title"
                                         style={{ flex: 1, padding: '0.5rem', fontWeight: 'bold' }}
                                     />
-                                    <button onClick={() => deleteItem(index, 'projects')} style={{ color: 'red' }}>X</button>
+                                    <button onClick={() => confirmDelete(index, 'projects')} style={{ color: 'red' }}>X</button>
                                 </div>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
                                     <input
@@ -341,7 +456,7 @@ const Admin = () => {
                                         placeholder="Category"
                                         style={{ flex: 1, padding: '0.5rem' }}
                                     />
-                                    <button onClick={() => deleteItem(index, 'work')} style={{ color: 'red' }}>X</button>
+                                    <button onClick={() => confirmDelete(index, 'work')} style={{ color: 'red' }}>X</button>
                                 </div>
                                 <FileUpload
                                     label="Override Image"
@@ -374,7 +489,7 @@ const Admin = () => {
                                         <input type="number" max="5" min="1" value={item.rating} onChange={(e) => handleArrayChange(index, 'rating', parseInt(e.target.value), 'testimonials')} placeholder="Rating" style={{ width: '100%', padding: '0.5rem' }} />
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                                        <button onClick={() => deleteItem(index, 'testimonials')} style={{ color: 'red', padding: '0.5rem' }}>Remove</button>
+                                        <button onClick={() => confirmDelete(index, 'testimonials')} style={{ color: 'red', padding: '0.5rem' }}>Remove</button>
                                     </div>
                                 </div>
 
@@ -414,7 +529,7 @@ const Admin = () => {
                                     <label>Link</label>
                                     <input value={item.link} onChange={(e) => handleArrayChange(index, 'link', e.target.value, 'instagram')} placeholder="Link URL" style={{ width: '100%', padding: '0.5rem' }} />
                                 </div>
-                                <button onClick={() => deleteItem(index, 'instagram')} style={{ color: 'red' }}>X</button>
+                                <button onClick={() => confirmDelete(index, 'instagram')} style={{ color: 'red' }}>X</button>
                             </div>
                         ))}
                         <button onClick={() => addItem('instagram')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add Post</button>

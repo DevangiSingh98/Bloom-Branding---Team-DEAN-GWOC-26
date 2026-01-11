@@ -10,34 +10,49 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isDarkText, setIsDarkText] = useState(false);
+    const [scrollY, setScrollY] = useState(0); // New state to track exact scroll position
     const location = useLocation();
+
+    // Track scroll position for robust fallback
+    useEffect(() => {
+        const handleScroll = () => setScrollY(window.scrollY);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll(); // Init
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const toggleMenu = () => setIsOpen(!isOpen);
 
     useEffect(() => {
-        // Refresh ScrollTrigger and set up triggers for light sections
+        // 1. IMMEDIATE STATE RESET based on Route
+        // This ensures the color is correct momentarily before any scrolling happens
+        if (location.pathname === '/about') {
+            setIsDarkText(true); // About starts Dark
+        } else {
+            setIsDarkText(false); // Home, Services, Work start Yellow
+        }
+
+        // 2. HARD RESET of ScrollTrigger
+        // Kill ALL triggers to prevent ghosts from previous pages
+        // ScrollTrigger.getAll().forEach(t => t.kill()); // REMOVED: This causes race conditions with new page mounting
+
         const ctx = gsap.context(() => {
             if (location.pathname.startsWith('/services')) {
-                // Services Page specific logic: Coordinate-based
-                // Hero is 100vh. Everything after is Dark.
-                // We utilize a simple trigger on the entire document that checks scroll position.
                 ScrollTrigger.create({
                     start: 0,
                     end: "max",
                     onUpdate: (self) => {
-                        // Check if we have scrolled past the viewport height (Hero)
-                        // Subtract a small buffer (e.g., 50px) for the Navbar background
                         const isPastHero = self.scroll() > window.innerHeight - 50;
                         setIsDarkText(isPastHero);
                     }
                 });
             } else {
-                // Standard logic for Home / other pages using class markers
+                // Class-based logic for other simple pages (if any use .light-section)
                 const sections = gsap.utils.toArray('.light-section');
                 sections.forEach(section => {
                     ScrollTrigger.create({
                         trigger: section,
-                        start: "top 80px", // Trigger when section hits top (navbar area)
+                        start: "top 80px",
                         end: "bottom 80px",
                         onEnter: () => setIsDarkText(true),
                         onLeave: () => setIsDarkText(false),
@@ -48,10 +63,16 @@ export default function Navbar() {
             }
         });
 
-        // Force a check/refresh slightly after render to ensure elements are present
-        setTimeout(() => ScrollTrigger.refresh(), 100);
+        // 3. REFRESH AFTER RENDER
+        const timer = setTimeout(() => {
+            ScrollTrigger.refresh();
+            window.dispatchEvent(new Event('scroll'));
+        }, 500);
 
-        return () => ctx.revert();
+        return () => {
+            ctx.revert(); // Revert local context
+            clearTimeout(timer);
+        };
     }, [location]);
 
     const menuVariants = {
@@ -116,17 +137,23 @@ export default function Navbar() {
         if (isOpen) return 'var(--color-butter-yellow)';
         if (isWork) return 'var(--color-butter-yellow)';
 
-        // Home Page Logic: Now dynamic via events (passed from Home.jsx)
-        // We removed the forced "if (isHome) return Yellow" check.
+        // 1. SAFETY OVERRIDE: Enforce "Top of Page" colors
+        // If we are basically at the top (< 10px), FORCE the correct color
+        // This solves the issue where ScrollTriggers haven't loaded yet
+        if (scrollY < 50) {
+            if (location.pathname === '/about') return 'var(--color-dark-choc)'; // About starts Dark
+            if (location.pathname === '/') return 'var(--color-butter-yellow)';  // Home starts Yellow
+            if (location.pathname.startsWith('/services')) return 'var(--color-butter-yellow)'; // Services starts Yellow
+        }
 
+        // 2. Normal Logic (Dynamic via events)
         if (location.pathname === '/' || location.pathname === '/about') {
-            // For Home & About, we rely on isDarkText state which is driven by events
             return isDarkText ? 'var(--color-dark-choc)' : 'var(--color-butter-yellow)';
         }
 
         if (!isServices) return 'var(--color-dark-choc)';
 
-        // Services Page Logic (already handled by ScrollTrigger setting isDarkText)
+        // Services Page Logic
         return isDarkText ? 'var(--color-dark-choc)' : 'var(--color-butter-yellow)';
     };
 

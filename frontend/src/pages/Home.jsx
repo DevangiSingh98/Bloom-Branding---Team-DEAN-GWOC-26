@@ -247,8 +247,15 @@ export default function Home() {
 
     // Independent Navbar Color Triggers for Home Page
     useEffect(() => {
-        // 1. Initial State: Yellow (Hero)
+        // 1. Initial State: Yellow (Hero) - Dispatch immediately
         window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: false } }));
+
+        // 2. Refresh Triggers after mount/transition
+        const timer = setTimeout(() => {
+            ScrollTrigger.refresh();
+            // Re-dispatch to be safe after layout settles
+            window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: false } }));
+        }, 100);
 
         const ctx = gsap.context(() => {
             // "Blooming the Brand" -> Dark
@@ -276,7 +283,11 @@ export default function Home() {
             });
         }, containerRef);
 
-        return () => ctx.revert();
+        return () => {
+            ctx.revert();
+            // Double check cleanup for any stray triggers
+            ScrollTrigger.getAll().filter(t => t.vars.trigger === "#blooming-section" || t.vars.trigger === "#expertise-section" || t.vars.trigger === "#journey-stats").forEach(t => t.kill());
+        };
     }, []);
 
     return (

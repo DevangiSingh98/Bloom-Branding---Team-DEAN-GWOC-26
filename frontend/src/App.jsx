@@ -82,7 +82,13 @@ function ConditionalFooter() {
     // However, usually detailed pages also might want this or not. 
     // Let's stick to strict equality for now or strict equality to /work.
     // The user said "remove the footer from THIS page".
-    if (location.pathname === '/work' || location.pathname === '/about') {
+    // Check if the current path starts with /work since there might be sub-routes like /work/project-name, 
+    // BUT the user specifically said "for the works page". 
+    // Assuming they mean the main work listing page. 
+    // However, usually detailed pages also might want this or not. 
+    // Let's stick to strict equality for now or strict equality to /work.
+    // The user said "remove the footer from THIS page".
+    if (location.pathname === '/about') {
         return null;
     }
     return <Footer />;

@@ -24,8 +24,8 @@ const updateInstagramPost = async (req, res) => {
     try {
         const post = await Instagram.findById(req.params.id);
         if (post) {
-            post.image = req.body.image || post.image;
-            post.link = req.body.link || post.link;
+            post.image = req.body.image !== undefined ? req.body.image : post.image;
+            post.link = req.body.link !== undefined ? req.body.link : post.link;
             const updated = await post.save();
             res.json(updated);
         } else {

@@ -6,6 +6,7 @@ const projectSchema = mongoose.Schema({
     imageUrl: { type: String, required: true },
     category: { type: String, required: true }, // e.g., 'Branding', 'Web Design'
     link: { type: String }, // External link to project if applicable
+    video: { type: String }, // Base64 or URL
 }, {
     timestamps: true
 });

@@ -19,7 +19,11 @@ const updateSelectedWork = async (req, res) => {
     try {
         const item = await SelectedWork.findById(req.params.id);
         if (item) {
-            Object.assign(item, req.body);
+            item.title = req.body.title !== undefined ? req.body.title : item.title;
+            item.category = req.body.category !== undefined ? req.body.category : item.category;
+            item.image = req.body.image !== undefined ? req.body.image : item.image;
+            item.video = req.body.video !== undefined ? req.body.video : item.video;
+            item.link = req.body.link !== undefined ? req.body.link : item.link;
             const updated = await item.save();
             res.json(updated);
         } else { res.status(404).json({ message: 'Not found' }); }

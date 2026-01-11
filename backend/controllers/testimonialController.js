@@ -30,11 +30,11 @@ const updateTestimonial = async (req, res) => {
     try {
         const t = await Testimonial.findById(req.params.id);
         if (t) {
-            t.text = req.body.text || t.text;
-            t.author = req.body.author || t.author;
-            t.rating = req.body.rating || t.rating;
-            t.image = req.body.image || t.image;
-            t.video = req.body.video || t.video;
+            t.text = req.body.text !== undefined ? req.body.text : t.text;
+            t.author = req.body.author !== undefined ? req.body.author : t.author;
+            t.rating = req.body.rating !== undefined ? req.body.rating : t.rating;
+            t.image = req.body.image !== undefined ? req.body.image : t.image;
+            t.video = req.body.video !== undefined ? req.body.video : t.video;
             const updated = await t.save();
             res.json(updated);
         } else {

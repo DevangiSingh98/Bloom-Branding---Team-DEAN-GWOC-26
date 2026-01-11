@@ -46,25 +46,43 @@ const ProjectSlide = ({ project }) => (
                 </p>
             </motion.div>
 
-            {/* Image Section */}
+            {/* Media Section */}
             <motion.div
                 initial={{ opacity: 0, x: 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
                 style={{ flexShrink: 0, display: 'flex', justifyContent: 'center' }}
             >
-                <img
-                    src={project.image}
-                    alt={project.title}
-                    style={{
-                        maxHeight: '80vh',
-                        maxWidth: '50vw',
-                        width: 'auto',
-                        borderRadius: '5px',
-                        boxShadow: '0 20px 40px rgba(0,0,0,0.8)',
-                        display: 'block'
-                    }}
-                />
+                {project.video ? (
+                    <video
+                        src={project.video}
+                        controls
+                        autoPlay
+                        loop
+                        muted
+                        style={{
+                            maxHeight: '80vh',
+                            maxWidth: '50vw',
+                            width: 'auto',
+                            borderRadius: '5px',
+                            boxShadow: '0 20px 40px rgba(0,0,0,0.8)',
+                            display: 'block'
+                        }}
+                    />
+                ) : (
+                    <img
+                        src={project.image}
+                        alt={project.title}
+                        style={{
+                            maxHeight: '80vh',
+                            maxWidth: '50vw',
+                            width: 'auto',
+                            borderRadius: '5px',
+                            boxShadow: '0 20px 40px rgba(0,0,0,0.8)',
+                            display: 'block'
+                        }}
+                    />
+                )}
             </motion.div>
         </div>
     </div>

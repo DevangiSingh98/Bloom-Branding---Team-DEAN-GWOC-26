@@ -247,14 +247,14 @@ export default function Home() {
 
     // Independent Navbar Color Triggers for Home Page
     useEffect(() => {
-        // 1. Initial State: Yellow (Hero) - Dispatch immediately
-        window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: false } }));
+        // 1. Initial State: Dark (Hero) - Dispatch immediately
+        window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: true } }));
 
         // 2. Refresh Triggers after mount/transition
         const timer = setTimeout(() => {
             ScrollTrigger.refresh();
             // Re-dispatch to be safe after layout settles
-            window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: false } }));
+            window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: true } }));
         }, 100);
 
         const ctx = gsap.context(() => {
@@ -263,7 +263,7 @@ export default function Home() {
                 trigger: "#blooming-section",
                 start: "top 100px",
                 onEnter: () => window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: true } })),
-                onLeaveBack: () => window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: false } }))
+                onLeaveBack: () => window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: true } })) // Hero is also Dark
             });
 
             // "Our Expertise" & "Selected Work" -> Yellow
@@ -281,12 +281,21 @@ export default function Home() {
                 onEnter: () => window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: true } })),
                 onLeaveBack: () => window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: false } }))
             });
+
+            // "Client Love" -> Dark (Reinforcement)
+            ScrollTrigger.create({
+                trigger: "#client-love-section",
+                start: "top 100px",
+                onEnter: () => window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: true } })),
+                onLeaveBack: () => window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: true } }))
+            });
+
         }, containerRef);
 
         return () => {
             ctx.revert();
             // Double check cleanup for any stray triggers
-            ScrollTrigger.getAll().filter(t => t.vars.trigger === "#blooming-section" || t.vars.trigger === "#expertise-section" || t.vars.trigger === "#journey-stats").forEach(t => t.kill());
+            ScrollTrigger.getAll().filter(t => t.vars.trigger === "#blooming-section" || t.vars.trigger === "#expertise-section" || t.vars.trigger === "#journey-stats" || t.vars.trigger === "#client-love-section").forEach(t => t.kill());
         };
     }, []);
 
@@ -362,9 +371,16 @@ export default function Home() {
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.5, duration: 1 }}
                             className="font-subtitle"
-                            style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto 2rem auto', color: 'var(--color-white)', textShadow: '0 0 10px rgba(0,0,0,0.5)' }}
+                            style={{
+                                fontSize: '1.2rem',
+                                margin: '0 auto 2rem auto',
+                                color: 'var(--color-white)',
+                                textShadow: '0 0 10px rgba(0,0,0,0.5)',
+                                textAlign: 'center',
+                                transform: 'translateX(50px)'
+                            }}
                         >
-                            {content.hero.subtitle}
+                            We build brands that bloom.
                         </motion.p>
                     </motion.div>
                 </ParallaxContent>
@@ -457,7 +473,7 @@ export default function Home() {
             </section>
 
             {/* Testimonials */}
-            <section className="section-padding light-section" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)', padding: '0' }}>
+            <section id="client-love-section" className="section-padding light-section" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)', padding: '0' }}>
                 <ParallaxContent>
                     <div className="container" style={{ maxWidth: '100%' }}>
                         <motion.h2

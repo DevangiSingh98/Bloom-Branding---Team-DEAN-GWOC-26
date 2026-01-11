@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import EmailServiceSelector from "./EmailServiceSelector";
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -11,6 +12,7 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isDarkText, setIsDarkText] = useState(false);
     const [scrollY, setScrollY] = useState(0); // New state to track exact scroll position
+    const [emailModalOpen, setEmailModalOpen] = useState(false);
     const location = useLocation();
 
     // Track scroll position for robust fallback
@@ -142,7 +144,7 @@ export default function Navbar() {
         // This solves the issue where ScrollTriggers haven't loaded yet
         if (scrollY < 50) {
             if (location.pathname === '/about') return 'var(--color-dark-choc)'; // About starts Dark
-            if (location.pathname === '/') return 'var(--color-butter-yellow)';  // Home starts Yellow
+            if (location.pathname === '/') return 'var(--color-dark-choc)';  // Home starts Dark (Hero)
             if (location.pathname.startsWith('/services')) return 'var(--color-butter-yellow)'; // Services starts Yellow
         }
 
@@ -353,12 +355,29 @@ export default function Navbar() {
 
                         <motion.div variants={itemVariants} style={{ marginTop: '4rem', fontFamily: 'var(--font-subtitle)' }}>
                             <p>Get in touch</p>
-                            <a href="mailto:hello.bloombranding@gmail.com">hello.bloombranding@gmail.com</a>
+                            <button
+                                onClick={() => setEmailModalOpen(true)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    color: 'inherit',
+                                    padding: 0,
+                                    cursor: 'pointer',
+                                    textDecoration: 'underline'
+                                }}
+                            >
+                                hello.bloombranding@gmail.com
+                            </button>
                         </motion.div>
-
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <EmailServiceSelector
+                isOpen={emailModalOpen}
+                onClose={() => setEmailModalOpen(false)}
+                recipient="hello.bloombranding@gmail.com"
+            />
         </>
     );
 }

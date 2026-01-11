@@ -19,7 +19,13 @@ const updateFounder = async (req, res) => {
     try {
         const item = await Founder.findById(req.params.id);
         if (item) {
-            Object.assign(item, req.body);
+            item.name = req.body.name !== undefined ? req.body.name : item.name;
+            item.role = req.body.role !== undefined ? req.body.role : item.role;
+            item.image = req.body.image !== undefined ? req.body.image : item.image;
+            item.bio1 = req.body.bio1 !== undefined ? req.body.bio1 : item.bio1;
+            item.bio2 = req.body.bio2 !== undefined ? req.body.bio2 : item.bio2;
+            item.key = req.body.key !== undefined ? req.body.key : item.key;
+            item.quote = req.body.quote !== undefined ? req.body.quote : item.quote;
             const updated = await item.save();
             res.json(updated);
         } else { res.status(404).json({ message: 'Not found' }); }

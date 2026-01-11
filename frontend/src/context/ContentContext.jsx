@@ -305,9 +305,52 @@ export const ContentProvider = ({ children }) => {
         fetchProjects();
     }, []);
 
-    // Save to localStorage whenever content changes
+    // Helper to sanitize content for localStorage (remove large media)
+    const sanitizeForStorage = (data) => {
+        const sanitized = { ...data };
+
+        if (sanitized.allProjects) {
+            sanitized.allProjects = sanitized.allProjects.map(p => ({
+                ...p,
+                image: p.image && p.image.startsWith('data:') ? '' : p.image,
+                video: p.video && p.video.startsWith('data:') ? '' : p.video
+            }));
+        }
+        if (sanitized.selectedWork) {
+            sanitized.selectedWork = sanitized.selectedWork.map(w => ({
+                ...w,
+                image: w.image && w.image.startsWith('data:') ? '' : w.image,
+                video: w.video && w.video.startsWith('data:') ? '' : w.video
+            }));
+        }
+        if (sanitized.testimonials) {
+            sanitized.testimonials = sanitized.testimonials.map(t => ({
+                ...t,
+                image: t.image && t.image.startsWith('data:') ? '' : t.image,
+                video: t.video && t.video.startsWith('data:') ? '' : t.video
+            }));
+        }
+        if (sanitized.instagram) {
+            sanitized.instagram = sanitized.instagram.map(i => ({ ...i, image: i.image && i.image.startsWith('data:') ? '' : i.image }));
+        }
+        if (sanitized.clientLogos) {
+            sanitized.clientLogos = sanitized.clientLogos.map(c => ({ ...c, logo: c.logo && c.logo.startsWith('data:') ? '' : c.logo }));
+        }
+        if (sanitized.founders) {
+            sanitized.founders = { ...sanitized.founders, image: sanitized.founders.image && sanitized.founders.image.startsWith('data:') ? '' : sanitized.founders.image };
+        }
+
+        return sanitized;
+    };
+
+    // Save to localStorage whenever content changes (Sanitized)
     useEffect(() => {
-        localStorage.setItem('bloomContent_v23', JSON.stringify(content));
+        try {
+            const sanitized = sanitizeForStorage(content);
+            localStorage.setItem('bloomContent_v23', JSON.stringify(sanitized));
+        } catch (e) {
+            console.error('Failed to save to localStorage:', e);
+        }
     }, [content]);
 
     const updateHero = async (updates) => {
@@ -373,7 +416,9 @@ export const ContentProvider = ({ children }) => {
                 title: project.title,
                 description: project.description,
                 category: project.category,
-                imageUrl: project.image || project.imageUrl
+                imageUrl: project.image !== undefined ? project.image : project.imageUrl,
+                video: project.video,
+                link: project.link
             };
 
             const url = project._id

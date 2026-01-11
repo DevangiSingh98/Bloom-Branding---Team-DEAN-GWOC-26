@@ -23,7 +23,6 @@ export default function Footer() {
                                 <li><Link to="/about">Story</Link></li>
                                 <li><Link to="/work">Work</Link></li>
                                 <li><Link to="/contact">Contact</Link></li>
-                                <li><Link to="/admin" target="_blank" rel="noopener noreferrer">Admin</Link></li>
                             </ul>
                         </div>
                         <div>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useContent } from '../context/ContentContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const FileUpload = ({ label, value, onFileSelect, type = "image" }) => {
+const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) => {
     const [fileName, setFileName] = useState("No file chosen");
     const fileInputRef = React.useRef(null);
 
@@ -63,8 +63,27 @@ const FileUpload = ({ label, value, onFileSelect, type = "image" }) => {
                         cursor: 'pointer'
                     }}
                 >
-                    Choose File
+                    {value ? 'Change File' : 'Choose File'}
                 </button>
+                {value && (
+                    <button
+                        onClick={() => {
+                            setFileName("No file chosen");
+                            if (onRemove) onRemove();
+                        }}
+                        style={{
+                            padding: '0.4rem 0.8rem',
+                            fontSize: '0.9rem',
+                            border: '1px solid #ff4d4f',
+                            borderRadius: '4px',
+                            backgroundColor: '#fff',
+                            color: '#ff4d4f',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Remove
+                    </button>
+                )}
                 <span style={{ fontSize: '0.9rem', color: '#555' }}>{fileName}</span>
             </div>
         </div>
@@ -399,7 +418,7 @@ const Admin = () => {
             </div>
 
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-                {['enquiries', 'projects', 'selected work', 'founder', 'testimonials', 'instagram'].map(tab => (
+                {['enquiries', 'projects', 'selected work', 'founder', 'testimonials', 'instagram', 'clients'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -575,11 +594,21 @@ const Admin = () => {
                                     placeholder="Project Description"
                                     style={{ width: '100%', padding: '0.5rem', marginBottom: '0.5rem', minHeight: '80px' }}
                                 />
-                                <FileUpload
-                                    label="Project Image"
-                                    value={item.image}
-                                    onFileSelect={(val) => handleArrayChange(index, 'image', val, 'projects')}
-                                />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <FileUpload
+                                        label="Project Image"
+                                        value={item.image}
+                                        onFileSelect={(val) => handleArrayChange(index, 'image', val, 'projects')}
+                                        onRemove={() => handleArrayChange(index, 'image', '', 'projects')}
+                                    />
+                                    <FileUpload
+                                        label="Project Video"
+                                        value={item.video || ''}
+                                        type="video"
+                                        onFileSelect={(val) => handleArrayChange(index, 'video', val, 'projects')}
+                                        onRemove={() => handleArrayChange(index, 'video', '', 'projects')}
+                                    />
+                                </div>
                             </div>
                         ))}
                         <button onClick={() => addItem('projects')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add New Project</button>
@@ -629,11 +658,21 @@ const Admin = () => {
                                     />
                                     <button onClick={() => deleteItem(index, 'work')} style={{ color: '#5D4037' }}>X</button>
                                 </div>
-                                <FileUpload
-                                    label="Override Image"
-                                    value={item.image}
-                                    onFileSelect={(val) => handleArrayChange(index, 'image', val, 'work')}
-                                />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <FileUpload
+                                        label="Override Image"
+                                        value={item.image}
+                                        onFileSelect={(val) => handleArrayChange(index, 'image', val, 'work')}
+                                        onRemove={() => handleArrayChange(index, 'image', '', 'work')}
+                                    />
+                                    <FileUpload
+                                        label="Override Video"
+                                        value={item.video || ''}
+                                        type="video"
+                                        onFileSelect={(val) => handleArrayChange(index, 'video', val, 'work')}
+                                        onRemove={() => handleArrayChange(index, 'video', '', 'work')}
+                                    />
+                                </div>
                             </div>
                         ))}
                         <button onClick={() => addItem('work')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add Project Slot</button>
@@ -669,12 +708,14 @@ const Admin = () => {
                                         label="Client Photo"
                                         value={item.image}
                                         onFileSelect={(val) => handleArrayChange(index, 'image', val, 'testimonials')}
+                                        onRemove={() => handleArrayChange(index, 'image', '', 'testimonials')}
                                     />
                                     <FileUpload
                                         label="Video"
                                         value={item.video}
                                         type="video"
                                         onFileSelect={(val) => handleArrayChange(index, 'video', val, 'testimonials')}
+                                        onRemove={() => handleArrayChange(index, 'video', '', 'testimonials')}
                                     />
                                 </div>
                             </div>
@@ -694,6 +735,7 @@ const Admin = () => {
                                         label="Thumbnail"
                                         value={item.image}
                                         onFileSelect={(val) => handleArrayChange(index, 'image', val, 'instagram')}
+                                        onRemove={() => handleArrayChange(index, 'image', '', 'instagram')}
                                     />
                                 </div>
                                 <div style={{ flex: 1 }}>
@@ -707,6 +749,32 @@ const Admin = () => {
                     </div >
                 )}
 
+                {activeTab === 'clients' && (
+                    <div>
+                        <h2>Manage Client Logos</h2>
+                        {content.clientLogos.map((item, index) => (
+                            <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
+                                <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
+                                    <input
+                                        value={item.name}
+                                        onChange={(e) => handleArrayChange(index, 'name', e.target.value, 'clients')}
+                                        placeholder="Client Name"
+                                        style={{ flex: 1, padding: '0.5rem' }}
+                                    />
+                                    <button onClick={() => deleteItem(index, 'clients')} style={{ color: '#5D4037' }}>X</button>
+                                </div>
+                                <FileUpload
+                                    label="Client Logo"
+                                    value={item.logo || ''}
+                                    onFileSelect={(val) => handleArrayChange(index, 'logo', val, 'clients')}
+                                    onRemove={() => handleArrayChange(index, 'logo', '', 'clients')}
+                                />
+                            </div>
+                        ))}
+                        <button onClick={() => addItem('clients')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add Client Logo</button>
+                    </div>
+                )}
+
                 {
                     activeTab === 'founder' && (
                         <div style={{ display: 'grid', gap: '2rem' }}>
@@ -716,6 +784,7 @@ const Admin = () => {
                                     label="Central Image"
                                     value={content.founders.image}
                                     onFileSelect={(val) => handleFoundersChange('main', 'image', val)}
+                                    onRemove={() => handleFoundersChange('main', 'image', '')}
                                 />
                             </div>
 

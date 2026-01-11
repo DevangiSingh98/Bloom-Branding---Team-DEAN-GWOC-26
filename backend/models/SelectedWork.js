@@ -4,6 +4,7 @@ const selectedWorkSchema = mongoose.Schema({
     title: { type: String, required: true },
     category: { type: String },
     image: { type: String }, // Base64
+    video: { type: String }, // Base64 or URL
     link: { type: String },
 }, {
     timestamps: true

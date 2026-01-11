@@ -16,7 +16,7 @@ const getProjects = async (req, res) => {
 // @route   POST /api/projects
 // @access  Private/Admin
 const createProject = async (req, res) => {
-    const { title, description, imageUrl, image, category, link } = req.body;
+    const { title, description, imageUrl, image, category, link, video } = req.body;
 
     try {
         const project = new Project({
@@ -24,7 +24,8 @@ const createProject = async (req, res) => {
             description,
             imageUrl: imageUrl || image,
             category,
-            link
+            link,
+            video
         });
 
         const createdProject = await project.save();
@@ -56,17 +57,18 @@ const deleteProject = async (req, res) => {
 // @route   PUT /api/projects/:id
 // @access  Private/Admin
 const updateProject = async (req, res) => {
-    const { title, description, imageUrl, image, category, link } = req.body;
+    const { title, description, imageUrl, image, category, link, video } = req.body;
 
     try {
         const project = await Project.findById(req.params.id);
 
         if (project) {
-            project.title = title || project.title;
-            project.description = description || project.description;
-            project.imageUrl = imageUrl || image || project.imageUrl;
-            project.category = category || project.category;
-            project.link = link || project.link;
+            project.title = title !== undefined ? title : project.title;
+            project.description = description !== undefined ? description : project.description;
+            project.imageUrl = (imageUrl !== undefined ? imageUrl : (image !== undefined ? image : project.imageUrl));
+            project.category = category !== undefined ? category : project.category;
+            project.link = link !== undefined ? link : project.link;
+            project.video = video !== undefined ? video : project.video;
 
             const updatedProject = await project.save();
             res.json(updatedProject);

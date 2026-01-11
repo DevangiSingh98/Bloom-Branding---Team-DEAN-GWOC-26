@@ -187,7 +187,6 @@ button {
 /* Force disable smooth scroll for infinite loops */
 .no-smooth-scroll {
   scroll-behavior: auto !important;
-  overscroll-behavior-y: none;
 }
 
 /* --- Magazine / Scrapbook Effects --- */
@@ -223,7 +222,8 @@ button {
 
 /* Paper / Card Texture */
 .paper-card {
-  background-color: #fdfbf7; /* Off-white paper */
+  background-color: #fdfbf7;
+  /* Off-white paper */
   box-shadow: 2px 4px 15px rgba(0, 0, 0, 0.1);
   position: relative;
   transition: transform 0.3s ease;
@@ -238,7 +238,8 @@ button {
 .polaroid {
   background-color: #fff;
   padding: 1rem;
-  padding-bottom: 3.5rem; /* Classic polaroid bottom */
+  padding-bottom: 3.5rem;
+  /* Classic polaroid bottom */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   transform: rotate(2deg);
 }

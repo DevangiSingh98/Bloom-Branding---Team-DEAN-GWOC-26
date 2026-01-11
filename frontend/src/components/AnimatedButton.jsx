@@ -44,12 +44,20 @@ const AnimatedButton = ({ to, children, className, style, onClick, type = "butto
                     to={to}
                     className={className}
                     style={{ position: 'relative', zIndex: 1, ...style }}
-                    onClick={() => window.scrollTo(0, 0)}
+                    onClick={() => {
+                        window.scrollTo(0, 0);
+                        if (onClick) onClick();
+                    }}
                 >
                     {children}
                 </Link>
             ) : (
-                <button type={type} onClick={onClick} className={className} style={{ position: 'relative', zIndex: 1, ...style }}>
+                <button
+                    type={type}
+                    onClick={onClick}
+                    className={className}
+                    style={{ position: 'relative', zIndex: 1, ...style }}
+                >
                     {children}
                 </button>
             )}

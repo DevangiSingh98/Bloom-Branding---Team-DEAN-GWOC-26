@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import AnimatedButton from '../components/AnimatedButton';
-
 import { useContent } from '../context/ContentContext';
 
 export default function Contact() {
@@ -22,14 +21,6 @@ export default function Contact() {
         if (name === 'message') {
             const words = value.trim().split(/\s+/);
             if (words.length > 200) {
-                // Allow deleting but not adding more words (rough check)
-                // Better: just cut it off? Or simple return?
-                // Simple return prevents pasting large text.
-                // Let's check if the new value has more words than allowed.
-                // Actually, if we just return, the user can't type.
-                // Let's just limit the state update if it exceeds.
-                // But we need to handle backspace.
-                // Actually, if we just calculate words of the *new* value:
                 if (words.length > 200) return;
             }
         }
@@ -232,3 +223,4 @@ export default function Contact() {
         </motion.div>
     );
 }
+

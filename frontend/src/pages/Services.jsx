@@ -118,7 +118,7 @@ const ServiceCard = ({ service, index, containerRef, id }) => {
                 position: 'sticky',
                 minHeight: '100vh',
                 scrollSnapAlign: 'start',
-                backgroundColor: '#FAF9F6',
+                backgroundColor: '#FFFFFF',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -315,7 +315,7 @@ export default function Services() {
                 // height: '100vh',
                 // overflowY: 'scroll',
                 // scrollSnapType: 'y mandatory',
-                backgroundColor: '#FAF9F6',
+                backgroundColor: '#FFFFFF',
                 // overflowX: 'hidden', // REMOVED: Breaks sticky positioning by creating a new context
                 paddingBottom: '0',
                 fontFamily: 'var(--font-main)',
@@ -398,7 +398,7 @@ export default function Services() {
             </div>
 
             {/* 2. STATS & DIFFERENCE - Start of Single Light Section Wrapper */}
-            <div style={{ position: 'relative', backgroundColor: '#FAF9F6' }}>
+            <div style={{ position: 'relative', backgroundColor: '#FFFFFF' }}>
                 <div style={{ paddingBottom: '100px' }}>
 
                     {/* STATS BANNER REMOVED */}

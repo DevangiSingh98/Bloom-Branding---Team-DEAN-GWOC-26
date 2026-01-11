@@ -17,18 +17,35 @@ export default function Navbar() {
     useEffect(() => {
         // Refresh ScrollTrigger and set up triggers for light sections
         const ctx = gsap.context(() => {
-            const sections = gsap.utils.toArray('.light-section');
-            sections.forEach(section => {
+            if (location.pathname.startsWith('/services')) {
+                // Services Page specific logic: Coordinate-based
+                // Hero is 100vh. Everything after is Dark.
+                // We utilize a simple trigger on the entire document that checks scroll position.
                 ScrollTrigger.create({
-                    trigger: section,
-                    start: "top 80px", // Trigger when section hits top (navbar area)
-                    end: "bottom 80px",
-                    onEnter: () => setIsDarkText(true),
-                    onLeave: () => setIsDarkText(false),
-                    onEnterBack: () => setIsDarkText(true),
-                    onLeaveBack: () => setIsDarkText(false)
+                    start: 0,
+                    end: "max",
+                    onUpdate: (self) => {
+                        // Check if we have scrolled past the viewport height (Hero)
+                        // Subtract a small buffer (e.g., 50px) for the Navbar background
+                        const isPastHero = self.scroll() > window.innerHeight - 50;
+                        setIsDarkText(isPastHero);
+                    }
                 });
-            });
+            } else {
+                // Standard logic for Home / other pages using class markers
+                const sections = gsap.utils.toArray('.light-section');
+                sections.forEach(section => {
+                    ScrollTrigger.create({
+                        trigger: section,
+                        start: "top 80px", // Trigger when section hits top (navbar area)
+                        end: "bottom 80px",
+                        onEnter: () => setIsDarkText(true),
+                        onLeave: () => setIsDarkText(false),
+                        onEnterBack: () => setIsDarkText(true),
+                        onLeaveBack: () => setIsDarkText(false)
+                    });
+                });
+            }
         });
 
         // Force a check/refresh slightly after render to ensure elements are present

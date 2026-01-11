@@ -141,22 +141,7 @@ const ServiceCard = ({ service, index, containerRef, id }) => {
                 position: 'relative'
             }}>
                 {/* DECORATIVE TRIANGLE ARROW */}
-                {/* DECORATIVE TRIANGLE ARROW */}
-                <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-                    style={{
-                        position: 'absolute',
-                        [isEven ? 'left' : 'right']: '-40px',
-                        top: '50%',
-                        width: 0,
-                        height: 0,
-                        borderTop: '15px solid transparent',
-                        borderBottom: '15px solid transparent',
-                        [isEven ? 'borderRight' : 'borderLeft']: `25px solid #004AAD`,
-                        transformOrigin: 'center'
-                    }}
-                ></motion.div>
+
 
                 {/* A. TEXT CARD SIDE */}
                 <div style={{ flex: '1 1 450px', position: 'relative', zIndex: 5 }}>
@@ -339,7 +324,7 @@ export default function Services() {
         >
 
             {/* 1. NEW SPLIT HERO SECTION */}
-            <div style={{ height: '100vh', width: '100%', display: 'flex', position: 'relative' }}>
+            <div className="services-hero" style={{ height: '100vh', width: '100%', display: 'flex', position: 'relative' }}>
 
                 {/* LEFT: DARK TEXT SIDE */}
                 <div style={{
@@ -413,7 +398,7 @@ export default function Services() {
             </div>
 
             {/* 2. STATS & DIFFERENCE - Start of Single Light Section Wrapper */}
-            <div className="light-section" style={{ position: 'relative', backgroundColor: '#FAF9F6' }}>
+            <div style={{ position: 'relative', backgroundColor: '#FAF9F6' }}>
                 <div style={{ paddingBottom: '100px' }}>
 
                     {/* STATS BANNER REMOVED */}

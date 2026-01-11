@@ -104,28 +104,22 @@ const ServiceList = () => {
     // Parallax Reveal: Starts "higher" (negative Y) behind the previous section and slides down to 0
     const titleY = useTransform(scrollYProgress, [0, 1], [-300, 0]);
 
-    const servicesRows = [
-        [
-            { title: "Branding", link: "/services#branding" },
-            { title: "Social Media", link: "/services#social-media" }
-        ],
-        [
-            { title: "Influencer Marketing", link: "/services#influencer-marketing" }
-        ],
-        [
-            { title: "Production", link: "/services#production" },
-            { title: "Creative Design", link: "/services#creative-design" }
-        ]
+    const services = [
+        { title: "Branding", link: "/services#branding", img: "/images/service_branding.png" },
+        { title: "Social Media", link: "/services#social-media", img: "/images/service_jewellery.png" },
+        { title: "Production", link: "/services#production", img: "/images/service_decor.png" },
+        { title: "Influencer", link: "/services#influencer-marketing", img: "/images/service_fashion.png" }, // Shortened title for layout balance
+        { title: "Creative", link: "/services#creative-design", img: "/images/service_lifestyle.png" } // Shortened title
     ];
 
     return (
-        <div ref={containerRef} style={{ width: '100%', padding: '15vh 0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        <div ref={containerRef} style={{ width: '100%', padding: '10vh 5%', backgroundColor: 'var(--color-electric-blue)' }}>
             <motion.h2
                 style={{
                     y: titleY,
                     fontSize: 'clamp(3rem, 9vw, 10rem)',
                     fontFamily: 'var(--font-brand)',
-                    marginBottom: '5rem',
+                    marginBottom: '60px',
                     textAlign: 'center',
                     color: 'var(--color-butter-yellow)',
                     textTransform: 'uppercase',
@@ -138,64 +132,105 @@ const ServiceList = () => {
                 Our Expertise
             </motion.h2>
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3rem', paddingLeft: '5vw', zIndex: 1, position: 'relative', width: '100%' }}>
-                {servicesRows.map((row, rowIndex) => (
-                    <div key={rowIndex} style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        justifyContent: 'center',
-                        gap: rowIndex === 0 || rowIndex === 2 ? '15rem' : '3rem', // Wider gap for 1st and 3rd rows
-                        width: '100%'
-                    }}>
-                        {row.map((service, colIndex) => (
-                            <Link
-                                key={service.title}
-                                to={service.link}
-                                style={{ textDecoration: 'none' }}
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(5, 1fr)', // Force 5 columns side-by-side
+                gap: '20px',
+                maxWidth: '1400px',
+                margin: '0 auto',
+                position: 'relative',
+                zIndex: 1
+            }}>
+                {services.map((service, index) => (
+                    <Link
+                        key={index}
+                        to={service.link}
+                        style={{ textDecoration: 'none' }}
+                    >
+                        <motion.div
+                            whileHover="hover"
+                            initial="rest"
+                            animate="rest"
+                            style={{
+                                // Minimalist: No background, no border, no shadow
+                                height: '420px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                cursor: 'pointer',
+                                padding: '20px 0'
+                            }}
+                            variants={{
+                                rest: { y: 0 },
+                                hover: { y: -10 }
+                            }}
+                            transition={{ duration: 0.3, ease: 'easeOut' }}
+                        >
+                            {/* Top Title */}
+                            <h3 style={{
+                                fontSize: '1.8rem', // Adjusted for balance
+                                margin: 0,
+                                fontFamily: 'var(--font-brand)',
+                                color: 'var(--color-butter-yellow)',
+                                textAlign: 'center',
+                                fontWeight: 'normal'
+                            }}>
+                                {service.title}
+                            </h3>
+
+                            {/* Service Image (Large Circular Focus) */}
+                            <motion.div
+                                style={{
+                                    width: '220px',
+                                    height: '220px',
+                                    borderRadius: '50%',
+                                    overflow: 'hidden',
+                                    border: '2px solid var(--color-butter-yellow)',
+                                    boxShadow: '0 0 0 4px rgba(246, 241, 181, 0.1)'
+                                }}
+                                variants={{
+                                    rest: { scale: 1, borderColor: 'var(--color-butter-yellow)' },
+                                    hover: { scale: 1.05, borderColor: 'var(--color-white)' }
+                                }}
+                                transition={{ duration: 0.4 }}
                             >
-                                <motion.div
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{
-                                        opacity: { delay: (rowIndex * 2 + colIndex) * 0.1, duration: 0.8, ease: "easeOut" },
-                                        y: { delay: (rowIndex * 2 + colIndex) * 0.1, duration: 0.8, ease: "easeOut" },
-                                        scale: { duration: 0.1, ease: "easeOut" }
+                                <img
+                                    src={service.img}
+                                    alt={service.title}
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'cover'
                                     }}
-                                    whileHover={{ scale: 1.02 }}
-                                    style={{ position: 'relative' }}
-                                >
-                                    <h3
-                                        className="service-item-title"
-                                        style={{
-                                            fontSize: 'clamp(2.5rem, 4vw, 4.5rem)',
-                                            fontFamily: "var(--font-subtitle)",
-                                            fontWeight: 'bold',
-                                            fontStretch: 'condensed',
-                                            color: 'var(--color-earl-gray)',
-                                            margin: 0,
-                                            lineHeight: 0.95,
-                                            cursor: 'pointer',
-                                            transition: 'color 0.3s ease',
-                                            letterSpacing: 'normal'
-                                        }}
-                                    >
-                                        {service.title}
-                                    </h3>
-                                </motion.div>
-                            </Link>
-                        ))}
-                    </div>
+                                />
+                            </motion.div>
+
+                            {/* Bottom Pill */}
+                            <motion.div
+                                style={{
+                                    padding: '10px 30px',
+                                    borderRadius: '50px',
+                                    border: '1px solid var(--color-butter-yellow)',
+                                    color: 'var(--color-butter-yellow)',
+                                    fontFamily: 'var(--font-subtitle)',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 'bold',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '1px'
+                                }}
+                                variants={{
+                                    rest: { backgroundColor: 'transparent', color: 'var(--color-butter-yellow)' },
+                                    hover: { backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-electric-blue)' }
+                                }}
+                            >
+                                Explore
+                            </motion.div>
+
+                        </motion.div>
+                    </Link>
                 ))}
             </div>
-
-            <style>
-                {`
-                    .service-item-title:hover {
-                        color: var(--color-butter-yellow) !important;
-                    }
-                `}
-            </style>
         </div>
     );
 };

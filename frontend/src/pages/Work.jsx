@@ -260,310 +260,132 @@ export default function Work() {
     const [modalOpen, setModalOpen] = useState(false);
     const [initialSlide, setInitialSlide] = useState(0);
 
-    // Scroll Logic for Main Page
+    // Scroll Logic for Hint Fade-out
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({
-        container: containerRef,
+        target: containerRef,
+        offset: ["start start", "end end"]
     });
-
-    const smoothProgress = useSpring(scrollYProgress, {
-        mass: 0.1,
-        stiffness: 100,
-        damping: 20,
-        restDelta: 0.001
-    });
-
-    // Dynamic Grid Logic
-    const ITEMS_PER_PAGE = 9;
-    const gridPagesCount = Math.ceil(projects.length / ITEMS_PER_PAGE) || 1;
-    const totalSections = 1 + gridPagesCount + 1; // Intro + Grids + CTA
-
-    // Horizontal Scroll Logic
-    // Map 0 -> 1 vertical progress to 0 -> -((totalSections-1) * 100)vw
-    // e.g. 3 sections -> -200vw
-    const x = useTransform(smoothProgress, [0, 1], ["0%", `-${(totalSections - 1) * 100}vw`]);
-
-    // Parallax for Desk Items (Shift left when scrolling) - REMOVED to fix glitch
-    // Items will move left naturally with the main horizontal scroll 'x'
-
-    // Resize Scale logic logic
-    const [scale, setScale] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
-        }
-        return 1;
-    });
-
-    useEffect(() => {
-        const handleResize = () => {
-            const widthScale = window.innerWidth / 1920;
-            const heightScale = window.innerHeight / 1080;
-            setScale(Math.min(widthScale, heightScale));
-        };
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
-
-    // Modal scroll logic moved to WorkModal component
-
+    const opacity = useTransform(scrollYProgress, [0.9, 1], [1, 0]);
 
     return (
         <div
             ref={containerRef}
             style={{
-                height: '100vh',
+                minHeight: '100vh',
                 width: '100vw',
                 overflowY: 'auto',
                 overflowX: 'hidden',
                 backgroundColor: '#3b2f2f',
                 position: 'relative',
-                scrollSnapType: 'y mandatory',
-                scrollBehavior: 'smooth'
+                overflowX: 'hidden', // Prevent incidental horizontal scroll
             }}
         >
-            {/* Scrollable Height for Dynamic Sections */}
-            <div style={{ height: `${totalSections * 100}vh`, position: 'relative' }}>
-                {/* Dynamic Snap Targets */}
-                {Array.from({ length: totalSections }).map((_, i) => (
-                    <div
-                        key={i}
-                        style={{
-                            position: 'absolute',
-                            top: `${i * 100}vh`,
-                            left: 0,
-                            width: '100%',
-                            height: '100vh',
-                            scrollSnapAlign: 'start',
-                            pointerEvents: 'none'
-                        }}
-                    />
-                ))}
+            {/* CONTENT CONTAINER - Added padding for Navbar */}
+            <div style={{
+                maxWidth: '1600px',
+                margin: '0 auto',
+                padding: '120px 5% 50px 5%',
+                boxSizing: 'border-box'
+            }}>
+                {/* PAGE TITLE */}
+                <h1 style={{
+                    fontFamily: 'Bigilla',
+                    fontSize: 'clamp(4rem, 10vw, 8rem)',
+                    color: '#fdfd96',
+                    textAlign: 'center',
+                    marginBottom: '4rem',
+                    lineHeight: 0.9,
+                    letterSpacing: '2px',
+                    fontWeight: 'normal'
+                }}>
+                    OUR WORKS
+                </h1>
 
                 <div style={{
-                    position: 'sticky',
-                    top: 0,
-                    height: '100vh',
-                    width: '100vw',
-                    overflow: 'hidden'
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '2rem',
                 }}>
-                    <motion.div
-                        style={{
-                            x,
-                            display: 'flex',
-                            width: `${totalSections * 100}vw`,
-                            height: '100vh',
-                            willChange: 'transform'
-                        }}
-                    >
-                        {/* 1. INTRO / HERO SECTION */}
-                        <div style={{
-                            width: '100vw',
-                            height: '100vh',
-                            position: 'relative',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            overflow: 'hidden',
-                            backgroundColor: '#3b2f2f',
-                            flexShrink: 0
-                        }}>
+                    <style>{`
+                        @media (max-width: 1200px) {
+                            .grid-container { grid-template-columns: repeat(2, 1fr) !important; }
+                        }
+                        @media (max-width: 768px) {
+                            .grid-container { grid-template-columns: 1fr !important; }
+                        }
+                    `}</style>
+
+                    {projects.map((project, index) => (
+                        <motion.div
+                            key={index}
+                            className="grid-container" // Hook for media queries
+                            whileHover={{ scale: 1.05 }}
+                            onClick={() => {
+                                setInitialSlide(index);
+                                setModalOpen(true);
+                            }}
+                            style={{
+                                cursor: 'pointer',
+                                position: 'relative'
+                            }}
+                        >
+                            {/* STRICT SQUARE IMAGE WRAPPER */}
                             <div style={{
-                                width: '1920px',
-                                height: '1080px',
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: `translate(-50%, -50%) scale(${scale})`,
-                                transformOrigin: 'center center',
-                                pointerEvents: 'none'
+                                width: '100%',
+                                aspectRatio: '1/1',
+                                overflow: 'hidden',
+                                borderRadius: '5px',
+                                boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
                             }}>
-                                <motion.div
-                                    initial="hidden"
-                                    whileInView="visible"
-                                    viewport={{ once: true }}
-                                >
-                                    {/* Paper & Stuff */}
-                                    <motion.img
-                                        src="/images/paper.png"
-                                        variants={{ hidden: { x: -600, y: -600, rotate: -90, opacity: 0 }, visible: { x: -100, y: -100, rotate: -15, opacity: 1 } }}
-                                        transition={{ duration: 1.5, ease: "backOut", delay: 0.5 }}
-                                        style={{ position: 'absolute', width: '500px', top: 0, left: 0, willChange: 'transform' }}
-                                    />
-                                    <motion.img
-                                        src="/images/stuff.png"
-                                        variants={{ hidden: { x: 600, y: -600, rotate: 90, opacity: 0 }, visible: { x: 100, y: -100, rotate: 15, opacity: 1 } }}
-                                        transition={{ duration: 1.5, ease: "backOut", delay: 0.6 }}
-                                        style={{ position: 'absolute', width: '550px', top: 0, right: 0, willChange: 'transform' }}
-                                    />
-
-                                    {/* Title Text - Behind Folder, Slides UP */}
-                                    <motion.div
-                                        variants={{ hidden: { y: 630, opacity: 1 }, visible: { y: 150, opacity: 1 } }}
-                                        transition={{ type: "spring", stiffness: 40, damping: 15, delay: 0.5 }}
-                                        style={{ position: 'absolute', width: '100%', display: 'flex', justifyContent: 'center', zIndex: 10, willChange: 'transform' }}
-                                    >
-                                        <h1 style={{
-                                            fontFamily: 'Bigilla',
-                                            fontSize: '200px',
-                                            color: '#fdfd96',
-                                            margin: 0,
-                                            lineHeight: 0.85,
-                                            letterSpacing: '2px',
-                                            textAlign: 'center',
-                                            textShadow: '0 10px 40px rgba(0,0,0,0.3)'
-                                        }}>
-                                            <div>OUR</div>
-                                            <div>WORK</div>
-                                        </h1>
-                                    </motion.div>
-
-                                    {/* Folder - Larger & Static (Standard IMG) */}
-                                    <img
-                                        src="/images/folder.png"
-                                        style={{ position: 'absolute', width: '900px', left: 'calc(50% - 450px)', top: '400px', zIndex: 20 }}
-                                        alt="Folder"
-                                    />
-
-                                    {/* Bottom Items - Enter WITH reveal */}
-                                    <motion.img src="/images/polaroid.png" variants={{ hidden: { x: -600, y: 600, opacity: 0 }, visible: { x: -80, y: 80, rotate: -10, opacity: 1 } }} transition={{ duration: 1.5, ease: "backOut", delay: 0.5 }} style={{ position: 'absolute', width: '450px', bottom: 0, left: 0, willChange: 'transform' }} />
-                                    <motion.img src="/images/pin.png" variants={{ hidden: { x: -200, y: 200, opacity: 0 }, visible: { x: 0, y: 0, opacity: 1 } }} transition={{ duration: 1.5, ease: "backOut", delay: 0.7 }} style={{ position: 'absolute', width: '120px', bottom: '25%', left: '5%', willChange: 'transform' }} />
-                                    <motion.img src="/images/pen.png" variants={{ hidden: { x: 600, y: 600, opacity: 0 }, visible: { x: 100, y: 100, rotate: -15, opacity: 1 } }} transition={{ duration: 1.5, ease: "backOut", delay: 0.6 }} style={{ position: 'absolute', width: '500px', bottom: '0', right: 0, willChange: 'transform' }} />
-                                    <motion.img src="/images/clip.png" variants={{ hidden: { x: 200, y: 200, opacity: 0 }, visible: { x: 0, y: 0, opacity: 1 } }} transition={{ duration: 1.5, ease: "backOut", delay: 0.7 }} style={{ position: 'absolute', width: '150px', bottom: '20%', right: '10%', willChange: 'transform' }} />
-                                </motion.div>
-                            </div>
-                        </div>
-
-                        {/* 2. DYNAMIC PROJECT GRID SECTIONS */}
-                        {Array.from({ length: gridPagesCount }).map((_, pageIndex) => {
-                            const pageProjects = projects.slice(pageIndex * ITEMS_PER_PAGE, (pageIndex + 1) * ITEMS_PER_PAGE);
-                            return (
-                                <div key={pageIndex} style={{
-                                    width: '100vw',
-                                    height: '100vh',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    flexShrink: 0,
-                                    padding: '0 5%',
-                                    boxSizing: 'border-box'
-                                }}>
-                                    <div style={{
-                                        width: '100%',
-                                        maxWidth: '1400px',
-                                        display: 'grid',
-                                        gridTemplateColumns: 'repeat(3, 1fr)',
-                                        gap: '1.5rem',
-                                        marginLeft: '12%' // Shift to optical center as requested
-                                    }}>
-                                        <style>{`
-                                            @media (max-width: 1200px) {
-                                                .work-grid { grid-template-columns: repeat(2, 1fr) !important; }
-                                            }
-                                            @media (max-width: 768px) {
-                                                .work-grid { grid-template-columns: 1fr !important; }
-                                            }
-                                        `}</style>
-                                        {pageProjects.map((project, index) => {
-                                            // Calculate global index for modal using page offset
-                                            const globalIndex = (pageIndex * ITEMS_PER_PAGE) + index;
-                                            return (
-                                                <motion.div
-                                                    key={globalIndex}
-                                                    className="work-grid"
-                                                    whileHover={{ scale: 1.05 }}
-                                                    onClick={() => {
-                                                        setInitialSlide(globalIndex);
-                                                        setModalOpen(true);
-                                                    }}
-                                                    style={{
-                                                        cursor: 'pointer',
-                                                        aspectRatio: '16/9',
-                                                        position: 'relative'
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={project.image}
-                                                        alt={project.title}
-                                                        style={{
-                                                            width: '100%',
-                                                            height: '100%',
-                                                            objectFit: 'cover',
-                                                            borderRadius: '5px',
-                                                            boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
-                                                        }}
-                                                    />
-                                                    <div style={{
-                                                        marginTop: '1rem',
-                                                        textAlign: 'center',
-                                                        fontFamily: 'var(--font-brand)',
-                                                        color: '#fdfd96',
-                                                        fontSize: '1.2rem'
-                                                    }}>
-                                                        {project.title}
-                                                    </div>
-                                                </motion.div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            );
-                        })}
-
-                        {/* 3. CTA SECTION */}
-                        <div style={{
-                            width: '100vw',
-                            height: '100vh',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            backgroundColor: '#3b2f2f',
-                            color: '#fdfd96',
-                            flexShrink: 0,
-                            position: 'relative'
-                        }}>
-                            <motion.div
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8 }}
-                                style={{ textAlign: 'center', maxWidth: '800px', padding: '0 20px' }}
-                            >
-                                <h2 style={{
-                                    fontFamily: 'Bigilla',
-                                    fontSize: 'clamp(3rem, 7vw, 7rem)',
-                                    color: '#fdfd96',
-                                    marginBottom: '1rem',
-                                    lineHeight: 1.1
-                                }}>
-                                    Ready to make your<br />brand bloom?
-                                </h2>
-                                <p style={{ fontSize: '1.5rem', opacity: 0.8, marginBottom: '3rem', fontFamily: 'Bigilla' }}>
-                                    Let's craft a unique identity that stands the test of time.
-                                </p>
-                                <Link
-                                    to="/contact"
-                                    className="btn-primary"
+                                <img
+                                    src={project.image}
+                                    alt={project.title}
                                     style={{
-                                        backgroundColor: '#fdfd96',
-                                        color: '#3b2f2f',
-                                        padding: '1.2rem 3.5rem',
-                                        fontSize: '1.2rem',
-                                        fontWeight: 'bold',
-                                        borderRadius: '50px',
-                                        textDecoration: 'none',
-                                        display: 'inline-block'
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'cover'
                                     }}
-                                >
-                                    Start a Project
-                                </Link>
-                            </motion.div>
-                        </div>
+                                />
+                            </div>
 
-                    </motion.div>
+                            {/* PROJECT TITLE */}
+                            <div style={{
+                                marginTop: '1.5rem',
+                                textAlign: 'center',
+                                fontFamily: 'var(--font-brand)',
+                                color: '#fdfd96',
+                            }}>
+                                <div style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>
+                                    {project.title}
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
                 </div>
             </div>
 
-            {/* MODAL */}
+            {/* FIXED BOTTOM "CLICK TO SEE DETAILS" INDICATOR - Fades out near bottom */}
+            <motion.div style={{
+                position: 'fixed',
+                bottom: '20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                zIndex: 50,
+                color: '#fdfd96',
+                fontFamily: 'var(--font-subtitle)',
+                fontSize: '1.3rem',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+                pointerEvents: 'none',
+                opacity: opacity, // Dynamic Opacity
+                mixBlendMode: 'difference'
+            }}>
+                Click to see details
+            </motion.div>
+
+            {/* MODAL (Preserved) */}
             <AnimatePresence>
                 {modalOpen && (
                     <WorkModal

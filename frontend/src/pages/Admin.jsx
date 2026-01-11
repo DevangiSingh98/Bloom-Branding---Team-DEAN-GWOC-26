@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useContent } from '../context/ContentContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const FileUpload = ({ label, value, onFileSelect, type = "image" }) => {
     const [fileName, setFileName] = useState("No file chosen");
@@ -77,6 +77,7 @@ const CustomModal = ({ show, title, message, type = 'info', onConfirm, onCancel,
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             style={{
                 position: 'fixed',
                 inset: 0,
@@ -89,8 +90,9 @@ const CustomModal = ({ show, title, message, type = 'info', onConfirm, onCancel,
             }}
         >
             <motion.div
-                initial={{ scale: 0.9, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
+                initial={{ scale: 0.9, y: 20, opacity: 0 }}
+                animate={{ scale: 1, y: 0, opacity: 1 }}
+                exit={{ scale: 0.9, y: 20, opacity: 0 }}
                 style={{
                     backgroundColor: 'white',
                     padding: '2.5rem',
@@ -98,19 +100,33 @@ const CustomModal = ({ show, title, message, type = 'info', onConfirm, onCancel,
                     maxWidth: '450px',
                     width: '90%',
                     textAlign: 'center',
-                    boxShadow: '0 20px 50px rgba(0,0,0,0.2)'
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
+                    border: '1px solid #eee'
                 }}
             >
                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
                     {type === 'confirm' ? '❓' : type === 'success' ? '✨' : '⚠️'}
                 </div>
-                <h3 style={{ fontSize: '1.5rem', marginBottom: '0.8rem', color: 'var(--color-electric-blue)' }}>{title}</h3>
-                <p style={{ color: '#666', lineHeight: 1.6, marginBottom: '2rem' }}>{message}</p>
+                <h3 style={{
+                    fontSize: '1.8rem',
+                    marginBottom: '0.8rem',
+                    color: 'var(--color-electric-blue)',
+                    fontFamily: 'Bigilla, serif'
+                }}>{title}</h3>
+                <p style={{ color: '#666', lineHeight: 1.6, marginBottom: '2rem', fontSize: '1.1rem' }}>{message}</p>
                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                     {type === 'confirm' && (
                         <button
                             onClick={onCancel}
-                            style={{ padding: '0.8rem 1.8rem', borderRadius: '30px', border: '1px solid #ddd', backgroundColor: 'transparent', cursor: 'pointer', fontWeight: '500' }}
+                            style={{
+                                padding: '0.8rem 1.8rem',
+                                borderRadius: '30px',
+                                border: '1px solid #ddd',
+                                backgroundColor: 'transparent',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                                color: '#555'
+                            }}
                         >
                             Cancel
                         </button>
@@ -124,7 +140,7 @@ const CustomModal = ({ show, title, message, type = 'info', onConfirm, onCancel,
                             backgroundColor: confirmColor || (type === 'confirm' ? '#5D4037' : 'var(--color-electric-blue)'),
                             color: 'white',
                             cursor: 'pointer',
-                            fontWeight: '600',
+                            fontWeight: 'bold',
                             boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                         }}
                     >
@@ -228,6 +244,13 @@ const Admin = () => {
             "var(--color-electric-blue)"
         );
     };
+
+    // Delete Modal State
+    const [deleteModal, setDeleteModal] = useState({
+        isOpen: false,
+        type: null,
+        index: null
+    });
 
     const handleHeroChange = (e) => {
         updateHero({ [e.target.name]: e.target.value });
@@ -353,6 +376,21 @@ const Admin = () => {
 
     return (
         <div className="section-padding container" style={{ minHeight: '80vh', marginTop: '4rem' }}>
+            <AnimatePresence>
+                {modal.show && (
+                    <CustomModal
+                        show={modal.show}
+                        title={modal.title}
+                        message={modal.message}
+                        type={modal.type}
+                        onConfirm={modal.onConfirm}
+                        onCancel={modal.onCancel}
+                        confirmText={modal.confirmText}
+                        confirmColor={modal.confirmColor}
+                    />
+                )}
+            </AnimatePresence>
+
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <h1 style={{ color: 'var(--color-electric-blue)', margin: 0 }}>Admin Dashboard</h1>
                 <span style={{ fontSize: '0.9rem', color: 'green', backgroundColor: '#e6fffa', padding: '0.5rem 1rem', borderRadius: '20px', border: '1px solid #b2f5ea' }}>
@@ -663,52 +701,54 @@ const Admin = () => {
                                     <input value={item.link} onChange={(e) => handleArrayChange(index, 'link', e.target.value, 'instagram')} placeholder="Link URL" style={{ width: '100%', padding: '0.5rem' }} />
                                 </div>
                                 <button onClick={() => deleteItem(index, 'instagram')} style={{ color: '#5D4037' }}>X</button>
-                            </div>
+                            </div >
                         ))}
                         <button onClick={() => addItem('instagram')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add Post</button>
-                    </div>
+                    </div >
                 )}
 
-                {activeTab === 'founder' && (
-                    <div style={{ display: 'grid', gap: '2rem' }}>
-                        <div>
-                            <h2>Shared Assets</h2>
-                            <FileUpload
-                                label="Central Image"
-                                value={content.founders.image}
-                                onFileSelect={(val) => handleFoundersChange('main', 'image', val)}
-                            />
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                            {/* Founder 1 */}
-                            <div style={{ border: '1px solid #ddd', padding: '1.5rem', borderRadius: '8px' }}>
-                                <h3>Founder 1</h3>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                    <input value={content.founders.left.name} onChange={(e) => handleFoundersChange('left', 'name', e.target.value)} placeholder="Name" style={{ padding: '0.5rem' }} />
-                                    <input value={content.founders.left.role} onChange={(e) => handleFoundersChange('left', 'role', e.target.value)} placeholder="Role" style={{ padding: '0.5rem' }} />
-                                    <textarea value={content.founders.left.bio1} onChange={(e) => handleFoundersChange('left', 'bio1', e.target.value)} placeholder="Bio Paragraph 1" style={{ padding: '0.5rem', minHeight: '100px' }} />
-                                    <textarea value={content.founders.left.bio2} onChange={(e) => handleFoundersChange('left', 'bio2', e.target.value)} placeholder="Bio Paragraph 2" style={{ padding: '0.5rem', minHeight: '100px' }} />
-                                </div>
+                {
+                    activeTab === 'founder' && (
+                        <div style={{ display: 'grid', gap: '2rem' }}>
+                            <div>
+                                <h2>Shared Assets</h2>
+                                <FileUpload
+                                    label="Central Image"
+                                    value={content.founders.image}
+                                    onFileSelect={(val) => handleFoundersChange('main', 'image', val)}
+                                />
                             </div>
 
-                            {/* Founder 2 */}
-                            <div style={{ border: '1px solid #ddd', padding: '1.5rem', borderRadius: '8px' }}>
-                                <h3>Founder 2</h3>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                    <input value={content.founders.right.name} onChange={(e) => handleFoundersChange('right', 'name', e.target.value)} placeholder="Name" style={{ padding: '0.5rem' }} />
-                                    <input value={content.founders.right.role} onChange={(e) => handleFoundersChange('right', 'role', e.target.value)} placeholder="Role" style={{ padding: '0.5rem' }} />
-                                    <textarea value={content.founders.right.bio1} onChange={(e) => handleFoundersChange('right', 'bio1', e.target.value)} placeholder="Bio Paragraph 1" style={{ padding: '0.5rem', minHeight: '100px' }} />
-                                    <textarea value={content.founders.right.bio2} onChange={(e) => handleFoundersChange('right', 'bio2', e.target.value)} placeholder="Bio Paragraph 2" style={{ padding: '0.5rem', minHeight: '100px' }} />
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                                {/* Founder 1 */}
+                                <div style={{ border: '1px solid #ddd', padding: '1.5rem', borderRadius: '8px' }}>
+                                    <h3>Founder 1</h3>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                        <input value={content.founders.left.name} onChange={(e) => handleFoundersChange('left', 'name', e.target.value)} placeholder="Name" style={{ padding: '0.5rem' }} />
+                                        <input value={content.founders.left.role} onChange={(e) => handleFoundersChange('left', 'role', e.target.value)} placeholder="Role" style={{ padding: '0.5rem' }} />
+                                        <textarea value={content.founders.left.bio1} onChange={(e) => handleFoundersChange('left', 'bio1', e.target.value)} placeholder="Bio Paragraph 1" style={{ padding: '0.5rem', minHeight: '100px' }} />
+                                        <textarea value={content.founders.left.bio2} onChange={(e) => handleFoundersChange('left', 'bio2', e.target.value)} placeholder="Bio Paragraph 2" style={{ padding: '0.5rem', minHeight: '100px' }} />
+                                    </div>
+                                </div>
+
+                                {/* Founder 2 */}
+                                <div style={{ border: '1px solid #ddd', padding: '1.5rem', borderRadius: '8px' }}>
+                                    <h3>Founder 2</h3>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                        <input value={content.founders.right.name} onChange={(e) => handleFoundersChange('right', 'name', e.target.value)} placeholder="Name" style={{ padding: '0.5rem' }} />
+                                        <input value={content.founders.right.role} onChange={(e) => handleFoundersChange('right', 'role', e.target.value)} placeholder="Role" style={{ padding: '0.5rem' }} />
+                                        <textarea value={content.founders.right.bio1} onChange={(e) => handleFoundersChange('right', 'bio1', e.target.value)} placeholder="Bio Paragraph 1" style={{ padding: '0.5rem', minHeight: '100px' }} />
+                                        <textarea value={content.founders.right.bio2} onChange={(e) => handleFoundersChange('right', 'bio2', e.target.value)} placeholder="Bio Paragraph 2" style={{ padding: '0.5rem', minHeight: '100px' }} />
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )
+                }
 
-            </div>
+            </div >
             <CustomModal {...modal} />
-        </div>
+        </div >
     );
 };
 

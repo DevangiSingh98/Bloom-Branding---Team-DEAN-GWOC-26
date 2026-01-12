@@ -571,23 +571,32 @@ export const ContentProvider = ({ children }) => {
     };
 
     const syncBrand = async (c) => {
+        console.log("Syncing Brand:", c); // Debug log
         try {
             const url = c._id ? `http://localhost:5000/api/brands/${c._id}` : 'http://localhost:5000/api/brands';
+            console.log("Sync URL:", url, "Method:", c._id ? 'PUT' : 'POST');
+
             const response = await fetch(url, {
                 method: c._id ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(c)
             });
+            console.log("Sync Response Status:", response.status);
+
             if (response.ok) {
                 const saved = await response.json();
+                console.log("Saved Brand:", saved);
                 if (!c._id) {
                     setContent(prev => ({
                         ...prev,
                         brandLogos: prev.brandLogos.map(item => (item.id === c.id && !item._id) ? { ...saved, id: saved._id } : item)
                     }));
                 }
+            } else {
+                console.error("Sync Failed:", await response.text());
+                // Optional: alert user or handle error state
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Sync Exception:", e); }
     };
 
     const removeBrand = async (id) => {

@@ -9,6 +9,7 @@ import Work from './pages/Work';
 import Services from './pages/Services';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
+import Brands from './pages/Brands';
 import { ContentProvider } from './context/ContentContext';
 import { AnimatePresence } from 'framer-motion';
 import Chatbot from './components/Chatbot';
@@ -69,6 +70,7 @@ function AnimatedRoutes() {
                 <Route path="/work" element={<Work />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/admin" element={<Admin />} />
+                <Route path="/brands" element={<Brands />} />
             </Routes>
         </AnimatePresence>
     );

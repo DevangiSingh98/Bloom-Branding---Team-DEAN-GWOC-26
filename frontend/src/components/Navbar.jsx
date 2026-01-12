@@ -291,6 +291,7 @@ export default function Navbar() {
                                 { name: 'Our Story', path: '/about', img: '/images/ourstory.png', height: '220px', tilt: 15 },
                                 { name: 'Services', path: '/services', img: '/images/services.png', height: '130px', tilt: -5 },
                                 { name: 'Our Work', path: '/work', img: '/images/Ourwork.png', height: '140px', tilt: 8 },
+                                { name: 'Brands', path: '/brands', img: '/images/client1.png', height: '140px', tilt: -12 },
                                 { name: 'Contact', path: '/contact', img: '/images/tele.png', height: '200px', tilt: -5 },
                             ].map((link) => (
                                 <motion.li key={link.name} variants={itemVariants} style={{ margin: 0, position: 'relative' }}>

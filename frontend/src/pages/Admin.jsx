@@ -660,7 +660,7 @@ const Admin = () => {
                                     >
                                         <option value="" disabled>Select a project...</option>
                                         {content.allProjects && content.allProjects.map((proj) => (
-                                            <option key={proj.title} value={proj.title}>
+                                            <option key={proj.title || proj.id} value={proj.title}>
                                                 {proj.title}
                                             </option>
                                         ))}
@@ -709,7 +709,7 @@ const Admin = () => {
 
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                                     <div style={{ flex: 1 }}>
-                                        <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: '0.2rem', color: '#666' }}>Client Name</label>
+                                        <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: '0.2rem', color: '#666' }}>Reviewer Name</label>
                                         <input value={item.author} onChange={(e) => handleArrayChange(index, 'author', e.target.value, 'testimonials')} placeholder="Author" style={{ width: '100%', padding: '0.5rem' }} />
                                     </div>
                                     <div style={{ width: '100px' }}>
@@ -755,7 +755,7 @@ const Admin = () => {
                 {activeTab === 'brands' && (
                     <div>
                         <h2>Manage Brand Logos</h2>
-                        {content.brandLogos.map((item, index) => (
+                        {content.brandLogos && content.brandLogos.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
                                     <input

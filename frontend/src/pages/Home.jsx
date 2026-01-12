@@ -621,54 +621,44 @@ export default function Home() {
                         BRANDS WE HAVE BLOOMED
                     </h2>
 
-                    <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
-                        <motion.div
-                            style={{
-                                display: 'flex',
-                                gap: '4rem',
-                                width: 'max-content',
-                                alignItems: 'center'
-                            }}
-                            animate={{ x: ["0%", "-50%"] }}
-                            transition={{
-                                x: {
-                                    repeat: Infinity,
-                                    repeatType: "loop",
-                                    duration: 30, // Much faster than testimonials for logos
-                                    ease: "linear"
-                                }
-                            }}
-                        >
-                            {(() => {
-                                // Duplicate logos for infinite scroll
-                                const logos = content.brandLogos && content.brandLogos.length > 0
-                                    ? [...content.brandLogos, ...content.brandLogos, ...content.brandLogos, ...content.brandLogos]
-                                    : [];
-
-                                return logos.map((brand, idx) => (
-                                    <div key={`brand-${idx}`} style={{
-                                        width: '150px',
-                                        height: '80px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        filter: 'brightness(0) invert(1)', // Make logos white for dark background
-                                        opacity: 0.8,
-                                        transition: 'opacity 0.3s ease'
-                                    }}>
-                                        {brand.logo ? (
-                                            <img
-                                                src={brand.logo}
-                                                alt={brand.name}
-                                                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                                            />
-                                        ) : (
-                                            <span style={{ color: 'white', fontSize: '0.8rem' }}>{brand.name}</span>
-                                        )}
-                                    </div>
-                                ));
-                            })()}
-                        </motion.div>
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                        gap: '3rem',
+                        alignItems: 'center',
+                        justifyItems: 'center',
+                        width: '100%'
+                    }}>
+                        {content.brandLogos && content.brandLogos.map((brand, idx) => (
+                            <motion.div
+                                key={brand.id || idx}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: idx * 0.1, duration: 0.5 }}
+                                style={{
+                                    width: '150px',
+                                    height: '80px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    filter: 'brightness(0) invert(1)', // Make logos white for dark background
+                                    opacity: 0.8,
+                                    cursor: 'default'
+                                }}
+                                whileHover={{ opacity: 1, scale: 1.05 }}
+                            >
+                                {brand.logo ? (
+                                    <img
+                                        src={brand.logo}
+                                        alt={brand.name}
+                                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                                    />
+                                ) : (
+                                    <span style={{ color: 'white', fontSize: '0.8rem', textAlign: 'center' }}>{brand.name}</span>
+                                )}
+                            </motion.div>
+                        ))}
                     </div>
                 </div>
             </section>

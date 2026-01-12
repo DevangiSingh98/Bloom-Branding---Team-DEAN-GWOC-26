@@ -192,7 +192,9 @@ export const ContentProvider = ({ children }) => {
     // Initialize state from localStorage if available, else default
     const [content, setContent] = useState(() => {
         const savedContent = localStorage.getItem('bloomContent_v23'); // Changed key to force reset
-        return savedContent ? JSON.parse(savedContent) : defaultContent;
+        const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
+        // Merge with defaultContent to ensure all mandatory keys (like brandLogos) exist
+        return { ...defaultContent, ...parsed };
     });
 
     // 1. Fetch live projects from MongoDB on mount

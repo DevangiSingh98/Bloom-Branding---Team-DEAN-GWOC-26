@@ -703,21 +703,6 @@ const Admin = () => {
                                     </div>
                                 </div>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                    <FileUpload
-                                        label="Client Photo"
-                                        value={item.image}
-                                        onFileSelect={(val) => handleArrayChange(index, 'image', val, 'testimonials')}
-                                        onRemove={() => handleArrayChange(index, 'image', '', 'testimonials')}
-                                    />
-                                    <FileUpload
-                                        label="Video"
-                                        value={item.video}
-                                        type="video"
-                                        onFileSelect={(val) => handleArrayChange(index, 'video', val, 'testimonials')}
-                                        onRemove={() => handleArrayChange(index, 'video', '', 'testimonials')}
-                                    />
-                                </div>
                             </div>
                         ))}
                         <button onClick={() => addItem('testimonials')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add Testimonial</button>

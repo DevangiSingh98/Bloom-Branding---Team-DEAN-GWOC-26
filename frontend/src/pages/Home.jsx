@@ -476,15 +476,36 @@ export default function Home() {
             <section id="client-love-section" className="section-padding light-section" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)', padding: '0' }}>
                 <ParallaxContent>
                     <div className="container" style={{ maxWidth: '100%' }}>
-                        <motion.h2
-                            initial={{ y: 100, opacity: 0 }}
-                            whileInView={{ y: 0, opacity: 1 }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
-                            viewport={{ once: true }}
-                            style={{ marginTop: '4rem', marginBottom: '2rem', textAlign: 'center', fontSize: '6rem', lineHeight: 1 }}
-                        >
-                            Client Love
-                        </motion.h2>
+                        <div style={{ marginTop: '4rem', marginBottom: '3rem', textAlign: 'center' }}>
+                            <motion.h2
+                                initial={{ y: 50, opacity: 0 }}
+                                whileInView={{ y: 0, opacity: 1 }}
+                                transition={{ duration: 0.8, ease: "easeOut" }}
+                                viewport={{ once: true }}
+                                style={{
+                                    fontSize: 'clamp(3rem, 8vw, 5.5rem)',
+                                    lineHeight: 1,
+                                    textTransform: 'uppercase',
+                                    fontFamily: 'var(--font-brand)',
+                                    letterSpacing: '2px',
+                                    marginBottom: '1.2rem',
+                                    color: 'black'
+                                }}
+                            >
+                                Client Reviews
+                            </motion.h2>
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.3, duration: 0.6 }}
+                                viewport={{ once: true }}
+                                style={{ display: 'flex', justifyContent: 'center', gap: '16px' }}
+                            >
+                                {[...Array(5)].map((_, i) => (
+                                    <Star key={i} size={20} fill="black" color="black" />
+                                ))}
+                            </motion.div>
+                        </div>
                         {/* Horizontal Marquee Container - Pinterest Style */}
                         <div style={{
                             width: '100%',
@@ -520,13 +541,10 @@ export default function Home() {
                                     ];
 
                                     return (
-                                        <div style={{ display: 'flex', gap: '3rem', alignItems: 'flex-start', paddingLeft: '1rem', paddingRight: '1rem' }}>
+                                        <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'flex-start', paddingLeft: '1rem', paddingRight: '1rem' }}>
                                             {allTestimonials.map((item, index) => {
                                                 // Asymmetrical layout: Alternating up and down
-                                                const marginTop = index % 2 === 1 ? '6rem' : '0rem';
-
-                                                // Varying heights, smaller than before
-                                                const height = index % 3 === 0 ? '400px' : index % 3 === 1 ? '350px' : '450px';
+                                                const marginTop = index % 2 === 1 ? '3rem' : '0rem';
 
                                                 return (
                                                     <motion.div
@@ -538,60 +556,44 @@ export default function Home() {
                                                         whileHover={{ scale: 1.05, zIndex: 10 }}
                                                         style={{
                                                             marginTop: marginTop,
-                                                            width: '300px', // Smaller size
-                                                            height: height,
+                                                            width: '320px',
+                                                            height: '220px', // Fixed height for equal dimensions
                                                             flexShrink: 0,
-                                                            borderRadius: '16px',
+                                                            borderRadius: '12px',
                                                             overflow: 'hidden',
-                                                            backgroundColor: 'rgba(255,255,255,0.9)',
+                                                            backgroundColor: 'rgba(255,255,255,0.95)',
                                                             display: 'flex',
                                                             flexDirection: 'column',
-                                                            boxShadow: '0 8px 25px rgba(0,0,0,0.08)',
-                                                            border: '1px solid rgba(0,0,0,0.05)'
+                                                            justifyContent: 'space-between', // Push author to bottom
+                                                            boxShadow: '0 6px 20px rgba(0,0,0,0.06)',
+                                                            border: '1px solid rgba(0,0,0,0.04)',
+                                                            padding: '1.5rem'
                                                         }}
                                                     >
-                                                        {/* Media Section */}
-                                                        <div style={{
-                                                            flex: 1, // Takes up remaining space
-                                                            minHeight: '40%',
-                                                            overflow: 'hidden',
-                                                            position: 'relative'
-                                                        }}>
-                                                            {item.video ? (
-                                                                <video
-                                                                    src={item.video}
-                                                                    autoPlay
-                                                                    muted
-                                                                    loop
-                                                                    playsInline
-                                                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                                                />
-                                                            ) : item.image ? (
-                                                                <img src={item.image} alt={item.author} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                            ) : (
-                                                                <div style={{ width: '100%', height: '100%', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                                    <span style={{ opacity: 0.3, fontSize: '1.5rem' }}>No Image</span>
-                                                                </div>
-                                                            )}
-                                                        </div>
-
                                                         {/* Text Content */}
-                                                        <div style={{ padding: '1.5rem', backgroundColor: '#fff' }}>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                                             <div style={{ display: 'flex', gap: '0.2rem', marginBottom: '0.8rem' }}>
-                                                                {[...Array(item.rating || 5)].map((_, starIndex) => <Star key={starIndex} size={14} fill="#000" />)}
+                                                                {[...Array(item.rating || 5)].map((_, starIndex) => <Star key={starIndex} size={12} fill="#000" />)}
                                                             </div>
                                                             <p style={{
-                                                                fontSize: '0.95rem',
+                                                                fontSize: '0.9rem',
                                                                 lineHeight: 1.5,
-                                                                color: '#222',
-                                                                marginBottom: '1rem',
+                                                                color: '#333',
                                                                 fontFamily: '"Arial Nova", sans-serif',
+                                                                fontStyle: 'italic',
+                                                                margin: 0,
+                                                                overflow: 'hidden',
+                                                                display: '-webkit-box',
+                                                                WebkitLineClamp: 4,
+                                                                WebkitBoxOrient: 'vertical'
                                                             }}>
                                                                 "{item.text}"
                                                             </p>
-                                                            <p className="font-subtitle" style={{ fontWeight: 'bold', fontSize: '0.9rem', color: '#666', textTransform: 'uppercase' }}>
-                                                                — {item.author}
-                                                            </p>
+                                                            <div style={{ marginTop: 'auto', paddingTop: '1rem' }}>
+                                                                <p className="font-subtitle" style={{ fontWeight: 'bold', fontSize: '0.85rem', color: 'var(--color-electric-blue)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
+                                                                    — {item.author}
+                                                                </p>
+                                                            </div>
                                                         </div>
                                                     </motion.div>
                                                 );

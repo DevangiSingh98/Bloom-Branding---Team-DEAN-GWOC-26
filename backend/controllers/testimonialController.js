@@ -16,9 +16,9 @@ const getTestimonials = async (req, res) => {
 // @route   POST /api/testimonials
 // @access  Public (Testing)
 const createTestimonial = async (req, res) => {
-    const { text, author, rating, image, video } = req.body;
+    const { text, author, rating } = req.body;
     try {
-        const testimonial = new Testimonial({ text, author, rating, image, video });
+        const testimonial = new Testimonial({ text, author, rating });
         const created = await testimonial.save();
         res.status(201).json(created);
     } catch (error) {
@@ -33,8 +33,6 @@ const updateTestimonial = async (req, res) => {
             t.text = req.body.text !== undefined ? req.body.text : t.text;
             t.author = req.body.author !== undefined ? req.body.author : t.author;
             t.rating = req.body.rating !== undefined ? req.body.rating : t.rating;
-            t.image = req.body.image !== undefined ? req.body.image : t.image;
-            t.video = req.body.video !== undefined ? req.body.video : t.video;
             const updated = await t.save();
             res.json(updated);
         } else {

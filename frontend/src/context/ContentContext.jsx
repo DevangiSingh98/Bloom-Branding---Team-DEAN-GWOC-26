@@ -91,78 +91,67 @@ const defaultContent = {
             id: 1,
             rating: 5,
             text: "Bloom Branding completely transformed our online presence. Their attention to detail is unmatched.",
-            author: "Client",
-            image: "/images/client1.jpg"
+            author: "Client"
         },
         {
             id: 2,
             rating: 5,
             text: "The team really understood our vision and brought it to life in ways we couldn't imagine.",
-            author: "Client",
-            image: "/images/client2.jpg"
+            author: "Client"
         },
         {
             id: 3,
             rating: 5,
             text: "Professional, creative, and results-driven. Highly recommend working with them.",
-            author: "Client",
-            image: "/images/client3.jpg"
+            author: "Client"
         },
         {
             id: 4,
             rating: 5,
             text: "A breath of fresh air in the branding world. They captured our essence perfectly.",
-            author: "Client",
-            image: "/images/client4.png"
+            author: "Client"
         },
         {
             id: 5,
             rating: 4,
             text: "Strategic and beautiful. Our conversion rates doubled after the rebrand.",
-            author: "Client",
-            image: "/images/client5.png"
+            author: "Client"
         },
         {
             id: 7,
             rating: 5,
             text: "Exceptional quality and speed. I was blown away by the final delivery.",
-            author: "Client",
-            image: "/images/client1.jpg"
+            author: "Client"
         },
         {
             id: 8,
             rating: 4,
             text: "They helped us find our voice in a crowded market. Forever grateful.",
-            author: "Client",
-            image: "/images/client2.jpg"
+            author: "Client"
         },
         {
             id: 9,
             rating: 5,
             text: "Minimalist, elegant, and impactful. Exactly what we needed.",
-            author: "Client",
-            image: "/images/client3.jpg"
+            author: "Client"
         },
         {
             id: 10,
             rating: 5,
             text: "The team went above and beyond. Our new brand identity is stunning.",
-            author: "Client",
-            image: "/images/client4.png"
+            author: "Client"
         },
         {
             id: 11,
             rating: 5,
             text: "Highly professional and creative team.",
-            author: "Client",
-            image: "/images/client5.png"
+            author: "Client"
         },
         {
             id: 12,
             rating: 5,
             text: "A joy to work with from start to finish.",
-            author: "Client",
-            image: "/images/client1.jpg"
+            author: "Client"
         }
     ],
     instagram: [
@@ -325,9 +314,7 @@ export const ContentProvider = ({ children }) => {
         }
         if (sanitized.testimonials) {
             sanitized.testimonials = sanitized.testimonials.map(t => ({
-                ...t,
-                image: t.image && t.image.startsWith('data:') ? '' : t.image,
-                video: t.video && t.video.startsWith('data:') ? '' : t.video
+                ...t
             }));
         }
         if (sanitized.instagram) {

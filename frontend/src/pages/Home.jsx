@@ -618,7 +618,7 @@ export default function Home() {
                         fontFamily: 'Bigilla, serif',
                         letterSpacing: '1px'
                     }}>
-                        BRANDS WE HAVE WORKED WITH
+                        BRANDS WE HAVE BLOOMED
                     </h2>
 
                     <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>

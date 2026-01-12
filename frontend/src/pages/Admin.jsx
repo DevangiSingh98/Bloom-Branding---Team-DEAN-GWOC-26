@@ -218,43 +218,61 @@ const Admin = () => {
                 setIsInitializing(true);
                 try {
                     // Sync Hero
-                    await updateHero(content.hero);
-                    // ... (rest of sync logic remains same)
+                    if (content.hero) await updateHero(content.hero);
 
                     // Sync All Projects
-                    for (const item of content.allProjects) {
-                        if (!item._id) await syncProject(item);
+                    if (content.allProjects) {
+                        for (const item of content.allProjects) {
+                            if (!item._id) await syncProject(item);
+                        }
                     }
+
                     // Sync Selected Work (Projects on Work page)
-                    for (const item of content.selectedWork) {
-                        if (!item._id) await syncSelectedWork(item);
+                    if (content.selectedWork) {
+                        for (const item of content.selectedWork) {
+                            if (!item._id) await syncSelectedWork(item);
+                        }
                     }
+
                     // Sync Testimonials
-                    for (const item of content.testimonials) {
-                        if (!item._id) await syncTestimonial(item);
+                    if (content.testimonials) {
+                        for (const item of content.testimonials) {
+                            if (!item._id) await syncTestimonial(item);
+                        }
                     }
+
                     // Sync Instagram
-                    for (const item of content.instagram) {
-                        if (!item._id) await syncInstagram(item);
+                    if (content.instagram) {
+                        for (const item of content.instagram) {
+                            if (!item._id) await syncInstagram(item);
+                        }
                     }
+
                     // Sync Values
-                    for (const item of content.values) {
-                        if (!item._id) await syncValue(item);
+                    if (content.values) {
+                        for (const item of content.values) {
+                            if (!item._id) await syncValue(item);
+                        }
                     }
+
                     // Sync Brands
-                    for (const item of content.brandLogos) {
-                        if (!item._id) await syncBrand(item);
+                    if (content.brandLogos) {
+                        for (const item of content.brandLogos) {
+                            if (!item._id) await syncBrand(item);
+                        }
                     }
 
                     // Sync Founders
-                    if (content.founders.left) await syncFounder({ ...content.founders.left, key: 'left' });
-                    if (content.founders.right) await syncFounder({ ...content.founders.right, key: 'right' });
-                    if (content.founders.image) await syncFounder({ image: content.founders.image, key: 'main' });
+                    if (content.founders) {
+                        if (content.founders.left) await syncFounder({ ...content.founders.left, key: 'left' });
+                        if (content.founders.right) await syncFounder({ ...content.founders.right, key: 'right' });
+                        if (content.founders.image) await syncFounder({ image: content.founders.image, key: 'main' });
+                    }
 
                     showAlert("Success!", "Database initialization complete! Everything is now synced and safely stored.", "success");
                 } catch (error) {
                     console.error("Initialization failed:", error);
-                    showAlert("Error", "Initialization failed. Please check your connection and try again.", "error");
+                    showAlert("Sync Error", `Initialization failed: ${error.message || 'Unknown error'}. Please check the console for details.`, "error");
                 } finally {
                     setIsInitializing(false);
                 }

@@ -75,6 +75,14 @@ export default function Chatbot() {
 
 
 
+    // const [inputValue, setInputValue] = useState(''); // Removed Gemini
+    // const [isLoading, setIsLoading] = useState(false); // Removed Gemini
+
+    /* Removed Gemini Logic
+    const handleSend = async () => { ... }
+    const handleKeyPress = (e) => { ... }
+    */
+
     return (
         <div style={{ position: 'fixed', bottom: '10px', right: '30px', zIndex: 1000 }}>
             <AnimatePresence>
@@ -246,8 +254,7 @@ export default function Chatbot() {
                                 <div ref={messagesEndRef} />
                             </div>
 
-                            {/* Input Area */}
-                            {/* Footer / Input Area (Removed) */}
+                            {/* Footer / Input Area (Reverted to Static) */}
                             <div style={{
                                 padding: '15px 25px',
                                 borderTop: '1px solid rgba(0,0,0,0.06)',

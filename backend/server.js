@@ -12,8 +12,8 @@ import founderRoutes from './routes/founderRoutes.js';
 import valueRoutes from './routes/valueRoutes.js';
 import brandRoutes from './routes/brandRoutes.js';
 import selectedWorkRoutes from './routes/selectedWorkRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 import heroRoutes from './routes/heroRoutes.js';
-
 
 // Load env vars from root directory
 dotenv.config({ path: '../.env' });
@@ -47,6 +47,7 @@ app.use('/api/values', valueRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/selected-work', selectedWorkRoutes);
 app.use('/api/hero', heroRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is running...');

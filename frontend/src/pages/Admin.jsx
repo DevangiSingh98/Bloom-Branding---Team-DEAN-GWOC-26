@@ -179,9 +179,9 @@ const Admin = () => {
         syncInstagram, removeInstagram,
         syncFounder, removeFounder,
         syncValue, removeValue,
-        syncClient, removeClient,
+        syncBrand, removeBrand,
         syncSelectedWork, removeSelectedWork,
-        updateHero, updateAllProjects, updateSelectedWork, updateTestimonials, updateClientLogos, updateInstagram, updateFounders, updateValues, resetContent
+        updateHero, updateAllProjects, updateSelectedWork, updateTestimonials, updateBrandLogos, updateInstagram, updateFounders, updateValues, resetContent
     } = useContent();
     const [activeTab, setActiveTab] = useState('enquiries');
     const [openEnquiryId, setOpenEnquiryId] = useState(null);
@@ -241,9 +241,9 @@ const Admin = () => {
                     for (const item of content.values) {
                         if (!item._id) await syncValue(item);
                     }
-                    // Sync Clients
-                    for (const item of content.clientLogos) {
-                        if (!item._id) await syncClient(item);
+                    // Sync Brands
+                    for (const item of content.brandLogos) {
+                        if (!item._id) await syncBrand(item);
                     }
 
                     // Sync Founders
@@ -317,11 +317,11 @@ const Admin = () => {
             newArray[index] = { ...newArray[index], [field]: value };
             updateValues(newArray);
             syncValue(newArray[index]);
-        } else if (type === 'clients') {
-            newArray = [...content.clientLogos];
+        } else if (type === 'brands') {
+            newArray = [...content.brandLogos];
             newArray[index] = { ...newArray[index], [field]: value };
-            updateClientLogos(newArray);
-            syncClient(newArray[index]);
+            updateBrandLogos(newArray);
+            syncBrand(newArray[index]);
         }
     };
 
@@ -342,9 +342,9 @@ const Admin = () => {
         } else if (type === 'values') {
             const newItem = { id: tempId, title: "New Value", text: "Description" };
             updateValues([...content.values, newItem]);
-        } else if (type === 'clients') {
-            const newItem = { id: tempId, name: "Client Name", logo: "" };
-            updateClientLogos([...content.clientLogos, newItem]);
+        } else if (type === 'brands') {
+            const newItem = { id: tempId, name: "Brand Name", logo: "" };
+            updateBrandLogos([...content.brandLogos, newItem]);
         }
     };
 
@@ -369,9 +369,9 @@ const Admin = () => {
                 } else if (type === 'values') {
                     const item = content.values[index];
                     if (item._id) await removeValue(item._id);
-                } else if (type === 'clients') {
-                    const item = content.clientLogos[index];
-                    if (item._id) await removeClient(item._id);
+                } else if (type === 'brands') {
+                    const item = content.brandLogos[index];
+                    if (item._id) await removeBrand(item._id);
                 }
 
                 if (type === 'work') newArray = content.selectedWork.filter((_, i) => i !== index);
@@ -379,14 +379,14 @@ const Admin = () => {
                 else if (type === 'testimonials') newArray = content.testimonials.filter((_, i) => i !== index);
                 else if (type === 'instagram') newArray = content.instagram.filter((_, i) => i !== index);
                 else if (type === 'values') newArray = content.values.filter((_, i) => i !== index);
-                else if (type === 'clients') newArray = content.clientLogos.filter((_, i) => i !== index);
+                else if (type === 'brands') newArray = content.brandLogos.filter((_, i) => i !== index);
 
                 if (type === 'work') updateSelectedWork(newArray);
                 else if (type === 'projects') updateAllProjects(newArray);
                 else if (type === 'testimonials') updateTestimonials(newArray);
                 else if (type === 'instagram') updateInstagram(newArray);
                 else if (type === 'values') updateValues(newArray);
-                else if (type === 'clients') updateClientLogos(newArray);
+                else if (type === 'brands') updateBrandLogos(newArray);
             },
             "Delete",
             "#5D4037"
@@ -418,7 +418,7 @@ const Admin = () => {
             </div>
 
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-                {['enquiries', 'projects', 'selected work', 'founder', 'testimonials', 'instagram', 'clients'].map(tab => (
+                {['enquiries', 'projects', 'selected work', 'founder', 'testimonials', 'instagram', 'brands'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -734,29 +734,29 @@ const Admin = () => {
                     </div >
                 )}
 
-                {activeTab === 'clients' && (
+                {activeTab === 'brands' && (
                     <div>
-                        <h2>Manage Client Logos</h2>
-                        {content.clientLogos.map((item, index) => (
+                        <h2>Manage Brand Logos</h2>
+                        {content.brandLogos.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
                                     <input
                                         value={item.name}
-                                        onChange={(e) => handleArrayChange(index, 'name', e.target.value, 'clients')}
-                                        placeholder="Client Name"
+                                        onChange={(e) => handleArrayChange(index, 'name', e.target.value, 'brands')}
+                                        placeholder="Brand Name"
                                         style={{ flex: 1, padding: '0.5rem' }}
                                     />
-                                    <button onClick={() => deleteItem(index, 'clients')} style={{ color: '#5D4037' }}>X</button>
+                                    <button onClick={() => deleteItem(index, 'brands')} style={{ color: '#5D4037' }}>X</button>
                                 </div>
                                 <FileUpload
-                                    label="Client Logo"
+                                    label="Brand Logo"
                                     value={item.logo || ''}
-                                    onFileSelect={(val) => handleArrayChange(index, 'logo', val, 'clients')}
-                                    onRemove={() => handleArrayChange(index, 'logo', '', 'clients')}
+                                    onFileSelect={(val) => handleArrayChange(index, 'logo', val, 'brands')}
+                                    onRemove={() => handleArrayChange(index, 'logo', '', 'brands')}
                                 />
                             </div>
                         ))}
-                        <button onClick={() => addItem('clients')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add Client Logo</button>
+                        <button onClick={() => addItem('brands')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add Brand Logo</button>
                     </div>
                 )}
 

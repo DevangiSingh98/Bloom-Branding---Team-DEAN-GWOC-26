@@ -10,7 +10,7 @@ import testimonialRoutes from './routes/testimonialRoutes.js';
 import instagramRoutes from './routes/instagramRoutes.js';
 import founderRoutes from './routes/founderRoutes.js';
 import valueRoutes from './routes/valueRoutes.js';
-import clientRoutes from './routes/clientRoutes.js';
+import brandRoutes from './routes/brandRoutes.js';
 import selectedWorkRoutes from './routes/selectedWorkRoutes.js';
 import heroRoutes from './routes/heroRoutes.js';
 
@@ -44,7 +44,7 @@ app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/instagram', instagramRoutes);
 app.use('/api/founders', founderRoutes);
 app.use('/api/values', valueRoutes);
-app.use('/api/clients', clientRoutes);
+app.use('/api/brands', brandRoutes);
 app.use('/api/selected-work', selectedWorkRoutes);
 app.use('/api/hero', heroRoutes);
 

@@ -607,6 +607,72 @@ export default function Home() {
                 </ParallaxContent>
             </section>
 
+            {/* Brands We Have Worked With Section */}
+            <section style={{ backgroundColor: '#2D1E17', padding: '5rem 0', overflow: 'hidden' }}>
+                <div className="container">
+                    <h2 style={{
+                        color: '#F9F1E7',
+                        textAlign: 'center',
+                        marginBottom: '3rem',
+                        fontSize: '2.5rem',
+                        fontFamily: 'Bigilla, serif',
+                        letterSpacing: '1px'
+                    }}>
+                        BRANDS WE HAVE WORKED WITH
+                    </h2>
+
+                    <div style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
+                        <motion.div
+                            style={{
+                                display: 'flex',
+                                gap: '4rem',
+                                width: 'max-content',
+                                alignItems: 'center'
+                            }}
+                            animate={{ x: ["0%", "-50%"] }}
+                            transition={{
+                                x: {
+                                    repeat: Infinity,
+                                    repeatType: "loop",
+                                    duration: 30, // Much faster than testimonials for logos
+                                    ease: "linear"
+                                }
+                            }}
+                        >
+                            {(() => {
+                                // Duplicate logos for infinite scroll
+                                const logos = content.brandLogos && content.brandLogos.length > 0
+                                    ? [...content.brandLogos, ...content.brandLogos, ...content.brandLogos, ...content.brandLogos]
+                                    : [];
+
+                                return logos.map((brand, idx) => (
+                                    <div key={`brand-${idx}`} style={{
+                                        width: '150px',
+                                        height: '80px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        filter: 'brightness(0) invert(1)', // Make logos white for dark background
+                                        opacity: 0.8,
+                                        transition: 'opacity 0.3s ease'
+                                    }}>
+                                        {brand.logo ? (
+                                            <img
+                                                src={brand.logo}
+                                                alt={brand.name}
+                                                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                                            />
+                                        ) : (
+                                            <span style={{ color: 'white', fontSize: '0.8rem' }}>{brand.name}</span>
+                                        )}
+                                    </div>
+                                ));
+                            })()}
+                        </motion.div>
+                    </div>
+                </div>
+            </section>
+
             {/* Instagram Preview */}
             <section className="section-padding light-section">
                 <ParallaxContent>

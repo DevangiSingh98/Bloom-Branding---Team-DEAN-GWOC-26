@@ -1,23 +1,23 @@
-import Client from '../models/Client.js';
+import Brand from '../models/Brand.js';
 
-const getClients = async (req, res) => {
+const getBrands = async (req, res) => {
     try {
-        const items = await Client.find({});
+        const items = await Brand.find({});
         res.json(items);
     } catch (error) { res.status(500).json({ message: error.message }); }
 };
 
-const createClient = async (req, res) => {
+const createBrand = async (req, res) => {
     try {
-        const item = new Client(req.body);
+        const item = new Brand(req.body);
         const created = await item.save();
         res.status(201).json(created);
     } catch (error) { res.status(400).json({ message: error.message }); }
 };
 
-const updateClient = async (req, res) => {
+const updateBrand = async (req, res) => {
     try {
-        const item = await Client.findById(req.params.id);
+        const item = await Brand.findById(req.params.id);
         if (item) {
             Object.assign(item, req.body);
             const updated = await item.save();
@@ -26,9 +26,9 @@ const updateClient = async (req, res) => {
     } catch (error) { res.status(400).json({ message: error.message }); }
 };
 
-const deleteClient = async (req, res) => {
+const deleteBrand = async (req, res) => {
     try {
-        const item = await Client.findById(req.params.id);
+        const item = await Brand.findById(req.params.id);
         if (item) {
             await item.deleteOne();
             res.json({ message: 'Removed' });
@@ -36,4 +36,4 @@ const deleteClient = async (req, res) => {
     } catch (error) { res.status(500).json({ message: error.message }); }
 };
 
-export { getClients, createClient, updateClient, deleteClient };
+export { getBrands, createBrand, updateBrand, deleteBrand };

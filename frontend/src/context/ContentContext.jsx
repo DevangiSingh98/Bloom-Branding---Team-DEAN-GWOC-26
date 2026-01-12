@@ -180,10 +180,10 @@ const defaultContent = {
         { id: 2, title: "Creativity", text: "Pushing boundaries is in our DNA." },
         { id: 3, title: "Growth", text: "We design with the future in mind." }
     ],
-    clientLogos: [
-        { id: 1, name: "Client 1", logo: "/images/client1.png" },
-        { id: 2, name: "Client 2", logo: "/images/client2.png" },
-        { id: 3, name: "Client 3", logo: "/images/client3.png" }
+    brandLogos: [
+        { id: 1, name: "Brand 1", logo: "/images/client1.png" },
+        { id: 2, name: "Brand 2", logo: "/images/client2.png" },
+        { id: 3, name: "Brand 3", logo: "/images/client3.png" }
     ],
     enquiries: []
 };
@@ -267,13 +267,13 @@ export const ContentProvider = ({ children }) => {
                     }
                 }
 
-                // Fetch Clients
-                const cResponse = await fetch('http://localhost:5000/api/clients');
+                // Fetch Brands
+                const cResponse = await fetch('http://localhost:5000/api/brands');
                 if (cResponse.ok) {
-                    const clients = await cResponse.json();
-                    if (clients && clients.length > 0) {
-                        const mappedClients = clients.map(c => ({ ...c, id: c._id }));
-                        setContent(prev => ({ ...prev, clientLogos: mappedClients }));
+                    const brands = await cResponse.json();
+                    if (brands && brands.length > 0) {
+                        const mappedBrands = brands.map(c => ({ ...c, id: c._id }));
+                        setContent(prev => ({ ...prev, brandLogos: mappedBrands }));
                     }
                 }
 
@@ -320,8 +320,8 @@ export const ContentProvider = ({ children }) => {
         if (sanitized.instagram) {
             sanitized.instagram = sanitized.instagram.map(i => ({ ...i, image: i.image && i.image.startsWith('data:') ? '' : i.image }));
         }
-        if (sanitized.clientLogos) {
-            sanitized.clientLogos = sanitized.clientLogos.map(c => ({ ...c, logo: c.logo && c.logo.startsWith('data:') ? '' : c.logo }));
+        if (sanitized.brandLogos) {
+            sanitized.brandLogos = sanitized.brandLogos.map(c => ({ ...c, logo: c.logo && c.logo.startsWith('data:') ? '' : c.logo }));
         }
         if (sanitized.founders) {
             sanitized.founders = { ...sanitized.founders, image: sanitized.founders.image && sanitized.founders.image.startsWith('data:') ? '' : sanitized.founders.image };
@@ -367,8 +367,8 @@ export const ContentProvider = ({ children }) => {
         setContent(prev => ({ ...prev, testimonials: newTestimonials }));
     };
 
-    const updateClientLogos = (newLogos) => {
-        setContent(prev => ({ ...prev, clientLogos: newLogos }));
+    const updateBrandLogos = (newLogos) => {
+        setContent(prev => ({ ...prev, brandLogos: newLogos }));
     };
 
     const updateInstagram = (newInsta) => {
@@ -568,9 +568,9 @@ export const ContentProvider = ({ children }) => {
         try { await fetch(`http://localhost:5000/api/values/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
     };
 
-    const syncClient = async (c) => {
+    const syncBrand = async (c) => {
         try {
-            const url = c._id ? `http://localhost:5000/api/clients/${c._id}` : 'http://localhost:5000/api/clients';
+            const url = c._id ? `http://localhost:5000/api/brands/${c._id}` : 'http://localhost:5000/api/brands';
             const response = await fetch(url, {
                 method: c._id ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -581,16 +581,16 @@ export const ContentProvider = ({ children }) => {
                 if (!c._id) {
                     setContent(prev => ({
                         ...prev,
-                        clientLogos: prev.clientLogos.map(item => (item.id === c.id && !item._id) ? { ...saved, id: saved._id } : item)
+                        brandLogos: prev.brandLogos.map(item => (item.id === c.id && !item._id) ? { ...saved, id: saved._id } : item)
                     }));
                 }
             }
         } catch (e) { console.error(e); }
     };
 
-    const removeClient = async (id) => {
+    const removeBrand = async (id) => {
         if (!id) return;
-        try { await fetch(`http://localhost:5000/api/clients/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+        try { await fetch('http://localhost:5000/api/brands/' + id, { method: 'DELETE' }); } catch (e) { console.error(e); }
     };
 
     const syncSelectedWork = async (w) => {
@@ -633,13 +633,13 @@ export const ContentProvider = ({ children }) => {
             removeFounder,
             syncValue,
             removeValue,
-            syncClient,
-            removeClient,
+            syncBrand,
+            removeBrand,
             syncSelectedWork,
             removeSelectedWork,
             updateSelectedWork,
             updateTestimonials,
-            updateClientLogos,
+            updateBrandLogos,
             updateInstagram,
             updateFounders,
             updateValues,

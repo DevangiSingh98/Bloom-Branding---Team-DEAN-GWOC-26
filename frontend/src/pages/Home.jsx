@@ -573,7 +573,14 @@ export default function Home() {
                                                         {/* Text Content */}
                                                         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                                             <div style={{ display: 'flex', gap: '0.2rem', marginBottom: '0.8rem' }}>
-                                                                {[...Array(item.rating || 5)].map((_, starIndex) => <Star key={starIndex} size={12} fill="#000" />)}
+                                                                {[...Array(5)].map((_, starIndex) => (
+                                                                    <Star
+                                                                        key={starIndex}
+                                                                        size={12}
+                                                                        fill={starIndex < (item.rating || 5) ? "#000" : "none"}
+                                                                        color="#000"
+                                                                    />
+                                                                ))}
                                                             </div>
                                                             <p style={{
                                                                 fontSize: '0.9rem',

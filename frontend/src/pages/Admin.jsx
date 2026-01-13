@@ -441,8 +441,8 @@ const Admin = () => {
                             time: new Date(msg.createdAt).toLocaleTimeString(),
                             read: msg.read
                         }));
-                        // Reverse to show newest first
-                        updateEnquiries(formatted.reverse());
+                        // Backend already sorts by createdAt: -1 (newest first), so no need to reverse
+                        updateEnquiries(formatted);
                     }
                 } catch (e) {
                     console.error("Failed to fetch enquiries", e);
@@ -1265,7 +1265,7 @@ const Admin = () => {
 
                 {activeTab === 'testimonials' && (
                     <div>
-                        <h2>Testimonials</h2>
+                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Testimonials</h2>
                         {content.testimonials.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ marginBottom: '1rem' }}>
@@ -1296,7 +1296,7 @@ const Admin = () => {
 
                 {activeTab === 'instagram' && (
                     <div>
-                        <h2>Instagram Content</h2>
+                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Instagram Content</h2>
                         {content.instagram.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px', display: 'flex', gap: '1rem' }}>
                                 <div style={{ flex: 1 }}>
@@ -1320,7 +1320,7 @@ const Admin = () => {
 
                 {activeTab === 'brands' && (
                     <div>
-                        <h2>Manage Brand Logos</h2>
+                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Manage Brand Logos</h2>
                         {content.brandLogos && content.brandLogos.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
@@ -1342,7 +1342,24 @@ const Admin = () => {
                     activeTab === 'founder' && (
                         <div style={{ display: 'grid', gap: '2rem' }}>
                             <div>
-                                <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Shared Assets</h2>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                    <h2 style={{ fontSize: '2.5rem', margin: 0 }}>Founders</h2>
+                                    <button
+                                        onClick={() => {
+                                            if (window.confirm("Are you sure you want to reset Founders data to defaults?")) {
+                                                const defaults = resetFounders();
+                                                // After resetting state, we should ideally sync if we have the token
+                                                // Since resetFounders updates state, we can rely on the user clicking "Initialize Database" 
+                                                // OR we can explicitly call sync here if we expose a return value.
+                                                // For now, let's notify the user to save.
+                                                alert("Founders reset to default values. Please click 'Initialize Database' to save these changes permanently.");
+                                            }
+                                        }}
+                                        style={{ padding: '0.5rem 1rem', backgroundColor: '#666', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+                                    >
+                                        Reset to Defaults
+                                    </button>
+                                </div>
                                 <FileUpload
                                     label="Central Image"
                                     value={content.founders.main?.image || ''}
@@ -1375,6 +1392,7 @@ const Admin = () => {
                                 </div>
                             </div>
                         </div>
+
                     )
                 }
 

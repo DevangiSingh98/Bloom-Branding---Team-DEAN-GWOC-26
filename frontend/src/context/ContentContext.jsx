@@ -131,14 +131,14 @@ const defaultContent = {
         left: {
             name: "Meghna Kherajani",
             role: "Co-founder",
-            bio1: "I’m drawn to the stories that live beneath the surface of a brand—the quiet intentions, the emotions, and the purpose that give it meaning. I love observing people, culture, and nuance, and translating those insights into brand narratives that feel honest, thoughtful, and deeply human. For me, branding is not just about how something looks, but how it feels and the connection it creates.",
-            bio2: "At Bloom Branding, I blend strategy with creativity to shape cohesive brand identities, meaningful content, and marketing experiences that help businesses stand out with clarity and grow with confidence in the digital space."
+            bio1: "I’m drawn to the stories that live beneath a brand’s surface—the quiet intentions, emotions, and purpose that give it meaning. By observing people, culture, and nuance, I translate these insights into narratives that feel honest, thoughtful, and deeply human.",
+            bio2: "At Bloom Branding, I blend strategy with creativity to craft cohesive brand identities, meaningful content, and immersive experiences. My goal is to help brands stand out with clarity and grow with confidence in the digital space."
         },
         right: {
             name: "Anushi Shah",
             role: "Co-founder",
-            bio1: "I started my career as a Graphic Designer four years ago, driven by a deep passion for design and an eagerness to constantly learn. Over time, this passion helped me discover not just my creative direction, but also my ability to lead and build meaningful visual stories.The belief in myself and my vision led to the creation of my own Branding & Advertising firm.",
-            bio2: "Today, I proudly co-found Bloom Branding, where I blend aesthetics, strategy, and creative leadership to help brands grow, evolve, and truly bloom 🌷"
+            bio1: "I began my journey as a Graphic Designer four years ago, driven by a passion for design and learning. That journey shaped my creative voice and gave me the confidence to lead and build meaningful visual stories.",
+            bio2: "Today, as the Co-founder of Bloom Branding, I blend aesthetics, strategy, and creativity to help brands grow, evolve, and truly bloom"
         }
     },
     values: [
@@ -157,7 +157,7 @@ const defaultContent = {
 export const ContentProvider = ({ children }) => {
     // Initialize state from localStorage if available, else default
     const [content, setContent] = useState(() => {
-        const savedContent = localStorage.getItem('bloomContent_REVIEWS_FINAL_V2'); // Increment version to force reset
+        const savedContent = localStorage.getItem('bloomContent_REVIEWS_FINAL_V3'); // Increment version to force reset
         console.log("Loading content...", savedContent ? "Found cached" : "Using default");
         const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
         // Merge with defaultContent to ensure all mandatory keys (like brandLogos) exist
@@ -447,6 +447,34 @@ export const ContentProvider = ({ children }) => {
         setContent(defaultContent);
     };
 
+    const resetFounders = () => {
+        // Copy defaults from fetched state (keys: left_default, right_default, main_default)
+        // to active keys: left, right, main
+        const defaults = {
+            left: { ...content.founders.left_default, key: 'left' },
+            right: { ...content.founders.right_default, key: 'right' },
+            main: { ...content.founders.main_default, key: 'main' }
+        };
+
+        setContent(prev => ({
+            ...prev,
+            founders: {
+                ...prev.founders,
+                left: defaults.left,
+                right: defaults.right,
+                main: defaults.main
+            }
+        }));
+
+        // Sync these resets to the backend (updating the active records)
+        // Token is needed effectively, but for now we rely on the Admin component calling us or updating state first.
+        // Wait, Admin calls syncFounder for edits. Reset should also persist.
+        // Since we don't have the token here easily without passing it, we'll return the defaults 
+        // and let the caller handle sync, OR we just update state and let user click "Initialize Database" or similar.
+        // Updates state immediately to defaults. User can then "Save" by acting on it or we can auto-save if token passed.
+        return defaults;
+    };
+
     const syncProject = async (project) => {
         try {
             const body = {
@@ -709,7 +737,8 @@ export const ContentProvider = ({ children }) => {
             removeEnquiries,
             removeAllEnquiries,
             addEnquiry,
-            resetContent
+            resetContent,
+            resetFounders
         }}>
             {children}
         </ContentContext.Provider>

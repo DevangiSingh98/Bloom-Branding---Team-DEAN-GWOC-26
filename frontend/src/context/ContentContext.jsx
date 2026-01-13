@@ -89,69 +89,33 @@ const defaultContent = {
     testimonials: [
         {
             id: 1,
-            rating: 5,
-            text: "Bloom Branding completely transformed our online presence. Their attention to detail is unmatched.",
-            author: "Client"
+            rating: 4,
+            text: "I’ve been working with Bloom for past 4-5 months and my experience with them has been great! Both the founders are very creative and also the team is flexible managing shoot timings and dates and accommodating special requests needed be! I’d recommend you take that meeting :)",
+            author: "Nishant Shah"
         },
         {
             id: 2,
             rating: 5,
-            text: "The team really understood our vision and brought it to life in ways we couldn't imagine.",
-            author: "Client"
+            text: "The bloom branding team is really hardworking and efficient. I am associated with bloom since more than a year now and they have taken my brand’s page from 20k followers to 50k + followers . Looking forward to touching 100k followers and many more effective collabs together . So wish they were in my city though to really make organic content for me as I suck at it myself.",
+            author: "Mansi Nagdev"
         },
         {
             id: 3,
             rating: 5,
-            text: "Professional, creative, and results-driven. Highly recommend working with them.",
-            author: "Client"
+            text: "I had an exceptional experience working with Bloom Branding. Their professionalism, tailored strategies, and excellent communication made them stand out. They tackled challenges creatively, delivered precise campaigns, and their dedication to results was evident throughout. I highly recommend Bloom Branding for their expertise and commitment to excellence.",
+            author: "Harsh Kheni"
         },
         {
             id: 4,
             rating: 5,
-            text: "A breath of fresh air in the branding world. They captured our essence perfectly.",
-            author: "Client"
+            text: "It was such a nice experience to have an working with bloom branding as, The way they all measure single detail is amazing and apart from that it really help my business. Keep it up bloom branding and team and thanks to you.",
+            author: "Shwet Tejani"
         },
         {
             id: 5,
-            rating: 4,
-            text: "Strategic and beautiful. Our conversion rates doubled after the rebrand.",
-            author: "Client"
-        },
-        {
-            id: 7,
             rating: 5,
-            text: "Exceptional quality and speed. I was blown away by the final delivery.",
-            author: "Client"
-        },
-        {
-            id: 8,
-            rating: 4,
-            text: "They helped us find our voice in a crowded market. Forever grateful.",
-            author: "Client"
-        },
-        {
-            id: 9,
-            rating: 5,
-            text: "Minimalist, elegant, and impactful. Exactly what we needed.",
-            author: "Client"
-        },
-        {
-            id: 10,
-            rating: 5,
-            text: "The team went above and beyond. Our new brand identity is stunning.",
-            author: "Client"
-        },
-        {
-            id: 11,
-            rating: 5,
-            text: "Highly professional and creative team.",
-            author: "Client"
-        },
-        {
-            id: 12,
-            rating: 5,
-            text: "A joy to work with from start to finish.",
-            author: "Client"
+            text: "Great work done by these people! One stop for all the assistance needed for digital marketing related work. The employees and all the staff here provide all the guidance to the best of your satisfaction.",
+            author: "Purva Shah"
         }
     ],
     instagram: [
@@ -193,7 +157,8 @@ const defaultContent = {
 export const ContentProvider = ({ children }) => {
     // Initialize state from localStorage if available, else default
     const [content, setContent] = useState(() => {
-        const savedContent = localStorage.getItem('bloomContent_v25'); // Increment version
+        const savedContent = localStorage.getItem('bloomContent_REVIEWS_FINAL_V2'); // Increment version to force reset
+        console.log("Loading content...", savedContent ? "Found cached" : "Using default");
         const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
         // Merge with defaultContent to ensure all mandatory keys (like brandLogos) exist
         return { ...defaultContent, ...parsed };
@@ -229,6 +194,7 @@ export const ContentProvider = ({ children }) => {
                 }
 
                 // Fetch Testimonials
+                /* 
                 const tResponse = await fetch('http://localhost:5000/api/testimonials');
                 if (tResponse.ok) {
                     const testimonials = await tResponse.json();
@@ -237,6 +203,7 @@ export const ContentProvider = ({ children }) => {
                         setContent(prev => ({ ...prev, testimonials: mappedTestimonials }));
                     }
                 }
+                */
 
                 // Fetch Instagram
                 const iResponse = await fetch('http://localhost:5000/api/instagram');

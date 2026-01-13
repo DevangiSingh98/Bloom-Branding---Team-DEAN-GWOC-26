@@ -169,12 +169,12 @@ const ServiceList = () => {
                         >
                             {/* Top Title */}
                             <h3 style={{
-                                fontSize: '1.8rem', // Adjusted for balance
+                                fontSize: '2.5rem', // Bigger for impact
                                 margin: 0,
                                 fontFamily: 'var(--font-brand)',
                                 color: 'var(--color-butter-yellow)',
                                 textAlign: 'center',
-                                fontWeight: 'normal'
+                                fontWeight: 'bold'
                             }}>
                                 {service.title}
                             </h3>
@@ -399,10 +399,10 @@ export default function Home() {
                             style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', alignItems: 'center' }}
                         >
                             <motion.div variants={fadeInUp}>
-                                <h2 style={{ fontSize: '3rem', marginBottom: '2rem', color: 'var(--color-electric-blue)' }}>Blooming the Brand</h2>
+                                <h2 style={{ fontSize: '3.8rem', marginBottom: '2rem', color: 'var(--color-electric-blue)' }}>Blooming the Brand</h2>
                                 <motion.p
                                     className="font-subtitle"
-                                    style={{ fontSize: '1.1rem', lineHeight: 1.8, textAlign: 'justify' }}
+                                    style={{ fontSize: '1.6rem', lineHeight: 1.6, textAlign: 'justify' }}
                                     initial={{ opacity: 0, y: -30 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
@@ -573,7 +573,14 @@ export default function Home() {
                                                         {/* Text Content */}
                                                         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                                                             <div style={{ display: 'flex', gap: '0.2rem', marginBottom: '0.8rem' }}>
-                                                                {[...Array(item.rating || 5)].map((_, starIndex) => <Star key={starIndex} size={12} fill="#000" />)}
+                                                                {[...Array(5)].map((_, starIndex) => (
+                                                                    <Star
+                                                                        key={starIndex}
+                                                                        size={12}
+                                                                        fill={starIndex < (item.rating || 5) ? "#000" : "none"}
+                                                                        color="#000"
+                                                                    />
+                                                                ))}
                                                             </div>
                                                             <p style={{
                                                                 fontSize: '0.9rem',
@@ -667,8 +674,8 @@ export default function Home() {
                 <ParallaxContent>
                     <div className="container" style={{ textAlign: 'center' }}>
                         <a href="https://www.instagram.com/bloom.branding_/?hl=en" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <h2 style={{ marginBottom: '3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                                @bloom.branding_ <ArrowUpRight size={48} strokeWidth={0.75} />
+                            <h2 style={{ fontSize: '4rem', marginBottom: '3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                @bloom.branding_ <ArrowUpRight size={56} strokeWidth={0.75} />
                             </h2>
                         </a>
                         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5rem' }}>

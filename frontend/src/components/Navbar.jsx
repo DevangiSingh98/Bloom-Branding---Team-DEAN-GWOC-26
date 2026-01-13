@@ -28,10 +28,10 @@ export default function Navbar() {
     useEffect(() => {
         // 1. IMMEDIATE STATE RESET based on Route
         // This ensures the color is correct momentarily before any scrolling happens
-        if (location.pathname === '/about') {
-            setIsDarkText(true); // About starts Dark
+        if (location.pathname === '/about' || location.pathname === '/') {
+            setIsDarkText(true); // About & Home start Dark (Brown)
         } else {
-            setIsDarkText(false); // Home, Services, Work start Yellow
+            setIsDarkText(false); // Services, Work start Yellow
         }
 
         // 2. HARD RESET of ScrollTrigger
@@ -126,7 +126,7 @@ export default function Navbar() {
 
     useEffect(() => {
         const handleColorChange = (e) => {
-            if (location.pathname === '/about') {
+            if (location.pathname === '/about' || location.pathname === '/') {
                 setIsDarkText(e.detail.isDark);
             }
         };

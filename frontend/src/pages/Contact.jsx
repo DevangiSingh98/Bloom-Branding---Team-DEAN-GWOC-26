@@ -90,7 +90,7 @@ export default function Contact() {
                                 {/* Section 2: Project Details */}
                                 <div>
                                     <h3 className="font-subtitle" style={{ fontSize: '2rem', marginBottom: '1.5rem', color: 'var(--color-dark-choc)', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
-                                        02. Project Details <span style={{ fontSize: '1.1rem', color: 'var(--color-electric-blue)', marginLeft: '10px' }}>(Required for understanding)</span>
+                                        02. Project Details
                                     </h3>
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

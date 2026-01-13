@@ -370,11 +370,87 @@ const Admin = () => {
         syncValue, removeValue,
         syncBrand, removeBrand,
         syncSelectedWork, removeSelectedWork,
-        updateHero, updateAllProjects, updateSelectedWork, updateTestimonials, updateBrandLogos, updateInstagram, updateFounders, updateValues, resetContent
+        updateHero, updateAllProjects, updateSelectedWork, updateTestimonials, updateBrandLogos, updateInstagram, updateFounders, updateValues, updateEnquiries,
+        removeEnquiry, removeEnquiries, removeAllEnquiries, resetContent
     } = useContent();
     const [activeTab, setActiveTab] = useState('enquiries');
     const [openEnquiryId, setOpenEnquiryId] = useState(null);
     const [isInitializing, setIsInitializing] = useState(false);
+
+    // Enquiry Deletion Logic
+    const [selectedEnquiries, setSelectedEnquiries] = useState(new Set());
+
+    const toggleSelect = (id) => {
+        const newSelected = new Set(selectedEnquiries);
+        if (newSelected.has(id)) newSelected.delete(id);
+        else newSelected.add(id);
+        setSelectedEnquiries(newSelected);
+    };
+
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            setSelectedEnquiries(new Set(content.enquiries.map(enq => enq.id)));
+        } else {
+            setSelectedEnquiries(new Set());
+        }
+    };
+
+    const handleDeleteEnquiry = (id) => {
+        showAlert("Delete Enquiry?", "Are you sure you want to delete this enquiry?", "warning", () => {
+            removeEnquiry(id, userInfo.token);
+        }, "Delete", "red");
+    };
+
+    const handleBulkDelete = () => {
+        showAlert("Delete Selected?", `Are you sure you want to delete ${selectedEnquiries.size} enquiries?`, "warning", () => {
+            removeEnquiries(Array.from(selectedEnquiries), userInfo.token);
+            setSelectedEnquiries(new Set());
+        }, "Delete Selected", "red");
+    };
+
+    const handleDeleteAllEnquiries = () => {
+        showAlert("Delete ALL?", "Are you sure you want to delete ALL enquiries? This cannot be undone.", "warning", () => {
+            removeAllEnquiries(userInfo.token);
+            setSelectedEnquiries(new Set());
+        }, "Delete ALL", "red");
+    };
+
+    // Fetch Enquiries when tab is active and user is logged in
+    useEffect(() => {
+        if (activeTab === 'enquiries' && userInfo && userInfo.token) {
+            const fetchEnquiries = async () => {
+                try {
+                    const res = await fetch('http://localhost:5000/api/messages', {
+                        headers: {
+                            Authorization: `Bearer ${userInfo.token}`
+                        }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        // Format msg for UI: backend fields -> UI fields
+                        const formatted = data.map(msg => ({
+                            id: msg._id,
+                            name: msg.name,
+                            email: msg.email,
+                            message: msg.message,
+                            service: msg.service || 'General',
+                            company: msg.company,
+                            budget: msg.budget,
+                            timeline: msg.timeline,
+                            date: new Date(msg.createdAt).toLocaleDateString(),
+                            time: new Date(msg.createdAt).toLocaleTimeString(),
+                            read: msg.read
+                        }));
+                        // Reverse to show newest first
+                        updateEnquiries(formatted.reverse());
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch enquiries", e);
+                }
+            };
+            fetchEnquiries();
+        }
+    }, [activeTab, userInfo]); // Removed updateEnquiries from deps to avoid loop if unstable
 
     // Custom Modal State
     const [modal, setModal] = useState({ show: false, title: '', message: '', type: 'info', onConfirm: () => { }, confirmText: '', confirmColor: '' });
@@ -483,9 +559,10 @@ const Admin = () => {
 
                     // Sync Founders
                     if (content.founders) {
-                        if (content.founders.left) await syncFounder({ ...content.founders.left, key: 'left' });
-                        if (content.founders.right) await syncFounder({ ...content.founders.right, key: 'right' });
-                        if (content.founders.image) await syncFounder({ image: content.founders.image, key: 'main' });
+                        if (content.founders.left) await syncFounder({ ...content.founders.left, key: 'left' }, userInfo.token);
+                        if (content.founders.right) await syncFounder({ ...content.founders.right, key: 'right' }, userInfo.token);
+                        // Check if main exists as an object now
+                        if (content.founders.main) await syncFounder({ ...content.founders.main, key: 'main' }, userInfo.token);
                     }
 
                     showAlert("Success!", "Database initialization complete! Everything is now synced and safely stored.", "success");
@@ -514,16 +591,12 @@ const Admin = () => {
 
     const handleFoundersChange = (section, field, value) => {
         const newFounders = { ...content.founders };
-        if (section === 'main') {
-            newFounders[field] = value;
-            updateFounders(newFounders);
-            // If it's the central image, we might want a special sync or just use 'main' key
-            syncFounder({ [field]: value, key: 'main' });
-        } else {
-            newFounders[section] = { ...newFounders[section], [field]: value };
-            updateFounders(newFounders);
-            syncFounder({ ...newFounders[section], key: section });
-        }
+        // Ensure section object exists
+        if (!newFounders[section]) newFounders[section] = {};
+
+        newFounders[section] = { ...newFounders[section], [field]: value };
+        updateFounders(newFounders);
+        syncFounder({ ...newFounders[section], key: section }, userInfo.token);
     };
 
     // Helper to handle array updates
@@ -936,72 +1009,131 @@ const Admin = () => {
             <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.05)' }}>
                 {activeTab === 'enquiries' && (
                     <div>
-                        <h2>Enquiries</h2>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', alignItems: 'center' }}>
+                            <h2 style={{ margin: 0 }}>Enquiries</h2>
+                            <div style={{ display: 'flex', gap: '1rem' }}>
+                                {selectedEnquiries.size > 0 && (
+                                    <button onClick={handleBulkDelete} className="btn-danger" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', backgroundColor: '#ff4d4d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                        Delete Selected ({selectedEnquiries.size})
+                                    </button>
+                                )}
+                                {content.enquiries?.length > 0 && (
+                                    <button onClick={handleDeleteAllEnquiries} className="btn-danger" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                        Delete All
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                         {(!content.enquiries || content.enquiries.length === 0) ? (
                             <p style={{ color: '#666', fontStyle: 'italic' }}>No enquiries received yet.</p>
                         ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                {content.enquiries.map((item) => (
-                                    <div key={item.id} style={{ border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
-                                        {/* Header Row */}
-                                        <div
-                                            onClick={() => setOpenEnquiryId(openEnquiryId === item.id ? null : item.id)}
-                                            style={{
-                                                padding: '1.5rem',
-                                                backgroundColor: '#f9f9f9',
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center'
-                                            }}
-                                        >
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>
-                                                    <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--color-electric-blue)' }}>{item.service || 'General Enquiry'}</span>
-                                                    <span style={{ fontSize: '0.9rem', color: '#666', fontFamily: 'monospace' }}>
-                                                        {item.date} &nbsp;|&nbsp; {(() => {
-                                                            try {
-                                                                // Attempt to parse time string by appending to a dummy date
-                                                                // Handles "20:30:00" -> "8:30 PM"
-                                                                // Handles "8:30 PM" -> "8:30 PM" (idempotent-ish)
-                                                                const timeString = item.time.trim();
-                                                                const dummyDate = new Date('2000-01-01 ' + timeString);
-
-                                                                if (isNaN(dummyDate.getTime())) return timeString; // Fallback if invalid
-
-                                                                return dummyDate.toLocaleTimeString('en-US', {
-                                                                    hour: 'numeric',
-                                                                    minute: '2-digit',
-                                                                    hour12: true
-                                                                });
-                                                            } catch (e) {
-                                                                return item.time;
-                                                            }
-                                                        })()}
-                                                    </span>
-                                                </div>
-                                                <div style={{ fontSize: '1.1rem' }}>{item.name}</div>
-                                            </div>
-                                            <div style={{ marginLeft: '1.5rem', transform: openEnquiryId === item.id ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s', fontSize: '1.5rem', color: '#888' }}>
-                                                ▼
-                                            </div>
-                                        </div>
-
-                                        {/* Expanded Details */}
-                                        {openEnquiryId === item.id && (
-                                            <div style={{ padding: '1.5rem', borderTop: '1px solid #ddd', backgroundColor: 'white' }}>
-                                                <div style={{ marginBottom: '1rem' }}>
-                                                    <strong>Email:</strong> <a href={`mailto:${item.email}`} style={{ color: 'var(--color-electric-blue)' }}>{item.email}</a>
-                                                </div>
-                                                <div>
-                                                    <strong>Message:</strong>
-                                                    <p style={{ backgroundColor: '#f4f4f4', padding: '1rem', borderRadius: '5px', marginTop: '0.5rem', whiteSpace: 'pre-wrap' }}>{item.message}</p>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
+                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <thead style={{ backgroundColor: '#f9f9f9', borderBottom: '2px solid #eee' }}>
+                                    <tr>
+                                        <th style={{ padding: '1rem', width: '40px', textAlign: 'center' }}>
+                                            <input
+                                                type="checkbox"
+                                                onChange={handleSelectAll}
+                                                checked={content.enquiries.length > 0 && selectedEnquiries.size === content.enquiries.length}
+                                                style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
+                                            />
+                                        </th>
+                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Date</th>
+                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Name</th>
+                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Email</th>
+                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Service</th>
+                                        <th style={{ padding: '1rem', textAlign: 'right' }}>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {content.enquiries.map((item) => (
+                                        <React.Fragment key={item.id}>
+                                            <tr style={{ borderBottom: '1px solid #eee', backgroundColor: selectedEnquiries.has(item.id) ? '#e6f7ff' : 'transparent' }}>
+                                                <td style={{ padding: '1rem', textAlign: 'center' }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedEnquiries.has(item.id)}
+                                                        onChange={() => toggleSelect(item.id)}
+                                                        style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
+                                                    />
+                                                </td>
+                                                <td style={{ padding: '1rem' }}>
+                                                    {item.date}
+                                                    <div style={{ fontSize: '0.8rem', color: '#999' }}>{item.time}</div>
+                                                </td>
+                                                <td style={{ padding: '1rem', fontWeight: 'bold' }}>{item.name}</td>
+                                                <td style={{ padding: '1rem' }}>{item.email}</td>
+                                                <td style={{ padding: '1rem' }}>{item.service}</td>
+                                                <td style={{ padding: '1rem', textAlign: 'right' }}>
+                                                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                        <button
+                                                            onClick={() => setOpenEnquiryId(openEnquiryId === item.id ? null : item.id)}
+                                                            style={{
+                                                                padding: '0.4rem 0.8rem',
+                                                                backgroundColor: 'transparent',
+                                                                color: 'var(--color-electric-blue)',
+                                                                border: '1px solid var(--color-electric-blue)',
+                                                                borderRadius: '4px',
+                                                                cursor: 'pointer',
+                                                                fontSize: '0.85rem',
+                                                                transition: 'all 0.2s'
+                                                            }}
+                                                            onMouseEnter={e => {
+                                                                e.target.style.backgroundColor = 'var(--color-electric-blue)';
+                                                                e.target.style.color = '#fff';
+                                                            }}
+                                                            onMouseLeave={e => {
+                                                                e.target.style.backgroundColor = 'transparent';
+                                                                e.target.style.color = 'var(--color-electric-blue)';
+                                                            }}
+                                                        >
+                                                            {openEnquiryId === item.id ? 'Close' : 'View'}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteEnquiry(item.id)}
+                                                            style={{
+                                                                padding: '0.4rem 0.8rem',
+                                                                backgroundColor: 'transparent',
+                                                                color: '#ff4d4f',
+                                                                border: '1px solid #ff4d4f',
+                                                                borderRadius: '4px',
+                                                                cursor: 'pointer',
+                                                                fontSize: '0.85rem',
+                                                                transition: 'all 0.2s'
+                                                            }}
+                                                            onMouseEnter={e => {
+                                                                e.target.style.backgroundColor = '#ff4d4f';
+                                                                e.target.style.color = '#fff';
+                                                            }}
+                                                            onMouseLeave={e => {
+                                                                e.target.style.backgroundColor = 'transparent';
+                                                                e.target.style.color = '#ff4d4f';
+                                                            }}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {openEnquiryId === item.id && (
+                                                <tr style={{ backgroundColor: '#f0f4f8' }}>
+                                                    <td colSpan="6" style={{ padding: '1.5rem' }}>
+                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                                            <div><strong>Company:</strong> {item.company || 'N/A'}</div>
+                                                            <div><strong>Budget:</strong> {item.budget || 'N/A'}</div>
+                                                            <div><strong>Timeline:</strong> {item.timeline || 'N/A'}</div>
+                                                            <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
+                                                                <strong>Message:</strong>
+                                                                <p style={{ marginTop: '0.5rem', lineHeight: '1.6', backgroundColor: '#fff', padding: '1rem', borderRadius: '4px' }}>{item.message}</p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </tbody>
+                            </table>
                         )}
                     </div>
                 )}
@@ -1203,7 +1335,7 @@ const Admin = () => {
                                 <h2>Shared Assets</h2>
                                 <FileUpload
                                     label="Central Image"
-                                    value={content.founders.image}
+                                    value={content.founders.main?.image || ''}
                                     onFileSelect={(val) => handleFoundersChange('main', 'image', val)}
                                     onRemove={() => handleFoundersChange('main', 'image', '')}
                                 />

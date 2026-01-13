@@ -350,8 +350,8 @@ export default function About() {
                         </motion.div>
 
                         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '-60px', position: 'relative', zIndex: 20 }}>
-                            {content.founders.image ? (
-                                <img src={content.founders.image} alt="Founders" style={{ width: '250%', maxWidth: 'none', marginLeft: '0%', height: 'auto', borderRadius: '10px 10px 0 0', display: 'block' }} />
+                            {content.founders.main?.image ? (
+                                <img src={content.founders.main.image} alt="Founders" style={{ width: '250%', maxWidth: 'none', marginLeft: '0%', height: 'auto', borderRadius: '10px 10px 0 0', display: 'block' }} />
                             ) : (
                                 <div className="img-placeholder" style={{ width: '100%', height: '600px', borderRadius: '10px 10px 0 0' }}>Founders Image</div>
                             )}

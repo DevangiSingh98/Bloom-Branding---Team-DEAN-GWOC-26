@@ -3,6 +3,10 @@ import mongoose from 'mongoose';
 const messageSchema = mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true },
+    company: { type: String },
+    service: { type: String },
+    budget: { type: String },
+    timeline: { type: String },
     subject: { type: String },
     message: { type: String, required: true },
     read: { type: Boolean, default: false }

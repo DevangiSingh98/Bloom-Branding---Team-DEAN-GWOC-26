@@ -9,6 +9,16 @@ const getFounders = async (req, res) => {
 
 const createFounder = async (req, res) => {
     try {
+        // Idempotency check: if key exists, update instead of create
+        if (req.body.key) {
+            const existing = await Founder.findOne({ key: req.body.key });
+            if (existing) {
+                Object.assign(existing, req.body);
+                const updated = await existing.save();
+                return res.status(200).json(updated);
+            }
+        }
+
         const item = new Founder(req.body);
         const created = await item.save();
         res.status(201).json(created);

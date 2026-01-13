@@ -161,18 +161,20 @@ const defaultContent = {
         { id: 4, link: "https://www.instagram.com/p/C_5lTgmByDn/?hl=en&img_index=1", image: "/images/insta4.png" }
     ],
     founders: {
-        image: "/images/founders.png",
+        main: {
+            image: "/images/founders.png"
+        },
         left: {
-            name: "Founder Name 1",
+            name: "Meghna Kherajani",
             role: "Co-founder",
-            bio1: "Bio Paragraph 1 for Founder 1. They are an expert in branding and strategy.",
-            bio2: "Bio Paragraph 2 for Founder 1. They love creating meaningful connections."
+            bio1: "I’m drawn to the stories that live beneath the surface of a brand—the quiet intentions, the emotions, and the purpose that give it meaning. I love observing people, culture, and nuance, and translating those insights into brand narratives that feel honest, thoughtful, and deeply human. For me, branding is not just about how something looks, but how it feels and the connection it creates.",
+            bio2: "At Bloom Branding, I blend strategy with creativity to shape cohesive brand identities, meaningful content, and marketing experiences that help businesses stand out with clarity and grow with confidence in the digital space."
         },
         right: {
-            name: "Founder Name 2",
+            name: "Anushi Shah",
             role: "Co-founder",
-            bio1: "Bio Paragraph 1 for Founder 2. They specialize in motion graphics and design.",
-            bio2: "Bio Paragraph 2 for Founder 2. They bring brands to life with animation."
+            bio1: "I started my career as a Graphic Designer four years ago, driven by a deep passion for design and an eagerness to constantly learn. Over time, this passion helped me discover not just my creative direction, but also my ability to lead and build meaningful visual stories.The belief in myself and my vision led to the creation of my own Branding & Advertising firm.",
+            bio2: "Today, I proudly co-found Bloom Branding, where I blend aesthetics, strategy, and creative leadership to help brands grow, evolve, and truly bloom 🌷"
         }
     },
     values: [
@@ -191,7 +193,7 @@ const defaultContent = {
 export const ContentProvider = ({ children }) => {
     // Initialize state from localStorage if available, else default
     const [content, setContent] = useState(() => {
-        const savedContent = localStorage.getItem('bloomContent_v23'); // Changed key to force reset
+        const savedContent = localStorage.getItem('bloomContent_v25'); // Increment version
         const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
         // Merge with defaultContent to ensure all mandatory keys (like brandLogos) exist
         return { ...defaultContent, ...parsed };
@@ -250,10 +252,13 @@ export const ContentProvider = ({ children }) => {
                 const fResponse = await fetch('http://localhost:5000/api/founders');
                 if (fResponse.ok) {
                     const foundersArr = await fResponse.json();
+                    console.log("Fetched Founders:", foundersArr);
                     if (foundersArr && foundersArr.length > 0) {
                         const foundersObj = { ...content.founders };
                         foundersArr.forEach(f => {
-                            if (f.key) foundersObj[f.key] = f;
+                            if (f.key && foundersObj[f.key]) {
+                                foundersObj[f.key] = f;
+                            }
                         });
                         setContent(prev => ({ ...prev, founders: foundersObj }));
                     }
@@ -326,7 +331,16 @@ export const ContentProvider = ({ children }) => {
             sanitized.brandLogos = sanitized.brandLogos.map(c => ({ ...c, logo: c.logo && c.logo.startsWith('data:') ? '' : c.logo }));
         }
         if (sanitized.founders) {
-            sanitized.founders = { ...sanitized.founders, image: sanitized.founders.image && sanitized.founders.image.startsWith('data:') ? '' : sanitized.founders.image };
+            const cleanFounders = { ...sanitized.founders };
+            if (cleanFounders.main && cleanFounders.main.image && cleanFounders.main.image.startsWith('data:')) {
+                cleanFounders.main = { ...cleanFounders.main, image: '' };
+            }
+            sanitized.founders = cleanFounders;
+        }
+
+        // Do not save enquiries to local storage
+        if (sanitized.enquiries) {
+            sanitized.enquiries = [];
         }
 
         return sanitized;
@@ -336,7 +350,7 @@ export const ContentProvider = ({ children }) => {
     useEffect(() => {
         try {
             const sanitized = sanitizeForStorage(content);
-            localStorage.setItem('bloomContent_v23', JSON.stringify(sanitized));
+            localStorage.setItem('bloomContent_v24', JSON.stringify(sanitized));
         } catch (e) {
             console.error('Failed to save to localStorage:', e);
         }
@@ -388,11 +402,78 @@ export const ContentProvider = ({ children }) => {
         setContent(prev => ({ ...prev, values: newValues }));
     };
 
-    const addEnquiry = (enquiry) => {
-        setContent(prev => ({
-            ...prev,
-            enquiries: [enquiry, ...(prev.enquiries || [])]
-        }));
+    const addEnquiry = async (enquiry) => {
+        try {
+            const response = await fetch('http://localhost:5000/api/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(enquiry)
+            });
+            if (response.ok) {
+                const saved = await response.json();
+                setContent(prev => ({
+                    ...prev,
+                    enquiries: [saved, ...(prev.enquiries || [])]
+                }));
+            }
+        } catch (e) { console.error("Failed to send enquiry:", e); }
+    };
+
+    const updateEnquiries = (newEnquiries) => {
+        setContent(prev => ({ ...prev, enquiries: newEnquiries }));
+    };
+
+    const removeEnquiry = async (id, token) => {
+        if (!id || !token) return;
+        try {
+            const res = await fetch(`http://localhost:5000/api/messages/${id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) {
+                setContent(prev => ({
+                    ...prev,
+                    enquiries: prev.enquiries.filter(e => e.id !== id)
+                }));
+            }
+        } catch (e) { console.error("Failed to delete enquiry", e); }
+    };
+
+    const removeEnquiries = async (ids, token) => {
+        if (!ids || ids.length === 0 || !token) return;
+        try {
+            const res = await fetch(`http://localhost:5000/api/messages`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ ids })
+            });
+            if (res.ok) {
+                setContent(prev => ({
+                    ...prev,
+                    enquiries: prev.enquiries.filter(e => !ids.includes(e.id))
+                }));
+            }
+        } catch (e) { console.error("Failed to delete enquiries", e); }
+    };
+
+    const removeAllEnquiries = async (token) => {
+        if (!token) return;
+        try {
+            const res = await fetch(`http://localhost:5000/api/messages`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ all: true })
+            });
+            if (res.ok) {
+                setContent(prev => ({ ...prev, enquiries: [] }));
+            }
+        } catch (e) { console.error("Failed to delete all enquiries", e); }
     };
 
     const resetContent = () => {
@@ -514,28 +595,27 @@ export const ContentProvider = ({ children }) => {
         } catch (e) { console.error(e); }
     };
 
-    const syncFounder = async (f) => {
+    const syncFounder = async (f, token) => {
         try {
             const url = f._id ? `http://localhost:5000/api/founders/${f._id}` : 'http://localhost:5000/api/founders';
             const response = await fetch(url, {
                 method: f._id ? 'PUT' : 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
                 body: JSON.stringify(f)
             });
             if (response.ok) {
                 const saved = await response.json();
-                if (!f._id) {
-                    setContent(prev => {
-                        const newFounders = { ...prev.founders };
-                        if (f.key) {
-                            newFounders[f.key] = { ...newFounders[f.key], _id: saved._id };
-                        } else {
-                            // If no key, maybe it's the main image or something else
-                            Object.assign(newFounders, saved);
-                        }
-                        return { ...prev, founders: newFounders };
-                    });
-                }
+                // Ensure we update the LOCAL state with the database ID to prevent future duplicates
+                setContent(prev => {
+                    const newFounders = { ...prev.founders };
+                    if (saved.key && newFounders[saved.key]) {
+                        newFounders[saved.key] = { ...newFounders[saved.key], ...saved, _id: saved._id };
+                    }
+                    return { ...prev, founders: newFounders };
+                });
             }
         } catch (e) { console.error(e); }
     };
@@ -657,6 +737,10 @@ export const ContentProvider = ({ children }) => {
             updateInstagram,
             updateFounders,
             updateValues,
+            updateEnquiries,
+            removeEnquiry,
+            removeEnquiries,
+            removeAllEnquiries,
             addEnquiry,
             resetContent
         }}>

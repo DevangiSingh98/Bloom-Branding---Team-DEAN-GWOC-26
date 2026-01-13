@@ -32,6 +32,7 @@ const createAdmin = async () => {
             console.log('Creating new "admin" user...');
             await User.create({
                 username,
+                email: "admin@example.com",
                 password,
                 isAdmin: true
             });

@@ -46,8 +46,8 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
     };
 
     return (
-        <div style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: '0.2rem', color: '#666' }}>{label}</label>
+        <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', fontSize: '1.1rem', marginBottom: '0.5rem', color: '#666' }}>{label}</label>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                 <div style={{
                     width: '60px',
@@ -82,8 +82,8 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
                 <button
                     onClick={() => fileInputRef.current.click()}
                     style={{
-                        padding: '0.4rem 0.8rem',
-                        fontSize: '0.9rem',
+                        padding: '0.6rem 1rem',
+                        fontSize: '1rem',
                         border: '1px solid #ccc',
                         borderRadius: '4px',
                         backgroundColor: '#f0f0f0',
@@ -99,8 +99,8 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
                             if (onRemove) onRemove();
                         }}
                         style={{
-                            padding: '0.4rem 0.8rem',
-                            fontSize: '0.9rem',
+                            padding: '0.6rem 1rem',
+                            fontSize: '1rem',
                             border: '1px solid #ff4d4f',
                             borderRadius: '4px',
                             backgroundColor: '#fff',
@@ -111,7 +111,7 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
                         Remove
                     </button>
                 )}
-                <span style={{ fontSize: '0.9rem', color: '#555' }}>{fileName}</span>
+                <span style={{ fontSize: '1rem', color: '#555' }}>{fileName}</span>
             </div>
         </div>
     );
@@ -214,7 +214,7 @@ const AuthInput = ({ type, placeholder, value, onChange }) => {
                     border: 'none',
                     borderBottom: focused ? '2px solid var(--color-electric-blue)' : '1px solid #ddd',
                     outline: 'none',
-                    fontSize: '1.1rem',
+                    fontSize: '1.2rem',
                     fontFamily: 'var(--font-body)',
                     color: '#333',
                     backgroundColor: 'transparent',
@@ -225,7 +225,7 @@ const AuthInput = ({ type, placeholder, value, onChange }) => {
                 position: 'absolute',
                 left: 0,
                 top: focused || value ? '-0.8rem' : '0.8rem',
-                fontSize: focused || value ? '0.75rem' : '1.1rem',
+                fontSize: focused || value ? '0.9rem' : '1.2rem',
                 color: focused ? 'var(--color-electric-blue)' : '#999',
                 transition: 'all 0.3s ease',
                 pointerEvents: 'none',
@@ -661,10 +661,10 @@ const Admin = () => {
                     <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '4px', background: 'linear-gradient(90deg, var(--color-electric-blue), #4ecdc4)' }} />
 
                     <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                        <h2 style={{ fontFamily: 'Bigilla, serif', fontSize: '2.8rem', marginBottom: '0.5rem', color: '#1a1a1a', letterSpacing: '-0.02em' }}>
+                        <h2 style={{ fontFamily: 'Bigilla, serif', fontSize: '3rem', marginBottom: '0.5rem', color: '#1a1a1a', letterSpacing: '-0.02em' }}>
                             {forgotStep === 1 ? 'Forgot Password' : forgotStep === 2 ? 'Reset Access' : 'Admin Access'}
                         </h2>
-                        <p style={{ fontFamily: 'var(--font-body)', color: '#666', fontSize: '1rem' }}>
+                        <p style={{ fontFamily: 'var(--font-body)', color: '#666', fontSize: '1.2rem' }}>
                             {forgotStep === 1 ? 'Enter your email to receive a secure token.' :
                                 forgotStep === 2 ? 'Creating a new secure password.' :
                                     'Welcome back. Please login to enter the studio.'}
@@ -836,13 +836,13 @@ const Admin = () => {
             </AnimatePresence>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ color: 'var(--color-electric-blue)', margin: 0 }}>Admin Dashboard</h1>
+                <h1 style={{ color: 'var(--color-electric-blue)', margin: 0, fontSize: '3rem' }}>Admin Dashboard</h1>
                 <span style={{ fontSize: '0.9rem', color: 'green', backgroundColor: '#e6fffa', padding: '0.5rem 1rem', borderRadius: '20px', border: '1px solid #b2f5ea' }}>
                     ✓ Changes auto-saved to Database
                 </span>
             </div>
 
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '0.8rem', marginBottom: '2rem', alignItems: 'center', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                 {['enquiries', 'projects', 'selected work', 'founder', 'testimonials', 'instagram', 'brands'].map(tab => (
                     <button
                         key={tab}
@@ -853,32 +853,38 @@ const Admin = () => {
                             backgroundColor: activeTab === tab ? 'var(--color-electric-blue)' : '#eee',
                             color: activeTab === tab ? 'white' : 'black',
                             textTransform: 'capitalize',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            fontSize: '0.9rem',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0
                         }}
                     >
                         {tab}
                     </button>
                 ))}
+
                 <button
                     onClick={initializeDatabase}
                     disabled={isInitializing}
                     style={{
-                        marginLeft: 'auto',
+                        marginLeft: '2rem',
                         backgroundColor: isInitializing ? '#ccc' : 'var(--color-electric-blue)',
                         color: 'white',
                         border: 'none',
-                        padding: '0.6rem 1.5rem',
+                        padding: '0.5rem 1rem',
                         borderRadius: '30px',
                         cursor: isInitializing ? 'not-allowed' : 'pointer',
                         fontWeight: '600',
-                        fontSize: '0.85rem',
+                        fontSize: '0.9rem',
                         textTransform: 'uppercase',
                         letterSpacing: '1px',
                         transition: 'all 0.3s ease',
                         boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '0.5rem'
+                        gap: '0.5rem',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
                     }}
                     onMouseOver={(e) => !isInitializing && (e.currentTarget.style.transform = 'translateY(-2px)', e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)')}
                     onMouseOut={(e) => !isInitializing && (e.currentTarget.style.transform = 'translateY(0)', e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)')}
@@ -902,13 +908,15 @@ const Admin = () => {
                     style={{
                         backgroundColor: '#ff4d4f',
                         color: 'white',
-                        padding: '0.6rem 1.2rem',
+                        padding: '0.5rem 1rem',
                         borderRadius: '30px',
                         cursor: 'pointer',
                         border: 'none',
-                        fontSize: '0.8rem',
+                        fontSize: '0.9rem',
                         fontWeight: '600',
-                        boxShadow: '0 4px 15px rgba(255, 77, 79, 0.2)'
+                        boxShadow: '0 4px 15px rgba(255, 77, 79, 0.2)',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
                     }}
                 >
                     Sign Out
@@ -918,13 +926,15 @@ const Admin = () => {
                     style={{
                         backgroundColor: 'transparent',
                         color: '#5D4037',
-                        padding: '0.6rem 1.2rem',
+                        padding: '0.5rem 1rem',
                         borderRadius: '30px',
                         cursor: 'pointer',
                         border: '1px solid #D7CCC8',
-                        fontSize: '0.8rem',
+                        fontSize: '0.9rem',
                         fontWeight: '500',
-                        transition: 'all 0.2s ease'
+                        transition: 'all 0.2s ease',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
                     }}
                     onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#EFEBE9', e.currentTarget.style.borderColor = '#5D4037')}
                     onMouseOut={(e) => (e.currentTarget.style.backgroundColor = 'transparent', e.currentTarget.style.borderColor = '#D7CCC8')}
@@ -936,9 +946,9 @@ const Admin = () => {
             <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.05)' }}>
                 {activeTab === 'enquiries' && (
                     <div>
-                        <h2>Enquiries</h2>
+                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem', color: 'var(--color-electric-blue)' }}>Enquiries</h2>
                         {(!content.enquiries || content.enquiries.length === 0) ? (
-                            <p style={{ color: '#666', fontStyle: 'italic' }}>No enquiries received yet.</p>
+                            <p style={{ color: '#666', fontStyle: 'italic', fontSize: '1.2rem' }}>No enquiries received yet.</p>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 {content.enquiries.map((item) => (
@@ -1009,8 +1019,8 @@ const Admin = () => {
                 {/* PROJECT MANAGEMENT (BRAND PROFILES) */}
                 {activeTab === 'projects' && (
                     <div>
-                        <h2>Manage All Projects</h2>
-                        <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>Add, edit, or remove projects from the global portfolio.</p>
+                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Manage All Projects</h2>
+                        <p style={{ fontSize: '1.3rem', color: '#666', marginBottom: '1.5rem' }}>Add, edit, or remove projects from the global portfolio.</p>
                         {content.allProjects.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
@@ -1018,23 +1028,23 @@ const Admin = () => {
                                         value={item.title}
                                         onChange={(e) => handleArrayChange(index, 'title', e.target.value, 'projects')}
                                         placeholder="Project Title"
-                                        style={{ flex: 1, padding: '0.5rem', fontWeight: 'bold' }}
+                                        style={{ flex: 1, padding: '0.8rem', fontWeight: 'bold', fontSize: '1.1rem' }}
                                     />
-                                    <button onClick={() => deleteItem(index, 'projects')} style={{ color: '#5D4037' }}>X</button>
+                                    <button onClick={() => deleteItem(index, 'projects')} style={{ color: '#5D4037', fontSize: '1.1rem', padding: '0.5rem' }}>X</button>
                                 </div>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
                                     <input
                                         value={item.category}
                                         onChange={(e) => handleArrayChange(index, 'category', e.target.value, 'projects')}
                                         placeholder="Category"
-                                        style={{ flex: 1, padding: '0.5rem' }}
+                                        style={{ flex: 1, padding: '0.8rem', fontSize: '1.15rem' }}
                                     />
                                 </div>
                                 <textarea
                                     value={item.description}
                                     onChange={(e) => handleArrayChange(index, 'description', e.target.value, 'projects')}
                                     placeholder="Project Description"
-                                    style={{ width: '100%', padding: '0.5rem', marginBottom: '0.5rem', minHeight: '80px' }}
+                                    style={{ width: '100%', padding: '0.8rem', marginBottom: '0.5rem', minHeight: '80px', fontSize: '1.15rem', fontFamily: 'inherit' }}
                                 />
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                     <FileUpload
@@ -1053,18 +1063,18 @@ const Admin = () => {
                                 </div>
                             </div>
                         ))}
-                        <button onClick={() => addItem('projects')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add New Project</button>
+                        <button onClick={() => addItem('projects')} className="btn-primary" style={{ fontSize: '1.1rem', padding: '0.8rem 1.5rem' }}>Add New Project</button>
                     </div>
                 )}
 
                 {activeTab === 'selected work' && (
                     <div>
-                        <h2>Selected Work (Home Page)</h2>
-                        <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '1rem' }}>Select which projects to feature on the Home page.</p>
+                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Selected Work (Home Page)</h2>
+                        <p style={{ fontSize: '1.3rem', color: '#666', marginBottom: '1.5rem' }}>Select which projects to feature on the Home page.</p>
                         {content.selectedWork.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ marginBottom: '0.5rem' }}>
-                                    <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: '0.2rem' }}>Project</label>
+                                    <label style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem' }}>Project</label>
                                     <select
                                         value={item.title}
                                         onChange={(e) => {
@@ -1080,7 +1090,7 @@ const Admin = () => {
                                                 updateSelectedWork(newArray);
                                             }
                                         }}
-                                        style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+                                        style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid #ccc', fontSize: '1.15rem' }}
                                     >
                                         <option value="" disabled>Select a project...</option>
                                         {content.allProjects && content.allProjects.map((proj) => (
@@ -1096,7 +1106,7 @@ const Admin = () => {
                                         value={item.category}
                                         onChange={(e) => handleArrayChange(index, 'category', e.target.value, 'work')}
                                         placeholder="Category"
-                                        style={{ flex: 1, padding: '0.5rem' }}
+                                        style={{ flex: 1, padding: '0.8rem', fontSize: '1.15rem' }}
                                     />
                                     <button onClick={() => deleteItem(index, 'work')} style={{ color: '#5D4037' }}>X</button>
                                 </div>
@@ -1127,18 +1137,18 @@ const Admin = () => {
                         {content.testimonials.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ marginBottom: '1rem' }}>
-                                    <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: '0.2rem', color: '#666' }}>Testimonial Text</label>
-                                    <textarea value={item.text} onChange={(e) => handleArrayChange(index, 'text', e.target.value, 'testimonials')} placeholder="Testimonial Text" style={{ width: '100%', padding: '0.5rem', minHeight: '80px' }} />
+                                    <label style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem', color: '#666' }}>Testimonial Text</label>
+                                    <textarea value={item.text} onChange={(e) => handleArrayChange(index, 'text', e.target.value, 'testimonials')} placeholder="Testimonial Text" style={{ width: '100%', padding: '0.8rem', minHeight: '80px', fontSize: '1.15rem', fontFamily: 'inherit' }} />
                                 </div>
 
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                                     <div style={{ flex: 1 }}>
-                                        <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: '0.2rem', color: '#666' }}>Reviewer Name</label>
-                                        <input value={item.author} onChange={(e) => handleArrayChange(index, 'author', e.target.value, 'testimonials')} placeholder="Author" style={{ width: '100%', padding: '0.5rem' }} />
+                                        <label style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem', color: '#666' }}>Reviewer Name</label>
+                                        <input value={item.author} onChange={(e) => handleArrayChange(index, 'author', e.target.value, 'testimonials')} placeholder="Author" style={{ width: '100%', padding: '0.8rem', fontSize: '1.15rem' }} />
                                     </div>
                                     <div style={{ width: '100px' }}>
-                                        <label style={{ display: 'block', fontSize: '0.8rem', marginBottom: '0.2rem', color: '#666' }}>Rating (1-5)</label>
-                                        <input type="number" max="5" min="1" value={item.rating} onChange={(e) => handleArrayChange(index, 'rating', parseInt(e.target.value), 'testimonials')} placeholder="Rating" style={{ width: '100%', padding: '0.5rem' }} />
+                                        <label style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem', color: '#666' }}>Rating (1-5)</label>
+                                        <input type="number" max="5" min="1" value={item.rating} onChange={(e) => handleArrayChange(index, 'rating', parseInt(e.target.value), 'testimonials')} placeholder="Rating" style={{ width: '100%', padding: '0.8rem', fontSize: '1.15rem' }} />
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'flex-end' }}>
                                         <button onClick={() => deleteItem(index, 'testimonials')} style={{ color: '#5D4037', padding: '0.5rem' }}>Remove</button>
@@ -1200,7 +1210,7 @@ const Admin = () => {
                     activeTab === 'founder' && (
                         <div style={{ display: 'grid', gap: '2rem' }}>
                             <div>
-                                <h2>Shared Assets</h2>
+                                <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Shared Assets</h2>
                                 <FileUpload
                                     label="Central Image"
                                     value={content.founders.image}
@@ -1214,10 +1224,10 @@ const Admin = () => {
                                 <div style={{ border: '1px solid #ddd', padding: '1.5rem', borderRadius: '8px' }}>
                                     <h3>Founder 1</h3>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                        <input value={content.founders.left.name} onChange={(e) => handleFoundersChange('left', 'name', e.target.value)} placeholder="Name" style={{ padding: '0.5rem' }} />
-                                        <input value={content.founders.left.role} onChange={(e) => handleFoundersChange('left', 'role', e.target.value)} placeholder="Role" style={{ padding: '0.5rem' }} />
-                                        <textarea value={content.founders.left.bio1} onChange={(e) => handleFoundersChange('left', 'bio1', e.target.value)} placeholder="Bio Paragraph 1" style={{ padding: '0.5rem', minHeight: '100px' }} />
-                                        <textarea value={content.founders.left.bio2} onChange={(e) => handleFoundersChange('left', 'bio2', e.target.value)} placeholder="Bio Paragraph 2" style={{ padding: '0.5rem', minHeight: '100px' }} />
+                                        <input value={content.founders.left.name} onChange={(e) => handleFoundersChange('left', 'name', e.target.value)} placeholder="Name" style={{ padding: '0.8rem', fontSize: '1.15rem' }} />
+                                        <input value={content.founders.left.role} onChange={(e) => handleFoundersChange('left', 'role', e.target.value)} placeholder="Role" style={{ padding: '0.8rem', fontSize: '1.15rem' }} />
+                                        <textarea value={content.founders.left.bio1} onChange={(e) => handleFoundersChange('left', 'bio1', e.target.value)} placeholder="Bio Paragraph 1" style={{ padding: '0.8rem', minHeight: '100px', fontSize: '1.15rem', fontFamily: 'inherit' }} />
+                                        <textarea value={content.founders.left.bio2} onChange={(e) => handleFoundersChange('left', 'bio2', e.target.value)} placeholder="Bio Paragraph 2" style={{ padding: '0.8rem', minHeight: '100px', fontSize: '1.15rem', fontFamily: 'inherit' }} />
                                     </div>
                                 </div>
 
@@ -1225,10 +1235,10 @@ const Admin = () => {
                                 <div style={{ border: '1px solid #ddd', padding: '1.5rem', borderRadius: '8px' }}>
                                     <h3>Founder 2</h3>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                        <input value={content.founders.right.name} onChange={(e) => handleFoundersChange('right', 'name', e.target.value)} placeholder="Name" style={{ padding: '0.5rem' }} />
-                                        <input value={content.founders.right.role} onChange={(e) => handleFoundersChange('right', 'role', e.target.value)} placeholder="Role" style={{ padding: '0.5rem' }} />
-                                        <textarea value={content.founders.right.bio1} onChange={(e) => handleFoundersChange('right', 'bio1', e.target.value)} placeholder="Bio Paragraph 1" style={{ padding: '0.5rem', minHeight: '100px' }} />
-                                        <textarea value={content.founders.right.bio2} onChange={(e) => handleFoundersChange('right', 'bio2', e.target.value)} placeholder="Bio Paragraph 2" style={{ padding: '0.5rem', minHeight: '100px' }} />
+                                        <input value={content.founders.right.name} onChange={(e) => handleFoundersChange('right', 'name', e.target.value)} placeholder="Name" style={{ padding: '0.8rem', fontSize: '1.15rem' }} />
+                                        <input value={content.founders.right.role} onChange={(e) => handleFoundersChange('right', 'role', e.target.value)} placeholder="Role" style={{ padding: '0.8rem', fontSize: '1.15rem' }} />
+                                        <textarea value={content.founders.right.bio1} onChange={(e) => handleFoundersChange('right', 'bio1', e.target.value)} placeholder="Bio Paragraph 1" style={{ padding: '0.8rem', minHeight: '100px', fontSize: '1.15rem', fontFamily: 'inherit' }} />
+                                        <textarea value={content.founders.right.bio2} onChange={(e) => handleFoundersChange('right', 'bio2', e.target.value)} placeholder="Bio Paragraph 2" style={{ padding: '0.8rem', minHeight: '100px', fontSize: '1.15rem', fontFamily: 'inherit' }} />
                                     </div>
                                 </div>
                             </div>

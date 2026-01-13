@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useContent } from '../context/ContentContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -198,7 +198,169 @@ const CustomModal = ({ show, title, message, type = 'info', onConfirm, onCancel,
     );
 };
 
+const AuthInput = ({ type, placeholder, value, onChange }) => {
+    const [focused, setFocused] = useState(false);
+    return (
+        <div style={{ position: 'relative', marginBottom: '1.2rem' }}>
+            <input
+                type={type}
+                value={value}
+                onChange={onChange}
+                onFocus={() => setFocused(true)}
+                onBlur={() => setFocused(false)}
+                style={{
+                    width: '100%',
+                    padding: '0.8rem 0',
+                    border: 'none',
+                    borderBottom: focused ? '2px solid var(--color-electric-blue)' : '1px solid #ddd',
+                    outline: 'none',
+                    fontSize: '1.1rem',
+                    fontFamily: 'var(--font-body)',
+                    color: '#333',
+                    backgroundColor: 'transparent',
+                    transition: 'border-color 0.3s ease'
+                }}
+            />
+            <label style={{
+                position: 'absolute',
+                left: 0,
+                top: focused || value ? '-0.8rem' : '0.8rem',
+                fontSize: focused || value ? '0.75rem' : '1.1rem',
+                color: focused ? 'var(--color-electric-blue)' : '#999',
+                transition: 'all 0.3s ease',
+                pointerEvents: 'none',
+                fontFamily: 'var(--font-body)'
+            }}>
+                {placeholder}
+            </label>
+        </div>
+    );
+};
+
+const AuthButton = ({ onClick, children, disabled, variant = 'primary', style }) => (
+    <button
+        type={onClick ? "button" : "submit"}
+        onClick={onClick}
+        disabled={disabled}
+        style={{
+            width: '100%',
+            padding: '1rem',
+            backgroundColor: variant === 'primary' ? 'var(--color-electric-blue)' : 'transparent',
+            color: variant === 'primary' ? 'white' : '#666',
+            border: 'none',
+            borderRadius: '50px',
+            fontSize: '1rem',
+            fontWeight: 'bold',
+            cursor: disabled ? 'not-allowed' : 'pointer',
+            opacity: disabled ? 0.7 : 1,
+            transition: 'all 0.2s',
+            fontFamily: 'var(--font-body)',
+            boxShadow: variant === 'primary' ? '0 10px 20px rgba(0, 74, 173, 0.2)' : 'none',
+            marginTop: variant === 'secondary' ? '0' : '1rem',
+            ...style
+        }}
+        onMouseEnter={e => !disabled && (e.currentTarget.style.transform = 'translateY(-2px)')}
+        onMouseLeave={e => !disabled && (e.currentTarget.style.transform = 'translateY(0)')}
+    >
+        {children}
+    </button>
+);
+
 const Admin = () => {
+    // Auth State
+    const [userInfo, setUserInfo] = useState(() => {
+        const saved = localStorage.getItem('userInfo');
+        return saved ? JSON.parse(saved) : null;
+    });
+    const [loginData, setLoginData] = useState({ username: '', password: '' });
+    const [authError, setAuthError] = useState('');
+
+    // Forgot Password State
+    const [forgotStep, setForgotStep] = useState(0); // 0: Login, 1: Enter Email, 2: Enter Token
+    const [resetEmail, setResetEmail] = useState('');
+    const [resetToken, setResetToken] = useState('');
+    const [resetData, setResetData] = useState({ newPassword: '', confirmPassword: '' });
+    const [resetMessage, setResetMessage] = useState({ type: '', text: '' });
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleSendEmail = async (e) => {
+        e.preventDefault();
+        setResetMessage({ type: '', text: '' });
+        setIsLoading(true);
+
+        try {
+            const res = await fetch('http://localhost:5000/api/users/forgotpassword', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: resetEmail })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                setForgotStep(2);
+                setResetMessage({ type: 'success', text: 'Email sent! Check your inbox for the token.' });
+            } else {
+                setResetMessage({ type: 'error', text: data.message || 'Error sending email' });
+            }
+        } catch (err) {
+            setResetMessage({ type: 'error', text: 'Connection failed' });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleResetPassword = async (e) => {
+        e.preventDefault();
+        setResetMessage({ type: '', text: '' });
+
+        if (resetData.newPassword !== resetData.confirmPassword) {
+            setResetMessage({ type: 'error', text: 'Passwords do not match' });
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const res = await fetch('http://localhost:5000/api/users/resetpassword', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    resetToken: resetToken,
+                    newPassword: resetData.newPassword
+                })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                setResetMessage({ type: 'success', text: 'Password updated! Please login.' });
+                setTimeout(() => {
+                    setForgotStep(0);
+                    setResetMessage({ type: '', text: '' });
+                    setResetData({ newPassword: '', confirmPassword: '' });
+                    setResetToken('');
+                    setResetEmail('');
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }, 3000);
+            } else {
+                setResetMessage({ type: 'error', text: data.message || 'Reset failed' });
+            }
+        } catch (err) {
+            setResetMessage({ type: 'error', text: 'Connection failed' });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Magic Link Detection
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('resetToken');
+        if (token) {
+            setResetToken(token);
+            setForgotStep(2);
+        }
+    }, []);
+
+
     const {
         content,
         syncProject, removeProject,
@@ -236,6 +398,36 @@ const Admin = () => {
     const showConfirm = (title, message, onConfirm, confirmText = '', confirmColor = '') => {
         showAlert(title, message, 'confirm', onConfirm, confirmText, confirmColor);
     };
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setAuthError('');
+        try {
+            const res = await fetch('http://localhost:5000/api/users/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(loginData)
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                localStorage.setItem('userInfo', JSON.stringify(data));
+                setUserInfo(data);
+            } else {
+                setAuthError(data.message || 'Invalid credentials');
+            }
+        } catch (err) {
+            setAuthError('Connection failed');
+        }
+    };
+
+    const logout = () => {
+        localStorage.removeItem('userInfo');
+        setUserInfo(null);
+        setLoginData({ username: '', password: '' });
+    };
+
+
 
     const initializeDatabase = async () => {
         showConfirm(
@@ -438,6 +630,194 @@ const Admin = () => {
         );
     };
 
+    if (!userInfo) {
+        return (
+            <div style={{
+                height: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: '#f8f9fa',
+                backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)',
+                backgroundSize: '24px 24px'
+            }}>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    style={{
+                        background: 'rgba(255, 255, 255, 0.85)',
+                        backdropFilter: 'blur(12px)',
+                        padding: '3.5rem',
+                        borderRadius: '24px',
+                        boxShadow: '0 20px 50px -12px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.05)',
+                        width: '100%',
+                        maxWidth: '460px',
+                        border: '1px solid rgba(255,255,255,0.6)',
+                        position: 'relative',
+                        overflow: 'hidden'
+                    }}
+                >
+                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '4px', background: 'linear-gradient(90deg, var(--color-electric-blue), #4ecdc4)' }} />
+
+                    <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+                        <h2 style={{ fontFamily: 'Bigilla, serif', fontSize: '2.8rem', marginBottom: '0.5rem', color: '#1a1a1a', letterSpacing: '-0.02em' }}>
+                            {forgotStep === 1 ? 'Forgot Password' : forgotStep === 2 ? 'Reset Access' : 'Admin Access'}
+                        </h2>
+                        <p style={{ fontFamily: 'var(--font-body)', color: '#666', fontSize: '1rem' }}>
+                            {forgotStep === 1 ? 'Enter your email to receive a secure token.' :
+                                forgotStep === 2 ? 'Creating a new secure password.' :
+                                    'Welcome back. Please login to enter the studio.'}
+                        </p>
+                    </div>
+
+                    <AnimatePresence mode="wait">
+                        {forgotStep === 0 && (
+                            <motion.form
+                                key="login"
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                exit={{ x: 20, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                onSubmit={handleLogin}
+                            >
+                                <AuthInput
+                                    type="text"
+                                    placeholder="Username"
+                                    value={loginData.username}
+                                    onChange={(e) => setLoginData({ ...loginData, username: e.target.value })}
+                                />
+                                <AuthInput
+                                    type="password"
+                                    placeholder="Password"
+                                    value={loginData.password}
+                                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                                />
+
+                                {authError && (
+                                    <motion.p
+                                        initial={{ opacity: 0, y: -5 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        style={{ color: '#e74c3c', textAlign: 'center', fontSize: '0.9rem', marginTop: '1rem', background: '#fdeded', padding: '0.5rem', borderRadius: '8px' }}
+                                    >
+                                        {authError}
+                                    </motion.p>
+                                )}
+
+                                <AuthButton>Enter</AuthButton>
+                                <AuthButton variant="secondary" onClick={() => { setForgotStep(1); setResetMessage({ type: '', text: '' }); }}>
+                                    Forgot Password?
+                                </AuthButton>
+                            </motion.form>
+                        )}
+
+                        {forgotStep === 1 && (
+                            <motion.form
+                                key="email"
+                                initial={{ x: 20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                exit={{ x: -20, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                onSubmit={handleSendEmail}
+                            >
+                                <AuthInput
+                                    type="email"
+                                    placeholder="Admin Email Address"
+                                    value={resetEmail}
+                                    onChange={(e) => setResetEmail(e.target.value)}
+                                />
+
+                                {resetMessage.text && (
+                                    <motion.p
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        style={{
+                                            color: resetMessage.type === 'success' ? '#27ae60' : '#e74c3c',
+                                            textAlign: 'center',
+                                            fontSize: '0.9rem',
+                                            marginTop: '1rem',
+                                            padding: '0.5rem',
+                                            background: resetMessage.type === 'success' ? '#eafaf1' : '#fdeded',
+                                            borderRadius: '8px'
+                                        }}
+                                    >
+                                        {resetMessage.text}
+                                    </motion.p>
+                                )}
+
+                                <AuthButton disabled={isLoading}>
+                                    {isLoading ? 'Sending...' : 'Send Reset Link'}
+                                </AuthButton>
+                                <AuthButton variant="secondary" onClick={() => { setForgotStep(0); setResetMessage({ type: '', text: '' }); }}>
+                                    Back to Login
+                                </AuthButton>
+                            </motion.form>
+                        )}
+
+                        {forgotStep === 2 && (
+                            <motion.form
+                                key="token"
+                                initial={{ x: 20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                exit={{ x: -20, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                onSubmit={handleResetPassword}
+                            >
+                                <AuthInput
+                                    type="text"
+                                    placeholder="Security Token"
+                                    value={resetToken}
+                                    onChange={(e) => setResetToken(e.target.value)}
+                                />
+                                <AuthInput
+                                    type="password"
+                                    placeholder="New Password"
+                                    value={resetData.newPassword}
+                                    onChange={(e) => setResetData({ ...resetData, newPassword: e.target.value })}
+                                />
+                                <AuthInput
+                                    type="password"
+                                    placeholder="Confirm Password"
+                                    value={resetData.confirmPassword}
+                                    onChange={(e) => setResetData({ ...resetData, confirmPassword: e.target.value })}
+                                />
+
+                                {resetMessage.text && (
+                                    <motion.p
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        style={{
+                                            color: resetMessage.type === 'success' ? '#27ae60' : '#e74c3c',
+                                            textAlign: 'center',
+                                            fontSize: '0.9rem',
+                                            marginTop: '1rem',
+                                            padding: '0.5rem',
+                                            background: resetMessage.type === 'success' ? '#eafaf1' : '#fdeded',
+                                            borderRadius: '8px'
+                                        }}
+                                    >
+                                        {resetMessage.text}
+                                    </motion.p>
+                                )}
+
+                                <AuthButton disabled={isLoading}>
+                                    {isLoading ? 'Updating...' : 'Set New Password'}
+                                </AuthButton>
+                                <AuthButton variant="secondary" onClick={() => { setForgotStep(0); setResetMessage({ type: '', text: '' }); }}>
+                                    Back to Login
+                                </AuthButton>
+                            </motion.form>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
+
+                <p style={{ position: 'absolute', bottom: '2rem', color: '#999', fontSize: '0.8rem', fontFamily: 'var(--font-body)', letterSpacing: '0.05em' }}>
+                    BLOOM BRANDING STUDIOS © 2026
+                </p>
+            </div>
+        );
+    }
+
     return (
         <div className="section-padding container" style={{ minHeight: '80vh', marginTop: '4rem' }}>
             <AnimatePresence>
@@ -515,6 +895,23 @@ const Admin = () => {
                             Syncing...
                         </>
                     ) : 'Initialize Database'}
+                </button>
+
+                <button
+                    onClick={logout}
+                    style={{
+                        backgroundColor: '#ff4d4f',
+                        color: 'white',
+                        padding: '0.6rem 1.2rem',
+                        borderRadius: '30px',
+                        cursor: 'pointer',
+                        border: 'none',
+                        fontSize: '0.8rem',
+                        fontWeight: '600',
+                        boxShadow: '0 4px 15px rgba(255, 77, 79, 0.2)'
+                    }}
+                >
+                    Sign Out
                 </button>
                 <button
                     onClick={() => showConfirm("Reset Content", "Reset all content to defaults? This will clear your current customizations.", () => resetContent())}

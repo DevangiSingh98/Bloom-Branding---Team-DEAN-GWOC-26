@@ -1,5 +1,7 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import sendEmail from '../utils/sendEmail.js';
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET || 'secret', {
@@ -20,6 +22,7 @@ const authUser = async (req, res) => {
             res.json({
                 _id: user._id,
                 username: user.username,
+                email: user.email,
                 isAdmin: user.isAdmin,
                 token: generateToken(user._id),
             });
@@ -31,20 +34,20 @@ const authUser = async (req, res) => {
     }
 };
 
-// @desc    Register a new user (Admin specific for now)
+// @desc    Register a new user
 // @route   POST /api/users
-// @access  Public (should be private in prod or disabled after initial setup)
+// @access  Protected (Admin)
 const registerUser = async (req, res) => {
-    const { username, password } = req.body;
+    const { username, email, password } = req.body;
 
-    // Check if user exists
-    const userExists = await User.findOne({ username });
+    const userExists = await User.findOne({ $or: [{ username }, { email }] });
     if (userExists) {
         return res.status(400).json({ message: 'User already exists' });
     }
 
     const user = await User.create({
         username,
+        email,
         password,
         isAdmin: true
     });
@@ -53,6 +56,7 @@ const registerUser = async (req, res) => {
         res.status(201).json({
             _id: user._id,
             username: user.username,
+            email: user.email,
             isAdmin: user.isAdmin,
             token: generateToken(user._id),
         });
@@ -61,4 +65,97 @@ const registerUser = async (req, res) => {
     }
 };
 
-export { authUser, registerUser };
+// @desc    Forgot Password - Send Email
+// @route   POST /api/users/forgotpassword
+// @access  Public
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Generate Reset Token
+        const resetToken = crypto.randomBytes(20).toString('hex');
+
+        // Hash token and save to DB
+        user.resetPasswordToken = crypto
+            .createHash('sha256')
+            .update(resetToken)
+            .digest('hex');
+
+        // Set expire (10 minutes)
+        user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+
+        await user.save();
+
+        // Create Reset URL
+        const resetUrl = `http://localhost:5173/admin?resetToken=${resetToken}`;
+
+        const message = `You are receiving this email because you (or someone else) has requested the reset of a password. \n\n
+Please click on the following link to reset your password:\n\n
+${resetUrl}\n\n
+If you did not request this, please ignore this email.`;
+
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: 'Password Reset Token',
+                message,
+            });
+
+            res.status(200).json({ success: true, data: 'Email sent' });
+        } catch (err) {
+            console.error(err);
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpire = undefined;
+            await user.save();
+            return res.status(500).json({ message: 'Email could not be sent' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Reset Password
+// @route   PUT /api/users/resetpassword/:resettoken
+// @access  Public
+const resetPassword = async (req, res) => {
+    const { resetToken, newPassword } = req.body;
+
+    // Get hashed token
+    const resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+
+    try {
+        const user = await User.findOne({
+            resetPasswordToken,
+            resetPasswordExpire: { $gt: Date.now() },
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid token' });
+        }
+
+        user.password = newPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+
+        await user.save();
+
+        res.status(201).json({
+            success: true,
+            message: 'Password Updated Success',
+            token: generateToken(user._id),
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export { authUser, registerUser, forgotPassword, resetPassword };

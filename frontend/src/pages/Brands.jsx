@@ -6,16 +6,16 @@ const Brands = () => {
     const { content } = useContent();
 
     return (
-        <div style={{ backgroundColor: '#2D1E17', minHeight: '100vh', paddingTop: '10rem' }}>
+        <div style={{ background: 'linear-gradient(to bottom, var(--color-earl-gray), #d8d6c8)', minHeight: '100vh', paddingTop: '10rem' }}>
             <div className="container">
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     style={{
-                        color: '#F9F1E7',
+                        color: 'var(--color-dark-choc)',
                         textAlign: 'center',
                         marginBottom: '5rem',
-                        fontSize: '4rem',
+                        fontSize: '8rem',
                         fontFamily: 'Bigilla, serif',
                         letterSpacing: '2px'
                     }}
@@ -26,7 +26,7 @@ const Brands = () => {
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-                    gap: '4rem',
+                    gap: '6rem',
                     alignItems: 'center',
                     justifyItems: 'center'
                 }}>
@@ -36,16 +36,16 @@ const Brands = () => {
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: idx * 0.1 }}
-                            style={{ width: '150px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            style={{ width: '220px', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
                             <img
                                 src={brand.logo}
-                                alt={brand.name}
+                                alt="Brand Logo"
                                 style={{
                                     maxWidth: '100%',
                                     maxHeight: '100%',
                                     objectFit: 'contain',
-                                    filter: 'brightness(0) invert(1)'
+                                    // filter: 'brightness(0) invert(1)' // Removed to show original logo colors
                                 }}
                             />
                         </motion.div>

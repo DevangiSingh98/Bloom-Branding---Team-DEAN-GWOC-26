@@ -12,7 +12,34 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
             setFileName(file.name);
             const reader = new FileReader();
             reader.onloadend = () => {
-                onFileSelect(reader.result);
+                const img = new Image();
+                img.src = reader.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 800;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const compressedDataUrl = canvas.toDataURL('image/png');
+                    onFileSelect(compressedDataUrl);
+                };
             };
             reader.readAsDataURL(file);
         }
@@ -361,7 +388,7 @@ const Admin = () => {
             const newItem = { id: tempId, title: "New Value", text: "Description" };
             updateValues([...content.values, newItem]);
         } else if (type === 'brands') {
-            const newItem = { id: tempId, name: "Brand Name", logo: "" };
+            const newItem = { id: tempId, logo: "" };
             updateBrandLogos([...content.brandLogos, newItem]);
         }
     };
@@ -758,13 +785,7 @@ const Admin = () => {
                         {content.brandLogos && content.brandLogos.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
-                                    <input
-                                        value={item.name}
-                                        onChange={(e) => handleArrayChange(index, 'name', e.target.value, 'brands')}
-                                        placeholder="Brand Name"
-                                        style={{ flex: 1, padding: '0.5rem' }}
-                                    />
-                                    <button onClick={() => deleteItem(index, 'brands')} style={{ color: '#5D4037' }}>X</button>
+                                    <button onClick={() => deleteItem(index, 'brands')} style={{ color: '#5D4037', marginLeft: 'auto' }}>X</button>
                                 </div>
                                 <FileUpload
                                     label="Brand Logo"

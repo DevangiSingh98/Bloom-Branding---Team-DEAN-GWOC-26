@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 const brandSchema = mongoose.Schema({
-    name: { type: String },
     logo: { type: String }, // Base64
 }, {
     timestamps: true

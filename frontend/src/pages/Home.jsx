@@ -607,14 +607,15 @@ export default function Home() {
                 </ParallaxContent>
             </section>
 
+
             {/* Brands We Have Worked With Section */}
-            <section style={{ backgroundColor: '#2D1E17', padding: '5rem 0', overflow: 'hidden' }}>
+            <section style={{ background: 'linear-gradient(to bottom, var(--color-earl-gray), #d8d6c8)', padding: '5rem 0', overflow: 'hidden' }}>
                 <div className="container">
                     <h2 style={{
-                        color: '#F9F1E7',
+                        color: 'var(--color-dark-choc)',
                         textAlign: 'center',
                         marginBottom: '3rem',
-                        fontSize: '2.5rem',
+                        fontSize: '6rem',
                         fontFamily: 'Bigilla, serif',
                         letterSpacing: '1px'
                     }}>
@@ -624,7 +625,7 @@ export default function Home() {
                     <div style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                        gap: '3rem',
+                        gap: '5rem',
                         alignItems: 'center',
                         justifyItems: 'center',
                         width: '100%'
@@ -637,25 +638,23 @@ export default function Home() {
                                 viewport={{ once: true }}
                                 transition={{ delay: idx * 0.1, duration: 0.5 }}
                                 style={{
-                                    width: '150px',
-                                    height: '80px',
+                                    width: '220px',
+                                    height: '120px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    filter: 'brightness(0) invert(1)', // Make logos white for dark background
+                                    // filter: 'brightness(0) invert(1)', // Removed to show original logo colors
                                     opacity: 0.8,
                                     cursor: 'default'
                                 }}
                                 whileHover={{ opacity: 1, scale: 1.05 }}
                             >
-                                {brand.logo ? (
+                                {brand.logo && (
                                     <img
                                         src={brand.logo}
-                                        alt={brand.name}
+                                        alt="Brand Logo"
                                         style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                                     />
-                                ) : (
-                                    <span style={{ color: 'white', fontSize: '0.8rem', textAlign: 'center' }}>{brand.name}</span>
                                 )}
                             </motion.div>
                         ))}

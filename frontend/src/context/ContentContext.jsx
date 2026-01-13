@@ -594,9 +594,12 @@ export const ContentProvider = ({ children }) => {
                 }
             } else {
                 console.error("Sync Failed:", await response.text());
-                // Optional: alert user or handle error state
+                alert("Failed to save brand to database. Please ensure the backend server is running.");
             }
-        } catch (e) { console.error("Sync Exception:", e); }
+        } catch (e) {
+            console.error("Sync Exception:", e);
+            alert("Connection Error: Could not reach the server. Please check if the backend is running on port 5000.");
+        }
     };
 
     const removeBrand = async (id) => {

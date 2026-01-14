@@ -174,8 +174,8 @@ const WorkModal = ({ projects, initialIndex, onClose }) => {
             const state = scrollState.current;
             state.lastDirection = Math.sign(e.deltaY);
 
-            // Adjust Speed (multiplier 4 for responsiveness)
-            const move = e.deltaY * 4;
+            // Adjust Speed (multiplier 0.8 for responsiveness)
+            const move = e.deltaY * 0.8;
 
             state.target += move;
             if (scrollRef.current) {

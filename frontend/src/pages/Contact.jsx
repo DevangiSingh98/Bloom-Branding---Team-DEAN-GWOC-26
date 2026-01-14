@@ -106,13 +106,21 @@ export default function Contact() {
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                             <label className="font-subtitle" htmlFor="budget" style={{ fontSize: '1.2rem', color: '#888' }}>Estimated Budget *</label>
-                                            <select name="budget" required value={formData.budget} onChange={handleChange} style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#FCFCFC', fontSize: '1.2rem' }}>
-                                                <option value="">Select a range...</option>
-                                                <option value="₹50k - ₹1L">₹50k - ₹1L</option>
-                                                <option value="₹1L - ₹3L">₹1L - ₹3L</option>
-                                                <option value="₹3L - ₹5L">₹3L - ₹5L</option>
-                                                <option value="₹5L+">₹5L+</option>
-                                            </select>
+                                            <input
+                                                list="budget-options"
+                                                name="budget"
+                                                required
+                                                value={formData.budget}
+                                                onChange={handleChange}
+                                                style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#FCFCFC', fontSize: '1.2rem' }}
+                                                placeholder="Select or type amount..."
+                                            />
+                                            <datalist id="budget-options">
+                                                <option value="₹50k - ₹1L" />
+                                                <option value="₹1L - ₹3L" />
+                                                <option value="₹3L - ₹5L" />
+                                                <option value="₹5L+" />
+                                            </datalist>
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: '1 / -1' }}>
                                             <label className="font-subtitle" htmlFor="timeline" style={{ fontSize: '1.2rem', color: '#888' }}>Desired Timeline *</label>

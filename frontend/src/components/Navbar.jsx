@@ -260,61 +260,30 @@ export default function Navbar() {
                         animate="open"
                         exit="closed"
                         variants={menuVariants}
-                        style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            width: '100vw',
-                            height: '100vh',
-                            backgroundColor: 'var(--color-electric-blue)',
-                            color: 'var(--color-earl-gray)',
-                            zIndex: 90,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            overflow: 'hidden'
-                        }}
+                        className="nav-menu-wrapper"
                     >
-                        <motion.ul variants={listVariants} style={{
-                            listStyle: 'none',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            gap: '2vw',
-                            flexWrap: 'nowrap',
-                            width: '100%',
-                            padding: '0 2rem'
-                        }}>
+                        <motion.ul variants={listVariants} className="nav-menu-list">
                             {[
-                                { name: 'Home', path: '/', img: '/images/home.png', height: '250px', tilt: -10 },
-                                { name: 'Our Story', path: '/about', img: '/images/ourstory.png', height: '220px', tilt: 15 },
+                                { name: 'Home', path: '/', img: '/images/home.png', height: '150px', tilt: -10 },
+                                { name: 'Our Story', path: '/about', img: '/images/ourstory.png', height: '150px', tilt: 15 },
                                 { name: 'Services', path: '/services', img: '/images/services.png', height: '130px', tilt: -5 },
                                 { name: 'Our Work', path: '/work', img: '/images/Ourwork.png', height: '140px', tilt: 8 },
-                                { name: 'Contact', path: '/contact', img: '/images/tele.png', height: '200px', tilt: -5 },
+                                { name: 'Contact', path: '/contact', img: '/images/tele.png', height: '150px', tilt: -5 },
                             ].map((link) => (
-                                <motion.li key={link.name} variants={itemVariants} style={{ margin: 0, position: 'relative' }}>
+                                <motion.li key={link.name} variants={itemVariants} className="nav-menu-item">
                                     <Link
                                         to={link.path}
                                         onClick={() => {
                                             window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
                                             setIsOpen(false);
                                         }}
-                                        style={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            textDecoration: 'none',
-                                            color: 'inherit',
-                                            padding: '10px'
-                                        }}
+                                        className="nav-menu-link"
                                     >
                                         <motion.div
                                             initial="rest"
                                             whileHover="hover"
                                             animate="rest"
-                                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
                                         >
                                             <motion.img
                                                 src={link.img}
@@ -328,22 +297,15 @@ export default function Navbar() {
                                                         transition: { type: "spring", stiffness: 300, damping: 10 }
                                                     }
                                                 }}
-                                                style={{ height: link.height, width: 'auto', objectFit: 'contain', maxHeight: '300px', zIndex: 2 }}
+                                                className="nav-menu-img"
+                                                style={{ height: link.height }}
                                             />
                                             <motion.span
                                                 variants={{
                                                     rest: { opacity: 0, y: 30, height: 0 },
                                                     hover: { opacity: 1, y: 10, height: 'auto' }
                                                 }}
-                                                style={{
-                                                    fontFamily: 'var(--font-brand)',
-                                                    fontSize: '2.5rem',
-                                                    textTransform: 'uppercase',
-                                                    whiteSpace: 'nowrap',
-                                                    color: 'var(--color-butter-yellow)',
-                                                    marginTop: '1rem',
-                                                    marginLeft: '-20px'
-                                                }}
+                                                className="nav-menu-text"
                                             >
                                                 {link.name}
                                             </motion.span>
@@ -370,8 +332,7 @@ export default function Navbar() {
                             </button>
                         </motion.div>
                     </motion.div>
-                )}
-            </AnimatePresence>
+                )}            </AnimatePresence>
 
             <EmailServiceSelector
                 isOpen={emailModalOpen}

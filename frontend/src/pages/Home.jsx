@@ -96,6 +96,7 @@ const _UnusedAnimatedButton = ({ to, children, className, style }) => {
 
 const ServiceList = () => {
     const containerRef = useRef(null);
+    const gridRef = useRef(null);
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start end", "center center"]
@@ -111,6 +112,38 @@ const ServiceList = () => {
         { title: "Influencer", link: "/services#influencer-marketing", img: "/images/service_fashion.png" }, // Shortened title for layout balance
         { title: "Creative", link: "/services#creative-design", img: "/images/service_lifestyle.png" } // Shortened title
     ];
+
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            // Mobile "Peek" Animation
+            // We match the CSS media query (max-width: 640px)
+            if (window.innerWidth <= 640) {
+                ScrollTrigger.create({
+                    trigger: gridRef.current,
+                    start: "top 50%", // Wait until the grid is centered in view
+                    once: true, // Only run once
+                    onEnter: () => {
+                        // Animate scrollLeft to "peek" (scrolls view to right, shifting items left)
+                        gsap.to(gridRef.current, {
+                            scrollLeft: 100, // Distance to peek
+                            duration: 1, // Slightly smoother duration
+                            delay: 0.5, // Slight pause to let the user "settle" on the screen
+                            ease: "power2.out",
+                            onComplete: () => {
+                                // Spring back to start
+                                gsap.to(gridRef.current, {
+                                    scrollLeft: 0,
+                                    duration: 1.5,
+                                    ease: "elastic.out(1, 0.5)"
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        }, gridRef);
+        return () => ctx.revert();
+    }, []);
 
     return (
         <div ref={containerRef} style={{ width: '100%', padding: '10vh 5%', backgroundColor: 'var(--color-electric-blue)' }}>
@@ -132,15 +165,7 @@ const ServiceList = () => {
                 Our Expertise
             </motion.h2>
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(5, 1fr)', // Force 5 columns side-by-side
-                gap: '20px',
-                maxWidth: '1400px',
-                margin: '0 auto',
-                position: 'relative',
-                zIndex: 1
-            }}>
+            <div ref={gridRef} className="services-grid">
                 {services.map((service, index) => (
                     <Link
                         key={index}
@@ -151,16 +176,7 @@ const ServiceList = () => {
                             whileHover="hover"
                             initial="rest"
                             animate="rest"
-                            style={{
-                                // Minimalist: No background, no border, no shadow
-                                height: '420px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                cursor: 'pointer',
-                                padding: '20px 0'
-                            }}
+                            className="service-card"
                             variants={{
                                 rest: { y: 0 },
                                 hover: { y: -10 }
@@ -168,27 +184,13 @@ const ServiceList = () => {
                             transition={{ duration: 0.3, ease: 'easeOut' }}
                         >
                             {/* Top Title */}
-                            <h3 style={{
-                                fontSize: '2.5rem', // Bigger for impact
-                                margin: 0,
-                                fontFamily: 'var(--font-brand)',
-                                color: 'var(--color-butter-yellow)',
-                                textAlign: 'center',
-                                fontWeight: 'bold'
-                            }}>
+                            <h3 className="service-title">
                                 {service.title}
                             </h3>
 
                             {/* Service Image (Large Circular Focus) */}
                             <motion.div
-                                style={{
-                                    width: '220px',
-                                    height: '220px',
-                                    borderRadius: '50%',
-                                    overflow: 'hidden',
-                                    border: '2px solid var(--color-butter-yellow)',
-                                    boxShadow: '0 0 0 4px rgba(246, 241, 181, 0.1)'
-                                }}
+                                className="service-img-container"
                                 variants={{
                                     rest: { scale: 1, borderColor: 'var(--color-butter-yellow)' },
                                     hover: { scale: 1.05, borderColor: 'var(--color-white)' }
@@ -208,17 +210,7 @@ const ServiceList = () => {
 
                             {/* Bottom Pill */}
                             <motion.div
-                                style={{
-                                    padding: '10px 30px',
-                                    borderRadius: '50px',
-                                    border: '1px solid var(--color-butter-yellow)',
-                                    color: 'var(--color-butter-yellow)',
-                                    fontFamily: 'var(--font-subtitle)',
-                                    fontSize: '0.9rem',
-                                    fontWeight: 'bold',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '1px'
-                                }}
+                                className="service-btn"
                                 variants={{
                                     rest: { backgroundColor: 'transparent', color: 'var(--color-butter-yellow)' },
                                     hover: { backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-electric-blue)' }

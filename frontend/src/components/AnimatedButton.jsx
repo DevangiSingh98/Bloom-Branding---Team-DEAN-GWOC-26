@@ -25,7 +25,7 @@ const AnimatedButton = ({ to, children, className, style, onClick, type = "butto
                 {[1, 2, 3].map((i, index) => (
                     <motion.img
                         key={i}
-                        src={`/images/f${i}.png`}
+                        src={`/images/f${i}.png?v=2`}
                         initial={{ scale: 0, opacity: 0 }}
                         animate={hover && randomDirs[index] ? {
                             scale: 0.5,

@@ -271,42 +271,258 @@ button {
   mask-repeat: repeat-x;
   mask-position: bottom;
 }
+
+/* Services Grid (Our Expertise) */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* Service Card Components */
+.service-card {
+  height: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 20px 0;
+}
+
+.service-title {
+  font-size: 2.5rem;
+  margin: 0;
+  font-family: var(--font-brand);
+  color: var(--color-butter-yellow);
+  text-align: center;
+  font-weight: bold;
+}
+
+.service-img-container {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--color-butter-yellow);
+  box-shadow: 0 0 0 4px rgba(246, 241, 181, 0.1);
+}
+
+.service-btn {
+  padding: 10px 30px;
+  border-radius: 50px;
+  border: 1px solid var(--color-butter-yellow);
+  color: var(--color-butter-yellow);
+  font-family: var(--font-subtitle);
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background-color: transparent;
+}
+
+@media (max-width: 640px) {
+  .services-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 0;
+    /* Removed gap completely per request */
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: -5%;
+    /* Negative margin to pull to edges */
+    margin-right: -5%;
+    /* Negative margin to pull to edges */
+    width: 110%;
+    /* Compensate for page padding */
+    align-items: flex-start;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .services-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Make items take up significant width to force scrolling */
+  .services-grid>a {
+    width: 45vw;
+    /* Slightly narrower to fit comfortably */
+    min-width: auto;
+    flex-shrink: 0;
+  }
+
+  /* Mobile resizing for card elements */
+  .service-card {
+    height: 280px;
+    padding: 10px 5px;
+    /* Added slight horizontal padding inside card instead of gap */
+  }
+
+  .service-title {
+    font-size: 1.5rem;
+    width: 100%;
+    /* Ensure text doesn't cut off */
+    overflow: visible;
+  }
+
+  .service-img-container {
+    width: 130px;
+    /* Slightly larger again */
+    height: 130px;
+  }
+
+  .service-btn {
+    padding: 6px 16px;
+    font-size: 0.7rem;
+  }
+}
+
 .work-grid {
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    gap: 2rem;
-    padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 2rem;
+  padding: 1rem;
 }
 
 @media (min-width: 600px) {
-    .work-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+  .work-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (min-width: 1024px) {
-    .work-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+  .work-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .work-grid-tight {
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    gap: 0.5rem; /* Very little gap */
-    padding: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 0.5rem;
+  /* Very little gap */
+  padding: 0.5rem;
 }
 
 @media (min-width: 600px) {
-    .work-grid-tight {
-        grid-template-columns: repeat(2, 1fr);
-    }
+  .work-grid-tight {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (min-width: 1024px) {
-    .work-grid-tight {
-        grid-template-columns: repeat(3, 1fr);
-    }
+  .work-grid-tight {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+
+/* Navbar Menu Styles */
+.nav-menu-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--color-electric-blue);
+  color: var(--color-earl-gray);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  /* Default desktop */
+}
+
+.nav-menu-list {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2vw;
+  flex-wrap: nowrap;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+.nav-menu-item {
+  margin: 0;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-menu-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+  padding: 10px;
+}
+
+.nav-menu-img {
+  width: auto;
+  object-fit: contain;
+  max-height: 300px;
+  z-index: 2;
+}
+
+.nav-menu-text {
+  font-family: var(--font-brand);
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-butter-yellow);
+  margin-top: 1rem;
+  margin-left: -20px;
+}
+
+/* Mobile Tweaks for Menu */
+@media (max-width: 768px) {
+  .nav-menu-wrapper {
+    overflow-y: auto;
+    justify-content: flex-start;
+    padding-top: 8rem;
+    padding-bottom: 2rem;
+  }
+
+  .nav-menu-list {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 1rem;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .nav-menu-item {
+    width: 45%;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .nav-menu-img {
+    max-width: 100%;
+    height: auto !important;
+    max-height: 85px !important;
+    /* Increased size for visibility */
+  }
+
+  .nav-menu-text {
+    font-size: 1rem;
+    margin-left: 0;
+    margin-top: 0.5rem;
+    text-align: center;
+  }
 }
 
 img {

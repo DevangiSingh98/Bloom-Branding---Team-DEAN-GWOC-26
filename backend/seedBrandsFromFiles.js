@@ -40,8 +40,7 @@ const seedBrandsFromFiles = async () => {
             'subhrekha.png',
             'the right cut.png',
             'thyme & whisk.png',
-            'vardhaman.png',
-            'bloomingthebrand.png' // Assuming this is 'bloomes'
+            'vardhaman.png'
         ];
 
         const brands = [];

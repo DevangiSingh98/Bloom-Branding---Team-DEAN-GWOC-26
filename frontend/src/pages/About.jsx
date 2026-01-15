@@ -325,12 +325,12 @@ export default function About() {
             </section>
 
             {/* JOURNEY & PHILOSOPHY ARCHED PORTALS */}
-            <section style={{ backgroundColor: '#fff', padding: '150px 5%', overflow: 'hidden' }}>
+            <section style={{ backgroundColor: '#fff', padding: '180px 5% 50px', overflow: 'hidden' }}>
                 <div className="container">
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-                        gap: '20px',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', // Adjusted for mobile
+                        gap: '40px', // Increased gap
                         alignItems: 'start'
                     }}>
                         {/* ARCH 1: OUR JOURNEY */}
@@ -351,17 +351,19 @@ export default function About() {
                             style={{
                                 backgroundColor: 'transparent',
                                 borderRadius: '500px 500px 0 0',
-                                padding: '120px 40px 60px',
+                                padding: '60px 20px 40px', // Reduced padding further
                                 border: '2.5px solid var(--color-dark-choc)',
                                 color: 'var(--color-dark-choc)',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                height: '700px',
-                                position: 'relative'
+                                height: 'auto', // Allow it to adjust
+                                minHeight: '500px',
+                                position: 'relative',
+                                marginBottom: '2rem'
                             }}
                         >
                             {/* Decorative Star */}
-                            <div style={{ position: 'absolute', top: '40px', left: '50%', transform: 'translateX(-50%)', color: 'var(--color-dark-choc)' }}>
+                            <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', color: 'var(--color-dark-choc)' }}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
                                 </svg>
@@ -369,9 +371,9 @@ export default function About() {
 
                             <h3 style={{
                                 fontFamily: 'var(--font-brand)',
-                                fontSize: '3.5rem',
+                                fontSize: '3rem', // Slightly smaller title
                                 textAlign: 'center',
-                                marginBottom: '2rem',
+                                marginBottom: '1.5rem',
                                 lineHeight: 1.1,
                                 letterSpacing: '1px'
                             }}>
@@ -380,13 +382,13 @@ export default function About() {
 
                             <p style={{
                                 fontFamily: 'var(--font-subtitle)',
-                                fontSize: '1.5rem',
+                                fontSize: '1.3rem', // Slightly smaller text
                                 fontWeight: 'bold',
-                                lineHeight: 1.6,
-                                textAlign: 'center',
+                                lineHeight: 1.5,
+                                textAlign: 'justify', // Changed to justify
                                 marginTop: 'auto',
                                 marginBottom: 'auto',
-                                padding: '0 20px'
+                                padding: '0 10px'
                             }}>
                                 OUR JOURNEY DIDN'T BEGIN IN A BOARDROOM. IT STARTED WITH A PASSION FOR ART, A CURIOSITY FOR TECHNOLOGY, AND A BELIEF THAT BUSINESS CAN BE BEAUTIFUL. WE'VE NAVIGATED THE EVOLVING DIGITAL LANDSCAPE BY STAYING TRUE TO OUR CORE: AUTHENTIC CONNECTION.
                             </p>
@@ -400,17 +402,19 @@ export default function About() {
                             style={{
                                 backgroundColor: 'transparent',
                                 borderRadius: '500px 500px 0 0',
-                                padding: '120px 40px 60px',
+                                padding: '60px 20px 40px', // Reduced padding
                                 border: '2.5px solid var(--color-dark-choc)',
                                 color: 'var(--color-dark-choc)',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                height: '700px',
-                                position: 'relative'
+                                height: 'auto',
+                                minHeight: '500px',
+                                position: 'relative',
+                                marginBottom: '2rem'
                             }}
                         >
                             {/* Decorative Star */}
-                            <div style={{ position: 'absolute', top: '40px', left: '50%', transform: 'translateX(-50%)', color: 'var(--color-dark-choc)' }}>
+                            <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', color: 'var(--color-dark-choc)' }}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
                                 </svg>
@@ -418,9 +422,9 @@ export default function About() {
 
                             <h3 style={{
                                 fontFamily: 'var(--font-brand)',
-                                fontSize: '3.5rem',
+                                fontSize: '3rem',
                                 textAlign: 'center',
-                                marginBottom: '2rem',
+                                marginBottom: '1.5rem',
                                 lineHeight: 1.1,
                                 letterSpacing: '1px'
                             }}>
@@ -429,13 +433,13 @@ export default function About() {
 
                             <p style={{
                                 fontFamily: 'var(--font-subtitle)',
-                                fontSize: '1.5rem',
+                                fontSize: '1.3rem',
                                 fontWeight: 'bold',
                                 lineHeight: 1.4,
-                                textAlign: 'center',
+                                textAlign: 'justify', // Changed to justify
                                 marginTop: 'auto',
                                 marginBottom: 'auto',
-                                padding: '0 20px'
+                                padding: '0 10px'
                             }}>
                                 MOTION IS AT THE HEART OF OUR PHILOSOPHY BECAUSE LIFE DOESN'T STAND STILL. BY INTEGRATING FLUID ANIMATIONS AND DYNAMIC VISUALS, WE BREATHE LIFE INTO STATIC BRANDS. WE CREATE DIGITAL ECOSYSTEMS WHERE USERS DON'T JUST VISIT—THEY FEEL, INTERACT, AND REMEMBER.
                             </p>

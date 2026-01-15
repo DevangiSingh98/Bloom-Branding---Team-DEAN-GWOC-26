@@ -540,8 +540,8 @@ img {
 
 @media (max-width: 480px) {
   .story-scrolling-text {
-    font-size: 1.5rem;
-    /* Further reduced */
+    font-size: 4rem;
+    /* Increased to 4rem per request */
   }
 }
 
@@ -613,11 +613,24 @@ img {
     justify-content: flex-start;
   }
 
+  /* Shift Rooted text up specifically - REVERTED per user request */
+  /* but we want to close the gap between title and text */
+  .about-text-item h2 {
+    margin-bottom: 0.5rem !important;
+    /* Brought text closer to title */
+  }
+
   /* Heading adjustments for mobile about-text-items */
   .about-text-item h2,
   .about-text-item h3 {
     font-size: 3rem !important;
     /* Force smaller size on mobile */
+  }
+
+  /* Unify text size and reduce line spacing for all about items on mobile */
+  .about-text-item p {
+    font-size: 1.5rem !important;
+    line-height: 1.1 !important;
   }
 }
 
@@ -698,7 +711,8 @@ img {
   }
 
   .founder-info {
-    text-align: center !important;
+    text-align: justify !important;
+    /* Changed to justify */
     padding-bottom: 0;
     width: 100%;
     padding: 0 1rem;

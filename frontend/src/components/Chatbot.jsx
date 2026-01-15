@@ -277,7 +277,7 @@ export default function Chatbot() {
                                     onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#f0f0f5'; }}
                                     onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                                 >
-                                    {showSidebar ? '«' : 'Qs'}
+                                    {showSidebar ? '«' : 'Ask Bloom'}
                                 </button>
                                 <span style={{ opacity: 0.7 }}>Powered by Bloom Branding</span>
                                 <div style={{ width: '30px' }}></div> {/* Spacer for balance */}

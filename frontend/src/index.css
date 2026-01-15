@@ -542,6 +542,10 @@ img {
   -ms-user-select: none;
 }
 
+.mobile-break {
+  display: none;
+}
+
 /* Story Page Scrolling Text */
 .story-scrolling-text {
   font-size: 4rem;
@@ -597,6 +601,8 @@ img {
   opacity: 0;
 }
 
+
+
 /* Mobile (375px / Phone) */
 @media (max-width: 600px) {
   .about-image-half {
@@ -605,6 +611,10 @@ img {
     /* Image takes top 40% */
     left: 0;
     top: 0;
+  }
+
+  .about-image-half img {
+    object-fit: cover !important;
   }
 
   .about-text-half {
@@ -617,7 +627,7 @@ img {
   }
 
   .about-text-item {
-    padding: 2rem;
+    padding: 1rem;
     padding-top: 1rem;
     justify-content: flex-start;
   }
@@ -638,8 +648,18 @@ img {
 
   /* Unify text size and reduce line spacing for all about items on mobile */
   .about-text-item p {
-    font-size: 1.5rem !important;
+    font-size: 1.1rem !important;
     line-height: 1.1 !important;
+  }
+
+  .mobile-break {
+    display: inline !important;
+  }
+
+  .vision-item,
+  .values-item,
+  .approach-item {
+    justify-content: center !important;
   }
 }
 

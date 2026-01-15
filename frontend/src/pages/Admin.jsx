@@ -55,7 +55,7 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
     return (
         <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', fontSize: '1.1rem', marginBottom: '0.5rem', color: '#666' }}>{label}</label>
-            <div className="file-upload-container" style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div className="file-upload-container" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'nowrap' }}>
                 <div style={{
                     width: '60px',
                     height: '60px',
@@ -957,7 +957,7 @@ const Admin = () => {
 
             <div className="admin-header-container">
                 <h1 className="admin-header-title">Admin Dashboard</h1>
-                <span style={{ fontSize: '0.9rem', color: 'green', backgroundColor: '#e6fffa', padding: '0.5rem 1rem', borderRadius: '20px', border: '1px solid #b2f5ea' }}>
+                <span className="admin-saved-message">
                     ✓ Changes auto-saved to Database
                 </span>
             </div>

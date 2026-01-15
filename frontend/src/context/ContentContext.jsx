@@ -448,12 +448,10 @@ export const ContentProvider = ({ children }) => {
     };
 
     const resetFounders = () => {
-        // Copy defaults from fetched state (keys: left_default, right_default, main_default)
-        // to active keys: left, right, main
         const defaults = {
-            left: { ...content.founders.left_default, key: 'left' },
-            right: { ...content.founders.right_default, key: 'right' },
-            main: { ...content.founders.main_default, key: 'main' }
+            left: { ...defaultContent.founders.left, key: 'left' },
+            right: { ...defaultContent.founders.right, key: 'right' },
+            main: { ...defaultContent.founders.main, key: 'main' }
         };
 
         setContent(prev => ({

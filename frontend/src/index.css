@@ -607,6 +607,7 @@ img {
 }
 
 /* Admin Tabs Horizontal Scroll */
+/* Admin Tabs Horizontal Scroll */
 .admin-tabs-container {
   display: flex;
   overflow-x: auto;
@@ -614,14 +615,73 @@ img {
   padding-bottom: 1rem;
   margin-bottom: 2rem;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  /* Hide scrollbar Firefox */
+  -ms-overflow-style: none;
+  /* Hide scrollbar IE/Edge */
 }
 
 .admin-tabs-container::-webkit-scrollbar {
-  height: 6px;
+  display: none;
+  /* Hide scrollbar Webkit */
 }
 
-.admin-tabs-container::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 3px;
+/* Admin Header Styles */
+.admin-header-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-header-title {
+  font-size: 2.5rem;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.admin-saved-message {
+  font-size: 0.9rem;
+  color: green;
+  background-color: #e6fffa;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid #b2f5ea;
+  white-space: nowrap;
+}
+
+/* Mobile Admin Tweaks */
+@media (max-width: 768px) {
+  .admin-header-container {
+    gap: 0.5rem;
+  }
+
+  .admin-header-title {
+    font-size: 1.5rem;
+  }
+
+  .admin-saved-message {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+}
+
+/* Admin Dual Grid (Side-by-Side Uploads) */
+.admin-dual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .admin-dual-grid {
+    grid-template-columns: 1fr 1fr;
+    /* Keep side-by-side on mobile */
+    gap: 0.5rem;
+    /* Reduce gap slightly */
+  }
 }

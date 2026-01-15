@@ -177,7 +177,7 @@ const ServiceList = () => {
                             whileHover="hover"
                             initial="hidden"
                             whileInView="visible"
-                            viewport={{ once: true, margin: "-50px" }} // Trigger earlier
+                            viewport={{ once: true, amount: 0.1 }} // Trigger when 10% visible
                             className="service-card"
                             variants={{
                                 hidden: { opacity: 0, x: -50 }, // Start Left
@@ -537,10 +537,7 @@ export default function Home() {
                                         <motion.p
                                             className="font-subtitle"
                                             style={{ fontSize: '1.6rem', lineHeight: 1.6, textAlign: 'left', marginTop: '2rem' }}
-                                            initial={{ opacity: 0, y: -30 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            viewport={{ once: true }}
-                                            transition={{ duration: 0.8, ease: "easeOut" }}
+                                        // inherents parent animation for visibility
                                         >
                                             We are a creative branding studio that helps brands grow through strategic storytelling, content creation, and high-impact digital experiences. We focus on modern, bold, and growth-driven brand identities.
                                         </motion.p>
@@ -788,7 +785,7 @@ export default function Home() {
                     <div style={{
                         display: 'grid',
                         gridTemplateColumns: window.innerWidth < 768 ? 'repeat(3, 1fr)' : 'repeat(auto-fit, minmax(150px, 1fr))',
-                        gap: '5rem',
+                        gap: window.innerWidth < 768 ? '0.5rem' : '5rem', // Tighter gap on mobile
                         alignItems: 'center',
                         justifyItems: 'center',
                         width: '100%'
@@ -801,8 +798,8 @@ export default function Home() {
                                 viewport={{ once: true }}
                                 transition={{ delay: idx * 0.1, duration: 0.5 }}
                                 style={{
-                                    width: window.innerWidth < 768 ? '80px' : '220px', // Smaller on mobile
-                                    height: '120px',
+                                    width: window.innerWidth < 768 ? '100%' : '220px', // Maximize width on mobile
+                                    height: window.innerWidth < 768 ? 'auto' : '120px', // Auto height
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -830,8 +827,8 @@ export default function Home() {
                 <ParallaxContent>
                     <div className="container" style={{ textAlign: 'center' }}>
                         <a href="https://www.instagram.com/bloom.branding_/?hl=en" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <h2 style={{ fontSize: window.innerWidth < 768 ? '1.8rem' : '4rem', marginBottom: '3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                                @bloom.branding_ <ArrowUpRight size={window.innerWidth < 768 ? 32 : 56} strokeWidth={0.75} />
+                            <h2 style={{ fontSize: window.innerWidth < 768 ? '2.2rem' : '4rem', marginBottom: '3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                                @bloom.branding_ <ArrowUpRight size={window.innerWidth < 768 ? 36 : 56} strokeWidth={0.75} />
                             </h2>
                         </a>
                         <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 768 ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.5rem' }}>
@@ -847,7 +844,7 @@ export default function Home() {
                                     transition={{ duration: 0.8, delay: index * 0.2, ease: "easeOut" }}
                                     whileHover={{ opacity: 0.8, scale: 1.02 }}
                                     className="img-placeholder"
-                                    style={{ width: '280px', flexGrow: 1, maxWidth: '350px', aspectRatio: '1', borderRadius: '1px', display: 'block', overflow: 'hidden' }}
+                                    style={{ width: '100%', flexGrow: 1, maxWidth: '350px', aspectRatio: '1', borderRadius: '1px', display: 'block', overflow: 'hidden' }}
                                 >
                                     {item.image ? (
                                         <img src={item.image} alt="Insta" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

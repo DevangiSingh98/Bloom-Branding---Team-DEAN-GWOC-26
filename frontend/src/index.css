@@ -881,7 +881,22 @@ img {
   .map-section h4,
   .contact-form-inner h3 {
     font-weight: bold !important;
-    /* Keep hierarchy via weight since size is same */
     margin-bottom: 0.5rem !important;
+  }
+
+  /* Navbar Menu Mobile Adjustments */
+  .nav-menu-text {
+    font-family: var(--font-brand) !important;
+    font-weight: bold !important;
+    font-size: 1.3rem !important;
+  }
+
+  .nav-menu-img {
+    max-height: 100px !important;
+  }
+
+  .nav-contact-section {
+    margin-top: 1.5rem !important;
+    font-size: 1.2rem !important;
   }
 }

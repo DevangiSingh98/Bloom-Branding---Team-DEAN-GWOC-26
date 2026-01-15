@@ -15,7 +15,7 @@ export default function Footer() {
                         </AnimatedButton>
                     </div>
 
-                    <div style={{ flex: 1, display: 'flex', gap: '4rem', fontFamily: 'var(--font-subtitle)', paddingTop: '1rem' }}>
+                    <div style={{ flex: 1, display: 'flex', gap: window.innerWidth < 768 ? '1.5rem' : '4rem', fontFamily: 'var(--font-subtitle)', paddingTop: '1rem', justifyContent: window.innerWidth < 768 ? 'space-between' : 'flex-start' }}>
                         <div>
                             <h4 style={{ color: 'var(--color-butter-yellow)', marginBottom: '1.5rem', textTransform: 'uppercase', fontSize: '1.4rem' }}>Explore</h4>
                             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '1.2rem' }}>

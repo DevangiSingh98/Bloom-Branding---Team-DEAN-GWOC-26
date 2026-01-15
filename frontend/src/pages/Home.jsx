@@ -11,8 +11,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const fadeInUp = {
-    initial: { opacity: 0, y: 60 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
+    initial: { opacity: 0, x: -60 }, // Left to Right
+    animate: { opacity: 1, x: 0, transition: { duration: 0.8, ease: "easeOut" } }
 };
 
 const staggerContainer = {
@@ -174,17 +174,18 @@ const ServiceList = () => {
                     >
                         <motion.div
                             whileHover="hover"
-                            initial="rest"
-                            animate="rest"
+                            initial="hidden"
+                            whileInView="visible"
+                            viewport={{ once: true, margin: "-50px" }} // Trigger earlier
                             className="service-card"
                             variants={{
-                                rest: { y: 0 },
+                                hidden: { opacity: 0, x: -50 }, // Start Left
+                                visible: { opacity: 1, x: 0, y: 0, transition: { duration: 0.6, ease: "easeOut" } }, // Move to Center
                                 hover: { y: -10 }
                             }}
-                            transition={{ duration: 0.3, ease: 'easeOut' }}
                         >
                             {/* Top Title */}
-                            <h3 className="service-title">
+                            <h3 className="service-title" style={{ fontSize: '2rem' }}>
                                 {service.title}
                             </h3>
 
@@ -215,6 +216,8 @@ const ServiceList = () => {
                                     rest: { backgroundColor: 'transparent', color: 'var(--color-butter-yellow)' },
                                     hover: { backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-electric-blue)' }
                                 }}
+                            >
+                                style={{ fontSize: '1rem', padding: '12px 35px' }}
                             >
                                 Explore
                             </motion.div>
@@ -339,7 +342,7 @@ export default function Home() {
                                 start: { x: -1800, y: -1200 },
                                 end: { x: -580, y: -180 },
                                 tabletEnd: { x: -420, y: -180 }, // Moved Inside (was -500)
-                                mobileEnd: { x: -200, y: -240 },
+                                mobileEnd: { x: -220, y: -260 }, // "Outside" slightly (was -200), Moved Up (was -240)
                                 rotate: -25, // Synced Angle
                                 delay: 0.2, z: 1, finalScale: 1.0, scaleX: -1, scaleY: -1,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'
@@ -349,8 +352,8 @@ export default function Home() {
                                 start: { x: 1800, y: -1200 },
                                 end: { x: 600, y: -300 },
                                 tabletEnd: { x: 420, y: -250 }, // Moved Inside (was 500)
-                                mobileEnd: { x: 200, y: -240 },
-                                rotate: 10, // Synced Angle
+                                mobileEnd: { x: 220, y: -260 }, // "Outside" slightly (was 200), Moved Up (was -240)
+                                rotate: -15, // Angled more left (was 10)
                                 delay: 0.0, z: 2, scaleY: -1, scaleX: -1,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'
                             },
@@ -517,7 +520,7 @@ export default function Home() {
                             whileInView="animate"
                             viewport={{ once: true }}
                             className="grid"
-                            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', alignItems: 'center' }}
+                            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', alignItems: 'center', textAlign: window.innerWidth < 768 ? 'left' : 'justify' }}
                         >
                             <motion.div variants={fadeInUp}>
                                 <h2 style={{ fontSize: '3.8rem', marginBottom: '2rem', color: 'var(--color-electric-blue)' }}>Blooming the Brand</h2>
@@ -534,7 +537,7 @@ export default function Home() {
                                 <br />
                                 <AnimatedButton to="/about" className="btn-primary" style={{ marginTop: '1rem' }}>Our Story</AnimatedButton>
                             </motion.div>
-                            <motion.div variants={fadeInUp}>
+                            <motion.div variants={fadeInUp} style={{ order: window.innerWidth < 768 ? -1 : 0 }}> {/* Image First on Mobile */}
                                 <div className="img-placeholder" style={{ width: '100%', height: '400px', borderRadius: '20px', overflow: 'hidden' }}>
                                     <img src="/images/bloomingthebrand.png" alt="Blooming the Brand" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
@@ -555,7 +558,7 @@ export default function Home() {
                     <div className="container">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
                             <h2 style={{ fontSize: '4.5rem', color: 'var(--color-butter-yellow)' }}>Selected Work</h2>
-                            <AnimatedButton to="/work" className="btn-primary" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)' }}>View All Projects</AnimatedButton>
+                            <AnimatedButton to="/work" className="btn-primary" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)', whiteSpace: 'nowrap', fontSize: window.innerWidth < 768 ? '0.8rem' : '1rem', padding: window.innerWidth < 768 ? '0.5rem 1rem' : '1rem 2rem' }}>View All Projects</AnimatedButton>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
@@ -567,7 +570,7 @@ export default function Home() {
                                     whileHover={{ scale: 0.98 }}
                                 >
                                     {item.image ? (
-                                        <img src={item.image} alt={item.title} style={{ width: '100%', height: '500px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem' }} />
+                                        <img src={item.image} alt={item.title} style={{ width: window.innerWidth < 768 ? '80%' : '100%', height: '500px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem', margin: window.innerWidth < 768 ? '0 auto 1rem' : '0 0 1rem', display: 'block' }} />
                                     ) : (
                                         <div className="img-placeholder" style={{ width: '100%', height: '500px', backgroundColor: '#4a3832', borderRadius: '10px', marginBottom: '1rem' }} />
                                     )}
@@ -584,7 +587,7 @@ export default function Home() {
             <section id="journey-stats" className="section-padding light-section">
                 <ParallaxContent>
                     <div className="container">
-                        <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '2rem', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'nowrap', gap: '1rem', textAlign: 'center', overflowX: 'auto', paddingBottom: '1rem' }}>
                             <Counter to={5} label="Years of Experience" />
                             <Counter to={50} label="Happy Clients" />
                             <Counter to={100} label="Projects Delivered" />
@@ -630,11 +633,13 @@ export default function Home() {
                         {/* Horizontal Marquee Container - Pinterest Style */}
                         <div style={{
                             width: '100%',
-                            overflow: 'hidden',
+                            overflowX: 'auto', // Horizontal scroll enabled
                             position: 'relative',
                             paddingTop: '0',
-                            paddingBottom: '4rem'
-                        }}>
+                            paddingBottom: '4rem',
+                            scrollbarWidth: 'none', // Hide scrollbar Firefox
+                            msOverflowStyle: 'none' // Hide scrollbar IE/Edge
+                        }} className="hide-scrollbar">
                             <motion.div
                                 style={{
                                     display: 'flex',
@@ -646,7 +651,7 @@ export default function Home() {
                                     x: {
                                         repeat: Infinity,
                                         repeatType: "loop",
-                                        duration: 600, // Extremely slow scroll
+                                        duration: 40, // Increased speed (was 600)
                                         ease: "linear"
                                     }
                                 }}
@@ -743,7 +748,7 @@ export default function Home() {
                         color: 'var(--color-dark-choc)',
                         textAlign: 'center',
                         marginBottom: '3rem',
-                        fontSize: '6rem',
+                        fontSize: window.innerWidth < 768 ? '3.5rem' : '6rem',
                         fontFamily: 'Bigilla, serif',
                         letterSpacing: '1px'
                     }}>
@@ -752,7 +757,7 @@ export default function Home() {
 
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                        gridTemplateColumns: window.innerWidth < 768 ? 'repeat(3, 1fr)' : 'repeat(auto-fit, minmax(150px, 1fr))',
                         gap: '5rem',
                         alignItems: 'center',
                         justifyItems: 'center',
@@ -766,7 +771,7 @@ export default function Home() {
                                 viewport={{ once: true }}
                                 transition={{ delay: idx * 0.1, duration: 0.5 }}
                                 style={{
-                                    width: '220px',
+                                    width: window.innerWidth < 768 ? '100px' : '220px',
                                     height: '120px',
                                     display: 'flex',
                                     alignItems: 'center',
@@ -795,11 +800,11 @@ export default function Home() {
                 <ParallaxContent>
                     <div className="container" style={{ textAlign: 'center' }}>
                         <a href="https://www.instagram.com/bloom.branding_/?hl=en" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <h2 style={{ fontSize: '4rem', marginBottom: '3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                            <h2 style={{ fontSize: window.innerWidth < 768 ? '2.5rem' : '4rem', marginBottom: '3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
                                 @bloom.branding_ <ArrowUpRight size={56} strokeWidth={0.75} />
                             </h2>
                         </a>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 768 ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
                             {content.instagram.map((item, index) => (
                                 <motion.a
                                     href={item.link}

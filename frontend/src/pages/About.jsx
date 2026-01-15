@@ -131,19 +131,7 @@ export default function About() {
     const xLeft = useTransform(smoothProgress, [0.1, 0.4], [80, 0]);
     const xRight = useTransform(smoothProgress, [0.1, 0.4], [-80, 0]);
 
-    // Reusable style for slideshow items
-    const slideItemStyle = {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        padding: '4rem',
-        opacity: 0, // Initially hidden
-    };
+    // Reusable style for slideshow items - Moved to CSS .about-text-item
 
     return (
         <motion.div
@@ -202,8 +190,7 @@ export default function About() {
                             flexShrink: 0
                         }}
                     >
-                        <p style={{
-                            fontSize: '6rem',
+                        <p className="story-scrolling-text" style={{
                             fontFamily: 'var(--font-subtitle)',
                             color: 'var(--color-dark-choc)',
                             margin: 0,
@@ -215,28 +202,10 @@ export default function About() {
 
                     {/* 3. Image Section (Flush Left) */}
                     <div
-                        className="image-section"
-                        style={{
-                            width: '100vw',
-                            height: '100%',
-                            position: 'relative',
-                            flexShrink: 0,
-                            display: 'flex',
-                            alignItems: 'center',
-                            backgroundColor: '#fff'
-                        }}
+                        className="image-section about-split-layout"
                     >
-                        {/* The Image (Flush Left, Full Height, 50% Width) */}
-                        <div
-                            style={{
-                                width: '50%',
-                                height: '100%',
-                                position: 'absolute',
-                                left: 0,
-                                top: 0,
-                                zIndex: 20,
-                            }}
-                        >
+                        {/* The Image (Flush Left, Full Height, 50% Width on Desktop) */}
+                        <div className="about-image-half">
                             <img
                                 src="/images/dummy9.png"
                                 alt="Blooming"
@@ -263,20 +232,9 @@ export default function About() {
                         </div>
 
                         {/* Right Content Container (The "Scrollable" Part) */}
-                        <div
-                            className="right-content-container"
-                            style={{
-                                width: '50%',
-                                height: '100%',
-                                position: 'absolute',
-                                right: 0,
-                                top: 0,
-                                zIndex: 10,
-                                overflow: 'hidden'
-                            }}
-                        >
+                        <div className="right-content-container about-text-half">
                             {/* 1. Rooted Story (Visible First via Opacity/Transform) */}
-                            <div className="story-item" style={{ ...slideItemStyle, opacity: 1 }}>
+                            <div className="story-item about-text-item" style={{ opacity: 1 }}>
                                 <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '5rem', marginBottom: '2rem', color: 'var(--color-dark-choc)', lineHeight: 0.9 }}>
                                     Rooted in <br /> Authenticity
                                 </h2>
@@ -286,7 +244,7 @@ export default function About() {
                             </div>
 
                             {/* 2. Vision */}
-                            <div className="vision-item" style={slideItemStyle}>
+                            <div className="vision-item about-text-item">
                                 <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '6rem', color: 'var(--color-electric-blue)', marginBottom: '1rem', lineHeight: 1 }}>VISION</h3>
                                 <p style={{ fontFamily: 'var(--font-subtitle)', fontSize: '2rem', lineHeight: 1.4 }}>
                                     To cultivate distinct identities that stand the test of time.
@@ -294,7 +252,7 @@ export default function About() {
                             </div>
 
                             {/* 3. Values */}
-                            <div className="values-item" style={slideItemStyle}>
+                            <div className="values-item about-text-item">
                                 <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '6rem', color: 'var(--color-electric-blue)', marginBottom: '1rem', lineHeight: 1 }}>VALUES</h3>
                                 <p style={{ fontFamily: 'var(--font-subtitle)', fontSize: '2rem', lineHeight: 1.4 }}>
                                     Authenticity, Growth, and Creative Courage.
@@ -302,7 +260,7 @@ export default function About() {
                             </div>
 
                             {/* 4. Creative Approach */}
-                            <div className="approach-item" style={slideItemStyle}>
+                            <div className="approach-item about-text-item">
                                 <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '5rem', color: 'var(--color-electric-blue)', marginBottom: '1rem', lineHeight: 0.9 }}>CREATIVE <br /> APPROACH</h3>
                                 <p style={{ fontFamily: 'var(--font-subtitle)', fontSize: '2rem', lineHeight: 1.4 }}>
                                     Merging strategy with fluid, artistic expression.
@@ -334,46 +292,45 @@ export default function About() {
                         Meet the Founders
                     </motion.h2>
 
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(3, 1fr)',
-                        gap: '0',
-                        alignItems: 'end',
-                        position: 'relative',
-                        zIndex: 10
-                    }}>
-                        <motion.div style={{ x: xLeft, textAlign: 'right', alignSelf: 'center', paddingBottom: '4rem', position: 'relative', zIndex: 5 }}>
-                            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontFamily: 'var(--font-subtitle)', color: 'var(--color-butter-yellow)' }}>{content.founders.left.name}</h3>
-                            <div style={{ color: 'var(--color-butter-yellow)', marginBottom: '1.5rem', fontWeight: 'bold' }}>{content.founders.left.role}</div>
-                            <p style={{ marginBottom: '1rem', lineHeight: 1.6, color: 'var(--color-white)' }}>{content.founders.left.bio1}</p>
-                            <p style={{ lineHeight: 1.6, color: 'var(--color-white)' }}>{content.founders.left.bio2}</p>
+                    <div className="founders-grid">
+                        <motion.div
+                            style={{ x: xLeft }}
+                            className="founder-info text-right founder-info-left"
+                        >
+                            <h3 className="founder-name">{content.founders.left.name}</h3>
+                            <div className="founder-role">{content.founders.left.role}</div>
+                            <p className="founder-bio margin-bottom">{content.founders.left.bio1}</p>
+                            <p className="founder-bio">{content.founders.left.bio2}</p>
                         </motion.div>
 
-                        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '-60px', position: 'relative', zIndex: 20 }}>
+                        <div className="founder-image-wrapper">
                             {content.founders.main?.image ? (
-                                <img src={content.founders.main.image} alt="Founders" style={{ width: '250%', maxWidth: 'none', marginLeft: '0%', height: 'auto', borderRadius: '10px 10px 0 0', display: 'block' }} />
+                                <img src={content.founders.main.image} alt="Founders" className="founder-main-image" />
                             ) : (
                                 <div className="img-placeholder" style={{ width: '100%', height: '600px', borderRadius: '10px 10px 0 0' }}>Founders Image</div>
                             )}
                         </div>
 
-                        <motion.div style={{ x: xRight, textAlign: 'left', alignSelf: 'center', paddingBottom: '4rem', position: 'relative', zIndex: 5 }}>
-                            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', fontFamily: 'var(--font-subtitle)', color: 'var(--color-butter-yellow)' }}>{content.founders.right.name}</h3>
-                            <div style={{ color: 'var(--color-butter-yellow)', marginBottom: '1.5rem', fontWeight: 'bold' }}>{content.founders.right.role}</div>
-                            <p style={{ marginBottom: '1rem', lineHeight: 1.6, color: 'var(--color-white)' }}>{content.founders.right.bio1}</p>
-                            <p style={{ lineHeight: 1.6, color: 'var(--color-white)' }}>{content.founders.right.bio2}</p>
+                        <motion.div
+                            style={{ x: xRight }}
+                            className="founder-info text-left founder-info-right"
+                        >
+                            <h3 className="founder-name">{content.founders.right.name}</h3>
+                            <div className="founder-role">{content.founders.right.role}</div>
+                            <p className="founder-bio margin-bottom">{content.founders.right.bio1}</p>
+                            <p className="founder-bio">{content.founders.right.bio2}</p>
                         </motion.div>
                     </div>
                 </div>
             </section>
 
             {/* JOURNEY & PHILOSOPHY ARCHED PORTALS */}
-            <section style={{ backgroundColor: '#fff', padding: '150px 5%', overflow: 'hidden' }}>
+            <section style={{ backgroundColor: '#fff', padding: '180px 5% 50px', overflow: 'hidden' }}>
                 <div className="container">
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-                        gap: '20px',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', // Adjusted for mobile
+                        gap: '40px', // Increased gap
                         alignItems: 'start'
                     }}>
                         {/* ARCH 1: OUR JOURNEY */}
@@ -394,17 +351,19 @@ export default function About() {
                             style={{
                                 backgroundColor: 'transparent',
                                 borderRadius: '500px 500px 0 0',
-                                padding: '120px 40px 60px',
+                                padding: '60px 20px 40px', // Reduced padding further
                                 border: '2.5px solid var(--color-dark-choc)',
                                 color: 'var(--color-dark-choc)',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                height: '700px',
-                                position: 'relative'
+                                height: 'auto', // Allow it to adjust
+                                minHeight: '500px',
+                                position: 'relative',
+                                marginBottom: '2rem'
                             }}
                         >
                             {/* Decorative Star */}
-                            <div style={{ position: 'absolute', top: '40px', left: '50%', transform: 'translateX(-50%)', color: 'var(--color-dark-choc)' }}>
+                            <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', color: 'var(--color-dark-choc)' }}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
                                 </svg>
@@ -412,9 +371,9 @@ export default function About() {
 
                             <h3 style={{
                                 fontFamily: 'var(--font-brand)',
-                                fontSize: '3.5rem',
+                                fontSize: '3rem', // Slightly smaller title
                                 textAlign: 'center',
-                                marginBottom: '2rem',
+                                marginBottom: '1.5rem',
                                 lineHeight: 1.1,
                                 letterSpacing: '1px'
                             }}>
@@ -423,13 +382,13 @@ export default function About() {
 
                             <p style={{
                                 fontFamily: 'var(--font-subtitle)',
-                                fontSize: '1.5rem',
+                                fontSize: '1.3rem', // Slightly smaller text
                                 fontWeight: 'bold',
-                                lineHeight: 1.6,
-                                textAlign: 'center',
+                                lineHeight: 1.5,
+                                textAlign: 'justify', // Changed to justify
                                 marginTop: 'auto',
                                 marginBottom: 'auto',
-                                padding: '0 20px'
+                                padding: '0 10px'
                             }}>
                                 OUR JOURNEY DIDN'T BEGIN IN A BOARDROOM. IT STARTED WITH A PASSION FOR ART, A CURIOSITY FOR TECHNOLOGY, AND A BELIEF THAT BUSINESS CAN BE BEAUTIFUL. WE'VE NAVIGATED THE EVOLVING DIGITAL LANDSCAPE BY STAYING TRUE TO OUR CORE: AUTHENTIC CONNECTION.
                             </p>
@@ -443,17 +402,19 @@ export default function About() {
                             style={{
                                 backgroundColor: 'transparent',
                                 borderRadius: '500px 500px 0 0',
-                                padding: '120px 40px 60px',
+                                padding: '60px 20px 40px', // Reduced padding
                                 border: '2.5px solid var(--color-dark-choc)',
                                 color: 'var(--color-dark-choc)',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                height: '700px',
-                                position: 'relative'
+                                height: 'auto',
+                                minHeight: '500px',
+                                position: 'relative',
+                                marginBottom: '2rem'
                             }}
                         >
                             {/* Decorative Star */}
-                            <div style={{ position: 'absolute', top: '40px', left: '50%', transform: 'translateX(-50%)', color: 'var(--color-dark-choc)' }}>
+                            <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', color: 'var(--color-dark-choc)' }}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
                                 </svg>
@@ -461,9 +422,9 @@ export default function About() {
 
                             <h3 style={{
                                 fontFamily: 'var(--font-brand)',
-                                fontSize: '3.5rem',
+                                fontSize: '3rem',
                                 textAlign: 'center',
-                                marginBottom: '2rem',
+                                marginBottom: '1.5rem',
                                 lineHeight: 1.1,
                                 letterSpacing: '1px'
                             }}>
@@ -472,13 +433,13 @@ export default function About() {
 
                             <p style={{
                                 fontFamily: 'var(--font-subtitle)',
-                                fontSize: '1.5rem',
+                                fontSize: '1.3rem',
                                 fontWeight: 'bold',
                                 lineHeight: 1.4,
-                                textAlign: 'center',
+                                textAlign: 'justify', // Changed to justify
                                 marginTop: 'auto',
                                 marginBottom: 'auto',
-                                padding: '0 20px'
+                                padding: '0 10px'
                             }}>
                                 MOTION IS AT THE HEART OF OUR PHILOSOPHY BECAUSE LIFE DOESN'T STAND STILL. BY INTEGRATING FLUID ANIMATIONS AND DYNAMIC VISUALS, WE BREATHE LIFE INTO STATIC BRANDS. WE CREATE DIGITAL ECOSYSTEMS WHERE USERS DON'T JUST VISIT—THEY FEEL, INTERACT, AND REMEMBER.
                             </p>

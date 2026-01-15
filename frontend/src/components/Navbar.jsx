@@ -325,7 +325,7 @@ export default function Navbar() {
                             ))}
                         </motion.ul>
 
-                        <motion.div variants={itemVariants} style={{ marginTop: '4rem', fontFamily: 'var(--font-subtitle)' }}>
+                        <motion.div variants={itemVariants} className="nav-contact-section" style={{ marginTop: '4rem', fontFamily: 'var(--font-subtitle)' }}>
                             <p>Get in touch</p>
                             <button
                                 onClick={() => setEmailModalOpen(true)}

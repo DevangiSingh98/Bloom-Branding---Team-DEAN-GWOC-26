@@ -60,6 +60,11 @@
 
 html {
   scroll-behavior: smooth;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -68,6 +73,10 @@ body {
   color: var(--color-dark-choc);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 h1,
@@ -428,7 +437,7 @@ button {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background-color: var(--color-electric-blue);
   color: var(--color-earl-gray);
@@ -493,8 +502,6 @@ button {
     justify-content: flex-start;
     padding-top: 8rem;
     padding-bottom: 2rem;
-    align-items: center;
-    /* Center vertically if possible */
   }
 
   .nav-menu-list {
@@ -507,8 +514,7 @@ button {
 
   .nav-menu-item {
     width: 45%;
-    margin-bottom: 1rem;
-    /* Reduced margin */
+    margin-bottom: 1.5rem;
     display: flex;
     justify-content: center;
   }
@@ -516,14 +522,14 @@ button {
   .nav-menu-img {
     max-width: 100%;
     height: auto !important;
-    max-height: 20vh !important;
-    /* Responsive height to fit screen */
+    max-height: 150px !important;
+    /* Increased size per user request */
   }
 
   .nav-menu-text {
-    font-size: 0.9rem;
+    font-size: 1rem;
     margin-left: 0;
-    margin-top: 0.2rem;
+    margin-top: 0.5rem;
     text-align: center;
   }
 }
@@ -536,165 +542,371 @@ img {
   -ms-user-select: none;
 }
 
-/* Chatbot Responsive Styles */
-.chatbot-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  position: fixed;
-  bottom: 10px;
-  right: 30px;
-  z-index: 1000;
+/* Story Page Scrolling Text */
+.story-scrolling-text {
+  font-size: 4rem;
 }
 
-.chatbot-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
-  width: auto;
-  max-width: 100vw;
-  padding-right: 10px;
-  margin-bottom: 5px;
-}
-
-.chatbot-window {
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(25px);
-  border-radius: 35px;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.18);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  height: 90vh !important;
-  max-height: 90vh !important;
-  width: 420px;
-  max-width: 95vw;
-}
-
-@media (max-width: 768px) {
-  .chatbot-container {
-    right: 0;
-    left: 0;
-    bottom: 0;
-    padding: 10px;
-    align-items: center;
-    justify-content: flex-end;
-    pointer-events: none;
-    /* Allow clicks through empty space */
-  }
-
-  .chatbot-container>* {
-    pointer-events: auto;
-    /* Re-enable clicks on children */
-  }
-
-  .chatbot-wrapper {
-    width: 100%;
-    margin-bottom: 80px;
-    /* Clear toggle button */
-    justify-content: flex-end;
-    align-items: center;
-    padding: 0;
-  }
-
-  .chatbot-window {
-    width: 95%;
-    height: 80vh !important;
-    max-height: 80vh;
-    /* Increased height available since no sidebar */
+@media (max-width: 480px) {
+  .story-scrolling-text {
+    font-size: 4rem;
+    /* Increased to 4rem per request */
   }
 }
 
-/* Admin Tabs Horizontal Scroll */
-/* Admin Tabs Horizontal Scroll */
-.admin-tabs-container {
+/* About Page Split Layout */
+.about-split-layout {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  flex-shrink: 0;
   display: flex;
-  overflow-x: auto;
-  gap: 1rem;
-  padding-bottom: 1rem;
-  margin-bottom: 2rem;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  /* Hide scrollbar Firefox */
-  -ms-overflow-style: none;
-  /* Hide scrollbar IE/Edge */
-}
-
-.admin-tabs-container::-webkit-scrollbar {
-  display: none;
-  /* Hide scrollbar Webkit */
-}
-
-/* Admin Header Styles */
-.admin-header-container {
-  display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
-  gap: 1.5rem;
-  margin-bottom: 1rem;
-  flex-wrap: wrap;
+  background-color: #fff;
 }
 
-.admin-header-title {
-  font-size: 2.5rem;
-  margin: 0;
-  white-space: nowrap;
+.about-image-half {
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 20;
 }
 
-.admin-saved-message {
-  font-size: 0.9rem;
-  color: green;
-  background-color: #e6fffa;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  border: 1px solid #b2f5ea;
-  white-space: nowrap;
+.about-text-half {
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+  overflow: hidden;
 }
 
-/* Mobile Admin Tweaks */
-@media (max-width: 768px) {
-  .admin-header-container {
-    gap: 0.5rem;
+.about-text-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+  opacity: 0;
+}
+
+/* Mobile (375px / Phone) */
+@media (max-width: 600px) {
+  .about-image-half {
+    width: 100%;
+    height: 40%;
+    /* Image takes top 40% */
+    left: 0;
+    top: 0;
   }
 
-  .admin-header-title {
-    font-size: 1.5rem;
+  .about-text-half {
+    width: 100%;
+    height: 60%;
+    /* Text takes bottom 60% */
+    left: 0;
+    top: 40%;
+    right: auto;
   }
 
-  .admin-saved-message {
-    font-size: 0.7rem;
-    padding: 0.3rem 0.6rem;
+  .about-text-item {
+    padding: 2rem;
+    padding-top: 1rem;
+    justify-content: flex-start;
+  }
+
+  /* Shift Rooted text up specifically - REVERTED per user request */
+  /* but we want to close the gap between title and text */
+  .about-text-item h2 {
+    margin-bottom: 0.5rem !important;
+    /* Brought text closer to title */
+  }
+
+  /* Heading adjustments for mobile about-text-items */
+  .about-text-item h2,
+  .about-text-item h3 {
+    font-size: 3rem !important;
+    /* Force smaller size on mobile */
+  }
+
+  /* Unify text size and reduce line spacing for all about items on mobile */
+  .about-text-item p {
+    font-size: 1.5rem !important;
+    line-height: 1.1 !important;
   }
 }
 
-/* Admin Dual Grid (Side-by-Side Uploads) */
-.admin-dual-grid {
+/* Founders Section Styles */
+.founders-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  align-items: end;
+  position: relative;
+  z-index: 10;
+}
+
+.founder-info {
+  align-self: center;
+  padding-bottom: 4rem;
+  position: relative;
+  z-index: 5;
+}
+
+.founder-info.text-right {
+  text-align: right;
+}
+
+.founder-info.text-left {
+  text-align: left;
+}
+
+.founder-name {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-subtitle);
+  color: var(--color-butter-yellow);
+}
+
+.founder-role {
+  color: var(--color-butter-yellow);
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+}
+
+.founder-bio {
+  line-height: 1.6;
+  color: var(--color-white);
+}
+
+.founder-bio.margin-bottom {
   margin-bottom: 1rem;
 }
 
+.founder-image-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: -60px;
+  position: relative;
+  z-index: 20;
+}
+
+.founder-main-image {
+  width: 250%;
+  max-width: none;
+  margin-left: 0%;
+  height: auto;
+  border-radius: 10px 10px 0 0;
+  display: block;
+}
+
+/* Mobile Founders Layout */
 @media (max-width: 768px) {
-  .admin-dual-grid {
-    grid-template-columns: 1fr 1fr;
-    /* Keep side-by-side on mobile */
-    gap: 0.5rem;
-    /* Reduce gap slightly */
+  .founders-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0rem;
+    padding-bottom: 2rem;
+    padding-top: 4rem;
+    /* Added top space */
   }
 
-  .admin-upload-btn {
-    padding: 0.3rem 0.5rem !important;
-    font-size: 0.75rem !important;
+  .founder-info {
+    text-align: justify !important;
+    /* Changed to justify */
+    padding-bottom: 0;
+    width: 100%;
+    padding: 0 1rem;
+    transform: none !important;
   }
 
-  .admin-remove-btn {
-    width: 24px !important;
-    height: 24px !important;
-    padding: 0 !important;
+  /* Order: Left Founder (1), Image (2), Right Founder (3) */
+  .founder-info-left {
+    order: 1;
+    margin-top: 6rem;
+    /* Shifted down more */
+    margin-bottom: 1rem;
+  }
+
+  .founder-image-wrapper {
+    order: 2;
+    margin-bottom: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .founder-info-right {
+    order: 3;
+    margin-top: 2rem;
+    /* Shifted down more */
+    padding-top: 0;
+  }
+
+  .founder-main-image {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin-left: 0;
+    border-radius: 10px;
+    position: relative;
+  }
+
+  .founder-name {
+    font-size: 2.5rem;
+  }
+}
+
+/* Mobile adjustments for Selected Work section on Home Page */
+@media (max-width: 600px) {
+
+  /* Header Container: Title and Button */
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:first-child {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+    margin-bottom: 2rem !important;
+  }
+
+  /* View All Projects Button */
+  section.section-padding[style*="var(--color-dark-choc)"] .btn-primary {
+    margin-left: 0 !important;
+    /* Shift slightly left if needed, but in column layout align-self works better */
+    align-self: flex-start;
     font-size: 0.9rem !important;
+    padding: 0.8rem 1.5rem !important;
+  }
+
+  /* Selected Work Grid - Re-targeting more specifically to override inline grid styles */
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:last-child {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    /* Center align the project cards */
+  }
+
+  /* Individual Project Card Wrapper */
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:last-child>div {
+    width: 90% !important;
+    /* Make projects smaller width-wise */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Project Image */
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:last-child>div img,
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:last-child>div .img-placeholder {
+    height: 350px !important;
+    /* Reduce height from 500px */
+  }
+
+  /* --- Contact Page Mobile Adjustments --- */
+  .contact-form-wrapper {
+    width: 90% !important;
+    margin: 0 auto !important;
+    border-radius: 10px !important;
+  }
+
+  .contact-form-inner {
+    padding: 1.5rem !important;
+    /* Reduce padding from 4rem */
+  }
+
+  .contact-form-grid {
+    grid-template-columns: 1fr !important;
+    /* Stack inputs vertically */
+    gap: 1.5rem !important;
+  }
+
+  /* Form Text Scaling */
+  /* Form Text Scaling */
+  .contact-form-inner h3,
+  .contact-form-inner label,
+  .contact-form-inner input,
+  .contact-form-inner select,
+  .contact-form-inner textarea,
+  .collab-section p,
+  .collab-section button,
+  .map-section p,
+  .map-section a,
+  .container>div>p.font-subtitle {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Titles for Collab and Map Sections */
+  .collab-section h2,
+  .map-section h4 {
+    font-size: 2.5rem !important;
+    font-weight: bold !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Adjust padding for the shrunk text */
+  .contact-form-inner label,
+  .contact-form-inner input,
+  .contact-form-inner select,
+  .contact-form-inner textarea {
+    padding: 0.6rem !important;
+  }
+
+  .collab-section h2,
+  .map-section h4,
+  .contact-form-inner h3 {
+    font-weight: bold !important;
+    /* Keep hierarchy via weight since size is same */
+    margin-bottom: 0.5rem !important;
+  }
+
+  .collab-section {
+    margin-top: 3rem !important;
+    padding: 3rem 1rem !important;
+    /* Reduce padding */
+  }
+
+  .collab-decor-1,
+  .collab-decor-2 {
+    width: 100px !important;
+    height: 100px !important;
+  }
+
+  .map-section {
+    margin-top: 3rem !important;
+  }
+
+  .contact-form-inner select,
+  .contact-form-inner textarea {
+    padding: 0.6rem !important;
+  }
+
+  .collab-section h2,
+  .map-section h4,
+  .contact-form-inner h3 {
+    font-weight: bold !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  /* Navbar Menu Mobile Adjustments */
+  .nav-menu-text {
+    font-family: var(--font-brand) !important;
+    font-weight: bold !important;
+    font-size: 1.3rem !important;
+  }
+
+  .nav-menu-img {
+    max-height: 100px !important;
+  }
+
+  .nav-contact-section {
+    margin-top: 1.5rem !important;
+    font-size: 1.2rem !important;
   }
 }. h i d e - s c r o l l b a r : : - w e b k i t - s c r o l l b a r  
    d i s p l a y :   n o n e ;    

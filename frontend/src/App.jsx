@@ -96,15 +96,26 @@ function ConditionalFooter() {
     return <Footer />;
 }
 
+import Preloader from './components/Preloader';
+
 function App() {
+    const [loading, setLoading] = React.useState(true);
+
     return (
         <ContentProvider>
             <Router>
                 <ScrollToTop />
-                <Navbar />
-                <AnimatedRoutes />
-                <Chatbot />
-                <ConditionalFooter />
+                <AnimatePresence mode="wait">
+                    {loading && <Preloader key="preloader" setLoading={setLoading} />}
+                </AnimatePresence>
+                {!loading && (
+                    <>
+                        <Navbar />
+                        <AnimatedRoutes />
+                        <Chatbot />
+                        <ConditionalFooter />
+                    </>
+                )}
             </Router>
         </ContentProvider>
     );

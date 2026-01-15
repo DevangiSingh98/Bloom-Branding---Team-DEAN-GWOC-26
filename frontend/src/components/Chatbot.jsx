@@ -16,7 +16,8 @@ const faqData = [
     {
         question: "How can I start a project?",
         answer: "You can reach out through our Contact page or send an enquiry directly. We'd love to hear about your vision and make your brand bloom!",
-        keywords: ["start", "project", "work", "enquiry", "hire", "process"]
+        keywords: ["start", "project", "work", "enquiry", "hire", "process"],
+        type: 'contact'
     },
     {
         question: "How much do your services cost?",
@@ -49,6 +50,7 @@ const faqData = [
 export default function Chatbot() {
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
+    const [showSidebar, setShowSidebar] = useState(false);
     const [messages, setMessages] = useState([
         { role: 'bot', text: "Hi! I'm Bloom Bot. How can I help you bloom today? Pick a question from the sidebar!" }
     ]);
@@ -84,93 +86,23 @@ export default function Chatbot() {
     */
 
     return (
-        <div style={{ position: 'fixed', bottom: '10px', right: '30px', zIndex: 1000 }}>
+        <div className="chatbot-container">
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
                         initial={{ opacity: 0, y: 20, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
-                        style={{
-                            display: 'flex',
-                            gap: '20px',
-                            alignItems: 'flex-end',
-                            marginBottom: '5px',
-                            flexWrap: 'wrap-reverse',
-                            justifyContent: 'flex-end'
-                        }}
+                        className="chatbot-wrapper"
                     >
-                        {/* FAQ Sidebar */}
-                        <motion.div
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            style={{
-                                width: '280px',
-                                maxHeight: '500px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                                backdropFilter: 'blur(15px)',
-                                borderRadius: '25px',
-                                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                                padding: '25px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '12px',
-                                border: '1px solid rgba(255, 255, 255, 0.4)',
-                                overflowY: 'auto'
-                            }}
-                            className="hide-scrollbar"
-                        >
-                            <h4 style={{ margin: '0 0 10px 0', fontSize: '1rem', color: 'var(--color-electric-blue)', fontFamily: 'Bigilla', letterSpacing: '1px' }}>QUICK QUESTIONS</h4>
-                            {faqData.map((faq, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => handleQuestionClick(faq)}
-                                    style={{
-                                        textAlign: 'left',
-                                        background: 'white',
-                                        border: '1px solid #eee',
-                                        padding: '12px 15px',
-                                        borderRadius: '18px',
-                                        fontSize: '0.85rem',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        color: '#444',
-                                        boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
-                                    }}
-                                    onMouseOver={(e) => {
-                                        e.currentTarget.style.borderColor = 'var(--color-electric-blue)';
-                                        e.currentTarget.style.background = 'rgba(0, 74, 173, 0.05)';
-                                        e.currentTarget.style.transform = 'translateX(5px)';
-                                    }}
-                                    onMouseOut={(e) => {
-                                        e.currentTarget.style.borderColor = '#eee';
-                                        e.currentTarget.style.background = 'white';
-                                        e.currentTarget.style.transform = 'translateX(0)';
-                                    }}
-                                >
-                                    {faq.question}
-                                </button>
-                            ))}
-                        </motion.div>
 
-                        {/* Chat Window */}
-                        <div
-                            style={{
-                                width: '380px',
-                                height: '600px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                                backdropFilter: 'blur(25px)',
-                                borderRadius: '35px',
-                                boxShadow: '0 30px 80px rgba(0,0,0,0.18)',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                overflow: 'hidden',
-                                border: '1px solid rgba(255, 255, 255, 0.5)',
-                            }}
-                        >
+
+
+
+                        <div className="chatbot-window" style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', position: 'relative' }}>
                             {/* Header */}
                             <div style={{
-                                padding: '30px 25px',
+                                padding: '20px',
                                 background: 'var(--color-electric-blue)',
                                 color: 'white',
                                 display: 'flex',
@@ -180,15 +112,12 @@ export default function Chatbot() {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                                     <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#4ade80' }}></div>
                                     <div>
-                                        <h3 style={{ margin: 0, fontSize: '1.4rem', fontFamily: 'Bigilla', letterSpacing: '0.5px' }}>Bloom Bot</h3>
-                                        <span style={{ fontSize: '0.75rem', opacity: 0.8, textTransform: 'uppercase', letterSpacing: '1px' }}>Always Growing</span>
+                                        <h3 style={{ margin: 0, fontSize: '1.2rem', fontFamily: 'Bigilla', letterSpacing: '0.5px' }}>Bloom Bot</h3>
                                     </div>
                                 </div>
                                 <button
                                     onClick={() => setIsOpen(false)}
-                                    style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontSize: '2rem', lineHeight: 0.5, transition: 'transform 0.2s' }}
-                                    onMouseOver={(e) => e.currentTarget.style.transform = 'rotate(90deg)'}
-                                    onMouseOut={(e) => e.currentTarget.style.transform = 'rotate(0)'}
+                                    style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontSize: '1.5rem', lineHeight: 0.5 }}
                                 >
                                     ×
                                 </button>
@@ -198,11 +127,11 @@ export default function Chatbot() {
                             <div style={{
                                 flex: 1,
                                 overflowY: 'auto',
-                                padding: '25px',
+                                padding: '20px',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 gap: '15px',
-                                backgroundColor: 'rgba(245, 245, 250, 0.3)'
+                                backgroundColor: '#f5f5fa'
                             }} className="hide-scrollbar">
                                 {messages.map((msg, i) => (
                                     <motion.div
@@ -213,12 +142,12 @@ export default function Chatbot() {
                                             alignSelf: msg.role === 'bot' ? 'flex-start' : 'flex-end',
                                             backgroundColor: msg.role === 'bot' ? 'white' : 'var(--color-electric-blue)',
                                             color: msg.role === 'bot' ? '#222' : 'white',
-                                            padding: '14px 20px',
-                                            borderRadius: msg.role === 'bot' ? '22px 22px 22px 5px' : '22px 22px 5px 22px',
+                                            padding: '12px 16px',
+                                            borderRadius: msg.role === 'bot' ? '12px 12px 12px 2px' : '12px 12px 2px 12px',
                                             maxWidth: '85%',
-                                            fontSize: '0.95rem',
+                                            fontSize: '0.9rem',
                                             lineHeight: 1.5,
-                                            boxShadow: msg.role === 'bot' ? '0 4px 15px rgba(0,0,0,0.05)' : '0 4px 15px rgba(0,74,173,0.15)',
+                                            boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
                                             position: 'relative'
                                         }}
                                     >
@@ -227,43 +156,131 @@ export default function Chatbot() {
                                             <button
                                                 onClick={() => navigate('/contact')}
                                                 style={{
-                                                    marginTop: '15px',
+                                                    marginTop: '10px',
                                                     backgroundColor: 'var(--color-electric-blue)',
                                                     color: 'white',
-                                                    border: '1px solid rgba(255,255,255,0.3)',
-                                                    padding: '10px 18px',
-                                                    borderRadius: '15px',
+                                                    border: 'none',
+                                                    padding: '8px 15px',
+                                                    borderRadius: '20px',
                                                     cursor: 'pointer',
                                                     fontWeight: 'bold',
-                                                    fontSize: '0.85rem',
+                                                    fontSize: '0.8rem',
                                                     width: '100%',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    gap: '8px',
-                                                    transition: 'all 0.2s'
+                                                    display: 'block'
                                                 }}
-                                                onMouseOver={(e) => e.currentTarget.style.filter = 'brightness(1.1)'}
-                                                onMouseOut={(e) => e.currentTarget.style.filter = 'none'}
                                             >
-                                                Start Chatting ×
+                                                Go to Contact
                                             </button>
                                         )}
                                     </motion.div>
                                 ))}
+                                {/* Question Overlay */}
+                                <AnimatePresence>
+                                    {showSidebar && (
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.95 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.95 }}
+                                            transition={{ duration: 0.2 }}
+                                            style={{
+                                                position: 'absolute',
+                                                top: '70px',
+                                                bottom: '60px',
+                                                left: '10px',
+                                                right: '10px',
+                                                backgroundColor: 'white',
+                                                borderRadius: '20px',
+                                                padding: '20px',
+                                                zIndex: 10,
+                                                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                                                border: '1px solid #eee',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                overflowY: 'auto'
+                                            }}
+                                            className="hide-scrollbar"
+                                        >
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                                                <h3 style={{ margin: 0, color: 'var(--color-electric-blue)', fontSize: '1.2rem', fontFamily: 'Bigilla' }}>Common Questions</h3>
+                                                <button onClick={() => setShowSidebar(false)} style={{ color: '#999', fontSize: '1.5rem', background: 'none', border: 'none', cursor: 'pointer' }}>×</button>
+                                            </div>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                                {faqData.map((faq, i) => (
+                                                    <button
+                                                        key={i}
+                                                        onClick={() => {
+                                                            handleQuestionClick(faq);
+                                                            setShowSidebar(false);
+                                                        }}
+                                                        style={{
+                                                            textAlign: 'left',
+                                                            padding: '12px 16px',
+                                                            borderRadius: '12px',
+                                                            border: '1px solid #f0f0f0',
+                                                            background: '#fafafa',
+                                                            fontSize: '0.9rem',
+                                                            color: '#333',
+                                                            cursor: 'pointer',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                        onMouseOver={(e) => {
+                                                            e.currentTarget.style.backgroundColor = 'var(--color-electric-blue)';
+                                                            e.currentTarget.style.color = 'white';
+                                                            e.currentTarget.style.borderColor = 'var(--color-electric-blue)';
+                                                        }}
+                                                        onMouseOut={(e) => {
+                                                            e.currentTarget.style.backgroundColor = '#fafafa';
+                                                            e.currentTarget.style.color = '#333';
+                                                            e.currentTarget.style.borderColor = '#f0f0f0';
+                                                        }}
+                                                    >
+                                                        {faq.question}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                                 <div ref={messagesEndRef} />
                             </div>
 
-                            {/* Footer / Input Area (Reverted to Static) */}
+                            {/* Footer */}
                             <div style={{
-                                padding: '15px 25px',
-                                borderTop: '1px solid rgba(0,0,0,0.06)',
+                                padding: '15px',
+                                borderTop: '1px solid #eee',
                                 backgroundColor: 'white',
-                                textAlign: 'center',
-                                fontSize: '0.85rem',
-                                color: '#888'
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                fontSize: '0.8rem',
+                                color: '#999'
                             }}>
-                                <span style={{ opacity: 0.7 }}>Select a question to start chatting ✨</span>
+                                <button
+                                    onClick={() => setShowSidebar(!showSidebar)}
+                                    style={{
+                                        background: showSidebar ? 'var(--color-electric-blue)' : 'white',
+                                        border: '2px solid var(--color-electric-blue)',
+                                        borderRadius: '12px',
+                                        width: '40px',
+                                        height: '40px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        cursor: 'pointer',
+                                        color: showSidebar ? 'white' : 'var(--color-electric-blue)',
+                                        transition: 'all 0.2s',
+                                        fontWeight: 'bold',
+                                        fontSize: '1rem',
+                                        fontFamily: 'var(--font-brand)'
+                                    }}
+                                    title="Show/Hide Questions"
+                                    onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#f0f0f5'; }}
+                                    onMouseOut={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                                >
+                                    {showSidebar ? '«' : 'Ask Bloom'}
+                                </button>
+                                <span style={{ opacity: 0.7 }}>Powered by Bloom Branding</span>
+                                <div style={{ width: '30px' }}></div> {/* Spacer for balance */}
                             </div>
                         </div>
                     </motion.div>
@@ -289,11 +306,13 @@ export default function Chatbot() {
                     justifyContent: 'center',
                     fontSize: '30px',
                     zIndex: 1001,
-                    position: 'relative'
+                    position: 'fixed',
+                    right: '20px',
+                    bottom: '20px'
                 }}
             >
                 {isOpen ? '×' : '💬'}
             </motion.button>
-        </div>
+        </div >
     );
 }

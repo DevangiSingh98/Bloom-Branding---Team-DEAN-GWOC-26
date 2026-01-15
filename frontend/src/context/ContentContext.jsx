@@ -164,11 +164,14 @@ export const ContentProvider = ({ children }) => {
         return { ...defaultContent, ...parsed };
     });
 
+    // Use environment variable for API URL, fallback to localhost for dev
+    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
     // 1. Fetch live projects from MongoDB on mount
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/projects');
+                const response = await fetch(`${API_BASE_URL}/api/projects`);
                 if (response.ok) {
                     const projects = await response.json();
                     if (projects && projects.length > 0) {
@@ -185,7 +188,7 @@ export const ContentProvider = ({ children }) => {
                 }
 
                 // Fetch Hero
-                const hResponse = await fetch('http://localhost:5000/api/hero');
+                const hResponse = await fetch(`${API_BASE_URL}/api/hero`);
                 if (hResponse.ok) {
                     const hero = await hResponse.json();
                     if (hero && hero.subtitle) {
@@ -193,20 +196,8 @@ export const ContentProvider = ({ children }) => {
                     }
                 }
 
-                // Fetch Testimonials
-                /* 
-                const tResponse = await fetch('http://localhost:5000/api/testimonials');
-                if (tResponse.ok) {
-                    const testimonials = await tResponse.json();
-                    if (testimonials && testimonials.length > 0) {
-                        const mappedTestimonials = testimonials.map(t => ({ ...t, id: t._id }));
-                        setContent(prev => ({ ...prev, testimonials: mappedTestimonials }));
-                    }
-                }
-                */
-
                 // Fetch Instagram
-                const iResponse = await fetch('http://localhost:5000/api/instagram');
+                const iResponse = await fetch(`${API_BASE_URL}/api/instagram`);
                 if (iResponse.ok) {
                     const insta = await iResponse.json();
                     if (insta && insta.length > 0) {
@@ -216,7 +207,7 @@ export const ContentProvider = ({ children }) => {
                 }
 
                 // Fetch Founders
-                const fResponse = await fetch('http://localhost:5000/api/founders');
+                const fResponse = await fetch(`${API_BASE_URL}/api/founders`);
                 if (fResponse.ok) {
                     const foundersArr = await fResponse.json();
                     console.log("Fetched Founders:", foundersArr);
@@ -232,7 +223,7 @@ export const ContentProvider = ({ children }) => {
                 }
 
                 // Fetch Values
-                const vResponse = await fetch('http://localhost:5000/api/values');
+                const vResponse = await fetch(`${API_BASE_URL}/api/values`);
                 if (vResponse.ok) {
                     const values = await vResponse.json();
                     if (values && values.length > 0) {
@@ -242,7 +233,7 @@ export const ContentProvider = ({ children }) => {
                 }
 
                 // Fetch Brands
-                const cResponse = await fetch('http://localhost:5000/api/brands');
+                const cResponse = await fetch(`${API_BASE_URL}/api/brands`);
                 if (cResponse.ok) {
                     const brands = await cResponse.json();
                     if (brands && brands.length > 0) {
@@ -252,7 +243,7 @@ export const ContentProvider = ({ children }) => {
                 }
 
                 // Fetch Selected Work
-                const wResponse = await fetch('http://localhost:5000/api/selected-work');
+                const wResponse = await fetch(`${API_BASE_URL}/api/selected-work`);
                 if (wResponse.ok) {
                     const work = await wResponse.json();
                     if (work && work.length > 0) {
@@ -330,7 +321,7 @@ export const ContentProvider = ({ children }) => {
         }));
         // Sync to backend
         try {
-            await fetch('http://localhost:5000/api/hero', {
+            await fetch(`${API_BASE_URL}/api/hero`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...content.hero, ...updates })
@@ -371,7 +362,7 @@ export const ContentProvider = ({ children }) => {
 
     const addEnquiry = async (enquiry) => {
         try {
-            const response = await fetch('http://localhost:5000/api/messages', {
+            const response = await fetch(`${API_BASE_URL}/api/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(enquiry)
@@ -393,7 +384,7 @@ export const ContentProvider = ({ children }) => {
     const removeEnquiry = async (id, token) => {
         if (!id || !token) return;
         try {
-            const res = await fetch(`http://localhost:5000/api/messages/${id}`, {
+            const res = await fetch(`${API_BASE_URL}/api/messages/${id}`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -409,7 +400,7 @@ export const ContentProvider = ({ children }) => {
     const removeEnquiries = async (ids, token) => {
         if (!ids || ids.length === 0 || !token) return;
         try {
-            const res = await fetch(`http://localhost:5000/api/messages`, {
+            const res = await fetch(`${API_BASE_URL}/api/messages`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -429,7 +420,7 @@ export const ContentProvider = ({ children }) => {
     const removeAllEnquiries = async (token) => {
         if (!token) return;
         try {
-            const res = await fetch(`http://localhost:5000/api/messages`, {
+            const res = await fetch(`${API_BASE_URL}/api/messages`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -448,12 +439,10 @@ export const ContentProvider = ({ children }) => {
     };
 
     const resetFounders = () => {
-        // Copy defaults from fetched state (keys: left_default, right_default, main_default)
-        // to active keys: left, right, main
         const defaults = {
-            left: { ...content.founders.left_default, key: 'left' },
-            right: { ...content.founders.right_default, key: 'right' },
-            main: { ...content.founders.main_default, key: 'main' }
+            left: { ...defaultContent.founders.left, key: 'left' },
+            right: { ...defaultContent.founders.right, key: 'right' },
+            main: { ...defaultContent.founders.main, key: 'main' }
         };
 
         setContent(prev => ({
@@ -487,8 +476,8 @@ export const ContentProvider = ({ children }) => {
             };
 
             const url = project._id
-                ? `http://localhost:5000/api/projects/${project._id}`
-                : 'http://localhost:5000/api/projects';
+                ? `${API_BASE_URL}/api/projects/${project._id}`
+                : `${API_BASE_URL}/api/projects`;
 
             const method = project._id ? 'PUT' : 'POST'; // Assuming PUT exists for update
 
@@ -519,7 +508,7 @@ export const ContentProvider = ({ children }) => {
     const removeProject = async (id) => {
         if (!id) return;
         try {
-            const response = await fetch(`http://localhost:5000/api/projects/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/api/projects/${id}`, {
                 method: 'DELETE'
             });
             return response.ok;
@@ -530,7 +519,7 @@ export const ContentProvider = ({ children }) => {
 
     const syncTestimonial = async (t) => {
         try {
-            const url = t._id ? `http://localhost:5000/api/testimonials/${t._id}` : 'http://localhost:5000/api/testimonials';
+            const url = t._id ? `${API_BASE_URL}/api/testimonials/${t._id}` : `${API_BASE_URL}/api/testimonials`;
             const method = t._id ? 'PUT' : 'POST';
             const response = await fetch(url, {
                 method,
@@ -555,13 +544,13 @@ export const ContentProvider = ({ children }) => {
     const removeTestimonial = async (id) => {
         if (!id) return;
         try {
-            await fetch(`http://localhost:5000/api/testimonials/${id}`, { method: 'DELETE' });
+            await fetch(`${API_BASE_URL}/api/testimonials/${id}`, { method: 'DELETE' });
         } catch (e) { console.error(e); }
     };
 
     const syncInstagram = async (post) => {
         try {
-            const url = post._id ? `http://localhost:5000/api/instagram/${post._id}` : 'http://localhost:5000/api/instagram';
+            const url = post._id ? `${API_BASE_URL}/api/instagram/${post._id}` : `${API_BASE_URL}/api/instagram`;
             const method = post._id ? 'PUT' : 'POST';
             const response = await fetch(url, {
                 method,
@@ -586,13 +575,13 @@ export const ContentProvider = ({ children }) => {
     const removeInstagram = async (id) => {
         if (!id) return;
         try {
-            await fetch(`http://localhost:5000/api/instagram/${id}`, { method: 'DELETE' });
+            await fetch(`${API_BASE_URL}/api/instagram/${id}`, { method: 'DELETE' });
         } catch (e) { console.error(e); }
     };
 
     const syncFounder = async (f, token) => {
         try {
-            const url = f._id ? `http://localhost:5000/api/founders/${f._id}` : 'http://localhost:5000/api/founders';
+            const url = f._id ? `${API_BASE_URL}/api/founders/${f._id}` : `${API_BASE_URL}/api/founders`;
             const response = await fetch(url, {
                 method: f._id ? 'PUT' : 'POST',
                 headers: {
@@ -617,12 +606,12 @@ export const ContentProvider = ({ children }) => {
 
     const removeFounder = async (id) => {
         if (!id) return;
-        try { await fetch(`http://localhost:5000/api/founders/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+        try { await fetch(`${API_BASE_URL}/api/founders/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
     };
 
     const syncValue = async (v) => {
         try {
-            const url = v._id ? `http://localhost:5000/api/values/${v._id}` : 'http://localhost:5000/api/values';
+            const url = v._id ? `${API_BASE_URL}/api/values/${v._id}` : `${API_BASE_URL}/api/values`;
             const response = await fetch(url, {
                 method: v._id ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -642,13 +631,13 @@ export const ContentProvider = ({ children }) => {
 
     const removeValue = async (id) => {
         if (!id) return;
-        try { await fetch(`http://localhost:5000/api/values/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+        try { await fetch(`${API_BASE_URL}/api/values/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
     };
 
     const syncBrand = async (c) => {
         console.log("Syncing Brand:", c); // Debug log
         try {
-            const url = c._id ? `http://localhost:5000/api/brands/${c._id}` : 'http://localhost:5000/api/brands';
+            const url = c._id ? `${API_BASE_URL}/api/brands/${c._id}` : `${API_BASE_URL}/api/brands`;
             console.log("Sync URL:", url, "Method:", c._id ? 'PUT' : 'POST');
 
             const response = await fetch(url, {
@@ -679,12 +668,12 @@ export const ContentProvider = ({ children }) => {
 
     const removeBrand = async (id) => {
         if (!id) return;
-        try { await fetch('http://localhost:5000/api/brands/' + id, { method: 'DELETE' }); } catch (e) { console.error(e); }
+        try { await fetch(`${API_BASE_URL}/api/brands/` + id, { method: 'DELETE' }); } catch (e) { console.error(e); }
     };
 
     const syncSelectedWork = async (w) => {
         try {
-            const url = w._id ? `http://localhost:5000/api/selected-work/${w._id}` : 'http://localhost:5000/api/selected-work';
+            const url = w._id ? `${API_BASE_URL}/api/selected-work/${w._id}` : `${API_BASE_URL}/api/selected-work`;
             const response = await fetch(url, {
                 method: w._id ? 'PUT' : 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -704,7 +693,7 @@ export const ContentProvider = ({ children }) => {
 
     const removeSelectedWork = async (id) => {
         if (!id) return;
-        try { await fetch(`http://localhost:5000/api/selected-work/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+        try { await fetch(`${API_BASE_URL}/api/selected-work/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
     };
 
     return (

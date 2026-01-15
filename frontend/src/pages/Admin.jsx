@@ -12,6 +12,13 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
             setFileName(file.name);
             const reader = new FileReader();
             reader.onloadend = () => {
+                // If it's a video, don't try to compress with canvas (image only)
+                if (type === 'video') {
+                    onFileSelect(reader.result);
+                    return;
+                }
+
+                // Image compression logic
                 const img = new Image();
                 img.src = reader.result;
                 img.onload = () => {
@@ -48,7 +55,7 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
     return (
         <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', fontSize: '1.1rem', marginBottom: '0.5rem', color: '#666' }}>{label}</label>
-            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <div className="file-upload-container" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'nowrap' }}>
                 <div style={{
                     width: '60px',
                     height: '60px',
@@ -79,39 +86,54 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
                     ref={fileInputRef}
                     style={{ display: 'none' }}
                 />
-                <button
-                    onClick={() => fileInputRef.current.click()}
-                    style={{
-                        padding: '0.6rem 1rem',
-                        fontSize: '1rem',
-                        border: '1px solid #ccc',
-                        borderRadius: '4px',
-                        backgroundColor: '#f0f0f0',
-                        cursor: 'pointer'
-                    }}
-                >
-                    {value ? 'Change File' : 'Choose File'}
-                </button>
-                {value && (
+                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                     <button
-                        onClick={() => {
-                            setFileName("No file chosen");
-                            if (onRemove) onRemove();
-                        }}
+                        className="admin-upload-btn"
+                        onClick={() => fileInputRef.current.click()}
                         style={{
-                            padding: '0.6rem 1rem',
-                            fontSize: '1rem',
-                            border: '1px solid #ff4d4f',
+                            padding: '0.5rem 0.8rem',
+                            fontSize: '0.85rem',
+                            border: '1px solid #ccc',
                             borderRadius: '4px',
-                            backgroundColor: '#fff',
-                            color: '#ff4d4f',
-                            cursor: 'pointer'
+                            backgroundColor: '#f0f0f0',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap'
                         }}
                     >
-                        Remove
+                        {value ? 'Change' : 'Choose File'}
                     </button>
-                )}
-                <span style={{ fontSize: '1rem', color: '#555' }}>{fileName}</span>
+                    {(value || type === 'video') && (
+                        <button
+                            className="admin-remove-btn"
+                            disabled={!value}
+                            onClick={() => {
+                                setFileName("No file chosen");
+                                if (onRemove) onRemove();
+                            }}
+                            title="Remove File"
+                            style={{
+                                padding: '0.5rem',
+                                width: '32px',
+                                height: '32px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '1rem',
+                                border: `1px solid ${value ? '#ff4d4f' : '#ccc'}`,
+                                borderRadius: '4px',
+                                backgroundColor: 'transparent',
+                                color: value ? '#ff4d4f' : '#ccc',
+                                cursor: value ? 'pointer' : 'not-allowed'
+                            }}
+                        >
+                            ✕
+                        </button>
+                    )}
+                </div>
+            </div>
+            {/* Show filename below with truncation */}
+            <div className="truncate-text" style={{ fontSize: '0.85rem', color: '#888', marginTop: '0.5rem', width: '100%' }}>
+                {fileName}
             </div>
         </div>
     );
@@ -139,17 +161,44 @@ const CustomModal = ({ show, title, message, type = 'info', onConfirm, onCancel,
                 initial={{ scale: 0.9, y: 20, opacity: 0 }}
                 animate={{ scale: 1, y: 0, opacity: 1 }}
                 exit={{ scale: 0.9, y: 20, opacity: 0 }}
+                className="modal-content"
                 style={{
                     backgroundColor: 'white',
-                    padding: '2.5rem',
                     borderRadius: '24px',
                     maxWidth: '450px',
                     width: '90%',
                     textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
                     boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
-                    border: '1px solid #eee'
+                    border: '1px solid #eee',
+                    position: 'relative'
                 }}
             >
+                <button
+                    onClick={onCancel}
+                    style={{
+                        position: 'absolute',
+                        top: '1rem',
+                        right: '1rem',
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '1.2rem',
+                        cursor: 'pointer',
+                        color: '#999',
+                        padding: '5px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '50%',
+                        transition: 'background-color 0.2s'
+                    }}
+                    onMouseEnter={e => e.target.style.backgroundColor = '#f5f5f5'}
+                    onMouseLeave={e => e.target.style.backgroundColor = 'transparent'}
+                >
+                    ✕
+                </button>
                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
                     {type === 'confirm' ? '❓' : type === 'success' ? '✨' : '⚠️'}
                 </div>
@@ -159,7 +208,7 @@ const CustomModal = ({ show, title, message, type = 'info', onConfirm, onCancel,
                     color: 'var(--color-electric-blue)',
                     fontFamily: 'Bigilla, serif'
                 }}>{title}</h3>
-                <p style={{ color: '#666', lineHeight: 1.6, marginBottom: '2rem', fontSize: '1.1rem' }}>{message}</p>
+                <p style={{ color: '#666', lineHeight: 1.6, marginBottom: '2rem', fontSize: '1.1rem', textAlign: 'center' }}>{message}</p>
                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
                     {type === 'confirm' && (
                         <button
@@ -194,7 +243,7 @@ const CustomModal = ({ show, title, message, type = 'info', onConfirm, onCancel,
                     </button>
                 </div>
             </motion.div>
-        </motion.div>
+        </motion.div >
     );
 };
 
@@ -289,7 +338,7 @@ const Admin = () => {
         setIsLoading(true);
 
         try {
-            const res = await fetch('http://localhost:5000/api/users/forgotpassword', {
+            const res = await fetch(`${API_URL}/api/users/forgotpassword`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: resetEmail })
@@ -320,7 +369,7 @@ const Admin = () => {
 
         setIsLoading(true);
         try {
-            const res = await fetch('http://localhost:5000/api/users/resetpassword', {
+            const res = await fetch(`${API_URL}/api/users/resetpassword`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -420,7 +469,7 @@ const Admin = () => {
         if (activeTab === 'enquiries' && userInfo && userInfo.token) {
             const fetchEnquiries = async () => {
                 try {
-                    const res = await fetch('http://localhost:5000/api/messages', {
+                    const res = await fetch(`${API_URL}/api/messages`, {
                         headers: {
                             Authorization: `Bearer ${userInfo.token}`
                         }
@@ -475,11 +524,13 @@ const Admin = () => {
         showAlert(title, message, 'confirm', onConfirm, confirmText, confirmColor);
     };
 
+    const API_URL = import.meta.env.VITE_API_URL || 'https://bloom-backend-pq68.onrender.com';
+
     const handleLogin = async (e) => {
         e.preventDefault();
         setAuthError('');
         try {
-            const res = await fetch('http://localhost:5000/api/users/login', {
+            const res = await fetch(`${API_URL}/api/users/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(loginData)
@@ -518,42 +569,42 @@ const Admin = () => {
                     // Sync All Projects
                     if (content.allProjects) {
                         for (const item of content.allProjects) {
-                            if (!item._id) await syncProject(item);
+                            await syncProject(item);
                         }
                     }
 
                     // Sync Selected Work (Projects on Work page)
                     if (content.selectedWork) {
                         for (const item of content.selectedWork) {
-                            if (!item._id) await syncSelectedWork(item);
+                            await syncSelectedWork(item);
                         }
                     }
 
                     // Sync Testimonials
                     if (content.testimonials) {
                         for (const item of content.testimonials) {
-                            if (!item._id) await syncTestimonial(item);
+                            await syncTestimonial(item);
                         }
                     }
 
                     // Sync Instagram
                     if (content.instagram) {
                         for (const item of content.instagram) {
-                            if (!item._id) await syncInstagram(item);
+                            await syncInstagram(item);
                         }
                     }
 
                     // Sync Values
                     if (content.values) {
                         for (const item of content.values) {
-                            if (!item._id) await syncValue(item);
+                            await syncValue(item);
                         }
                     }
 
                     // Sync Brands
                     if (content.brandLogos) {
                         for (const item of content.brandLogos) {
-                            if (!item._id) await syncBrand(item);
+                            await syncBrand(item);
                         }
                     }
 
@@ -718,14 +769,12 @@ const Admin = () => {
                     initial={{ opacity: 0, scale: 0.95, y: 10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    className="admin-login-container"
                     style={{
                         background: 'rgba(255, 255, 255, 0.85)',
                         backdropFilter: 'blur(12px)',
-                        padding: '3.5rem',
                         borderRadius: '24px',
                         boxShadow: '0 20px 50px -12px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.05)',
-                        width: '100%',
-                        maxWidth: '460px',
                         border: '1px solid rgba(255,255,255,0.6)',
                         position: 'relative',
                         overflow: 'hidden'
@@ -734,7 +783,7 @@ const Admin = () => {
                     <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '4px', background: 'linear-gradient(90deg, var(--color-electric-blue), #4ecdc4)' }} />
 
                     <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                        <h2 style={{ fontFamily: 'Bigilla, serif', fontSize: '3rem', marginBottom: '0.5rem', color: '#1a1a1a', letterSpacing: '-0.02em' }}>
+                        <h2 className="admin-login-title">
                             {forgotStep === 1 ? 'Forgot Password' : forgotStep === 2 ? 'Reset Access' : 'Admin Access'}
                         </h2>
                         <p style={{ fontFamily: 'var(--font-body)', color: '#666', fontSize: '1.2rem' }}>
@@ -908,14 +957,14 @@ const Admin = () => {
                 )}
             </AnimatePresence>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ color: 'var(--color-electric-blue)', margin: 0, fontSize: '3rem' }}>Admin Dashboard</h1>
-                <span style={{ fontSize: '0.9rem', color: 'green', backgroundColor: '#e6fffa', padding: '0.5rem 1rem', borderRadius: '20px', border: '1px solid #b2f5ea' }}>
+            <div className="admin-header-container">
+                <h1 className="admin-header-title">Admin Dashboard</h1>
+                <span className="admin-saved-message">
                     ✓ Changes auto-saved to Database
                 </span>
             </div>
 
-            <div style={{ display: 'flex', gap: '0.8rem', marginBottom: '2rem', alignItems: 'center', overflowX: 'auto', paddingBottom: '0.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="admin-tabs-container">
                 {['enquiries', 'projects', 'selected work', 'founder', 'testimonials', 'instagram', 'brands'].map(tab => (
                     <button
                         key={tab}
@@ -1037,113 +1086,145 @@ const Admin = () => {
                         {(!content.enquiries || content.enquiries.length === 0) ? (
                             <p style={{ color: '#666', fontStyle: 'italic', fontSize: '1.2rem' }}>No enquiries received yet.</p>
                         ) : (
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead style={{ backgroundColor: '#f9f9f9', borderBottom: '2px solid #eee' }}>
-                                    <tr>
-                                        <th style={{ padding: '1rem', width: '40px', textAlign: 'center' }}>
-                                            <input
-                                                type="checkbox"
-                                                onChange={handleSelectAll}
-                                                checked={content.enquiries.length > 0 && selectedEnquiries.size === content.enquiries.length}
-                                                style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
-                                            />
-                                        </th>
-                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Date</th>
-                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Name</th>
-                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Email</th>
-                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Service</th>
-                                        <th style={{ padding: '1rem', textAlign: 'right' }}>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {content.enquiries.map((item) => (
-                                        <React.Fragment key={item.id}>
-                                            <tr style={{ borderBottom: '1px solid #eee', backgroundColor: selectedEnquiries.has(item.id) ? '#e6f7ff' : 'transparent' }}>
-                                                <td style={{ padding: '1rem', textAlign: 'center' }}>
+                            <>
+                                <div className="desktop-table">
+                                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                        <thead style={{ backgroundColor: '#f9f9f9', borderBottom: '2px solid #eee' }}>
+                                            <tr>
+                                                <th style={{ padding: '1rem', width: '40px', textAlign: 'center' }}>
                                                     <input
                                                         type="checkbox"
-                                                        checked={selectedEnquiries.has(item.id)}
-                                                        onChange={() => toggleSelect(item.id)}
+                                                        onChange={handleSelectAll}
+                                                        checked={content.enquiries.length > 0 && selectedEnquiries.size === content.enquiries.length}
                                                         style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
                                                     />
-                                                </td>
-                                                <td style={{ padding: '1rem' }}>
-                                                    {item.date}
-                                                    <div style={{ fontSize: '0.8rem', color: '#999' }}>{item.time}</div>
-                                                </td>
-                                                <td style={{ padding: '1rem', fontWeight: 'bold' }}>{item.name}</td>
-                                                <td style={{ padding: '1rem' }}>{item.email}</td>
-                                                <td style={{ padding: '1rem' }}>{item.service}</td>
-                                                <td style={{ padding: '1rem', textAlign: 'right' }}>
-                                                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                                                        <button
-                                                            onClick={() => setOpenEnquiryId(openEnquiryId === item.id ? null : item.id)}
-                                                            style={{
-                                                                padding: '0.4rem 0.8rem',
-                                                                backgroundColor: 'transparent',
-                                                                color: 'var(--color-electric-blue)',
-                                                                border: '1px solid var(--color-electric-blue)',
-                                                                borderRadius: '4px',
-                                                                cursor: 'pointer',
-                                                                fontSize: '0.85rem',
-                                                                transition: 'all 0.2s'
-                                                            }}
-                                                            onMouseEnter={e => {
-                                                                e.target.style.backgroundColor = 'var(--color-electric-blue)';
-                                                                e.target.style.color = '#fff';
-                                                            }}
-                                                            onMouseLeave={e => {
-                                                                e.target.style.backgroundColor = 'transparent';
-                                                                e.target.style.color = 'var(--color-electric-blue)';
-                                                            }}
-                                                        >
-                                                            {openEnquiryId === item.id ? 'Close' : 'View'}
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDeleteEnquiry(item.id)}
-                                                            style={{
-                                                                padding: '0.4rem 0.8rem',
-                                                                backgroundColor: 'transparent',
-                                                                color: '#ff4d4f',
-                                                                border: '1px solid #ff4d4f',
-                                                                borderRadius: '4px',
-                                                                cursor: 'pointer',
-                                                                fontSize: '0.85rem',
-                                                                transition: 'all 0.2s'
-                                                            }}
-                                                            onMouseEnter={e => {
-                                                                e.target.style.backgroundColor = '#ff4d4f';
-                                                                e.target.style.color = '#fff';
-                                                            }}
-                                                            onMouseLeave={e => {
-                                                                e.target.style.backgroundColor = 'transparent';
-                                                                e.target.style.color = '#ff4d4f';
-                                                            }}
-                                                        >
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </td>
+                                                </th>
+                                                <th style={{ padding: '1rem', textAlign: 'left' }}>Date</th>
+                                                <th style={{ padding: '1rem', textAlign: 'left' }}>Name</th>
+                                                <th style={{ padding: '1rem', textAlign: 'left' }}>Email</th>
+                                                <th style={{ padding: '1rem', textAlign: 'left' }}>Service</th>
+                                                <th style={{ padding: '1rem', textAlign: 'right' }}>Actions</th>
                                             </tr>
-                                            {openEnquiryId === item.id && (
-                                                <tr style={{ backgroundColor: '#f0f4f8' }}>
-                                                    <td colSpan="6" style={{ padding: '1.5rem' }}>
-                                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                                            <div><strong>Company:</strong> {item.company || 'N/A'}</div>
-                                                            <div><strong>Budget:</strong> {item.budget || 'N/A'}</div>
-                                                            <div><strong>Timeline:</strong> {item.timeline || 'N/A'}</div>
-                                                            <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
-                                                                <strong>Message:</strong>
-                                                                <p style={{ marginTop: '0.5rem', lineHeight: '1.6', backgroundColor: '#fff', padding: '1rem', borderRadius: '4px' }}>{item.message}</p>
+                                        </thead>
+                                        <tbody>
+                                            {content.enquiries.map((item) => (
+                                                <React.Fragment key={item.id}>
+                                                    <tr style={{ borderBottom: '1px solid #eee', backgroundColor: selectedEnquiries.has(item.id) ? '#e6f7ff' : 'transparent' }}>
+                                                        <td style={{ padding: '1rem', textAlign: 'center' }}>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectedEnquiries.has(item.id)}
+                                                                onChange={() => toggleSelect(item.id)}
+                                                                style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
+                                                            />
+                                                        </td>
+                                                        <td style={{ padding: '1rem' }}>
+                                                            {item.date}
+                                                            <div style={{ fontSize: '0.8rem', color: '#999' }}>{item.time}</div>
+                                                        </td>
+                                                        <td style={{ padding: '1rem', fontWeight: 'bold' }}>{item.name}</td>
+                                                        <td style={{ padding: '1rem' }}>{item.email}</td>
+                                                        <td style={{ padding: '1rem' }}>{item.service}</td>
+                                                        <td style={{ padding: '1rem', textAlign: 'right' }}>
+                                                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                                <button
+                                                                    onClick={() => setOpenEnquiryId(openEnquiryId === item.id ? null : item.id)}
+                                                                    style={{
+                                                                        padding: '0.4rem 0.8rem',
+                                                                        backgroundColor: 'transparent',
+                                                                        color: 'var(--color-electric-blue)',
+                                                                        border: '1px solid var(--color-electric-blue)',
+                                                                        borderRadius: '4px',
+                                                                        cursor: 'pointer',
+                                                                        fontSize: '0.85rem',
+                                                                        transition: 'all 0.2s'
+                                                                    }}
+                                                                >
+                                                                    {openEnquiryId === item.id ? 'Close' : 'View'}
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDeleteEnquiry(item.id)}
+                                                                    style={{
+                                                                        padding: '0.4rem 0.8rem',
+                                                                        backgroundColor: 'transparent',
+                                                                        color: '#ff4d4f',
+                                                                        border: '1px solid #ff4d4f',
+                                                                        borderRadius: '4px',
+                                                                        cursor: 'pointer',
+                                                                        fontSize: '0.85rem',
+                                                                        transition: 'all 0.2s'
+                                                                    }}
+                                                                >
+                                                                    Delete
+                                                                </button>
                                                             </div>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                                        </td>
+                                                    </tr>
+                                                    {openEnquiryId === item.id && (
+                                                        <tr style={{ backgroundColor: '#f0f4f8' }}>
+                                                            <td colSpan="6" style={{ padding: '1.5rem' }}>
+                                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                                                    <div><strong>Company:</strong> {item.company || 'N/A'}</div>
+                                                                    <div><strong>Budget:</strong> {item.budget || 'N/A'}</div>
+                                                                    <div><strong>Timeline:</strong> {item.timeline || 'N/A'}</div>
+                                                                    <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
+                                                                        <strong>Message:</strong>
+                                                                        <p style={{ marginTop: '0.5rem', lineHeight: '1.6', backgroundColor: '#fff', padding: '1rem', borderRadius: '4px' }}>{item.message}</p>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    )}
+                                                </React.Fragment>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div className="mobile-cards">
+                                    {content.enquiries.map((item) => (
+                                        <div key={item.id} className="mobile-card">
+                                            <div className="mobile-card-row">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedEnquiries.has(item.id)}
+                                                    onChange={() => toggleSelect(item.id)}
+                                                    style={{ transform: 'scale(1.2)' }}
+                                                />
+                                                <div style={{ fontSize: '0.9rem', color: '#999' }}>{item.date} {item.time}</div>
+                                            </div>
+                                            <div className="mobile-card-row">
+                                                <div className="mobile-card-label">Name:</div>
+                                                <div>{item.name}</div>
+                                            </div>
+                                            <div className="mobile-card-row">
+                                                <div className="mobile-card-label">Service:</div>
+                                                <div>{item.service}</div>
+                                            </div>
+                                            <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                                <button onClick={() => setOpenEnquiryId(openEnquiryId === item.id ? null : item.id)} style={{ padding: '0.5rem', border: '1px solid var(--color-electric-blue)', borderRadius: '4px', color: 'var(--color-electric-blue)', background: 'transparent' }}>
+                                                    {openEnquiryId === item.id ? 'Close' : 'View'}
+                                                </button>
+                                                <button onClick={() => handleDeleteEnquiry(item.id)} style={{ padding: '0.5rem', border: '1px solid #ff4d4f', borderRadius: '4px', color: '#ff4d4f', background: 'transparent' }}>
+                                                    Delete
+                                                </button>
+                                            </div>
+                                            {openEnquiryId === item.id && (
+                                                <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#f0f4f8', borderRadius: '4px' }}>
+                                                    <div><strong>Email:</strong> {item.email}</div>
+                                                    <div><strong>Company:</strong> {item.company || 'N/A'}</div>
+                                                    <div><strong>Budget:</strong> {item.budget || 'N/A'}</div>
+                                                    <div><strong>Timeline:</strong> {item.timeline || 'N/A'}</div>
+                                                    <div style={{ marginTop: '0.5rem' }}>
+                                                        <strong>Message:</strong>
+                                                        <p style={{ backgroundColor: 'white', padding: '0.5rem' }}>{item.message}</p>
+                                                    </div>
+                                                </div>
                                             )}
-                                        </React.Fragment>
+                                        </div>
                                     ))}
-                                </tbody>
-                            </table>
+                                </div>
+                            </>
                         )}
                     </div>
                 )}
@@ -1178,7 +1259,7 @@ const Admin = () => {
                                     placeholder="Project Description"
                                     style={{ width: '100%', padding: '0.8rem', marginBottom: '0.5rem', minHeight: '80px', fontSize: '1.15rem', fontFamily: 'inherit' }}
                                 />
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div className="admin-dual-grid">
                                     <FileUpload
                                         label="Project Image"
                                         value={item.image}
@@ -1242,7 +1323,7 @@ const Admin = () => {
                                     />
                                     <button onClick={() => deleteItem(index, 'work')} style={{ color: '#5D4037' }}>X</button>
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div className="admin-dual-grid">
                                     <FileUpload
                                         label="Override Image"
                                         value={item.image}
@@ -1269,11 +1350,14 @@ const Admin = () => {
                         {content.testimonials.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ marginBottom: '1rem' }}>
-                                    <label style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem', color: '#666' }}>Testimonial Text</label>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                                        <label style={{ fontSize: '1.15rem', color: '#666' }}>Testimonial Text</label>
+                                        <button onClick={() => deleteItem(index, 'testimonials')} style={{ color: '#ff4d4f', padding: '0.2rem 0.5rem', border: '1px solid #ff4d4f', borderRadius: '4px', background: 'transparent', cursor: 'pointer', fontSize: '0.9rem' }}>Remove</button>
+                                    </div>
                                     <textarea value={item.text} onChange={(e) => handleArrayChange(index, 'text', e.target.value, 'testimonials')} placeholder="Testimonial Text" style={{ width: '100%', padding: '0.8rem', minHeight: '80px', fontSize: '1.15rem', fontFamily: 'inherit' }} />
                                 </div>
 
-                                <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                                <div className="admin-flex-row" style={{ marginBottom: '1rem' }}>
                                     <div style={{ flex: 1 }}>
                                         <label style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem', color: '#666' }}>Reviewer Name</label>
                                         <input value={item.author} onChange={(e) => handleArrayChange(index, 'author', e.target.value, 'testimonials')} placeholder="Author" style={{ width: '100%', padding: '0.8rem', fontSize: '1.15rem' }} />
@@ -1281,9 +1365,6 @@ const Admin = () => {
                                     <div style={{ width: '100px' }}>
                                         <label style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem', color: '#666' }}>Rating (1-5)</label>
                                         <input type="number" max="5" min="1" value={item.rating} onChange={(e) => handleArrayChange(index, 'rating', parseInt(e.target.value), 'testimonials')} placeholder="Rating" style={{ width: '100%', padding: '0.8rem', fontSize: '1.15rem' }} />
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                                        <button onClick={() => deleteItem(index, 'testimonials')} style={{ color: '#5D4037', padding: '0.5rem' }}>Remove</button>
                                     </div>
                                 </div>
 
@@ -1298,8 +1379,29 @@ const Admin = () => {
                     <div>
                         <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Instagram Content</h2>
                         {content.instagram.map((item, index) => (
-                            <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px', display: 'flex', gap: '1rem' }}>
-                                <div style={{ flex: 1 }}>
+                            <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px', position: 'relative' }}>
+                                <button
+                                    onClick={() => deleteItem(index, 'instagram')}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '10px',
+                                        right: '10px',
+                                        color: '#ff4d4f',
+                                        border: '1px solid #ff4d4f',
+                                        borderRadius: '50%',
+                                        width: '30px',
+                                        height: '30px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        background: 'transparent',
+                                        cursor: 'pointer',
+                                        zIndex: 10
+                                    }}
+                                >
+                                    ✕
+                                </button>
+                                <div style={{ marginBottom: '1rem', paddingRight: '40px' }}>
                                     <FileUpload
                                         label="Thumbnail"
                                         value={item.image}
@@ -1307,11 +1409,10 @@ const Admin = () => {
                                         onRemove={() => handleArrayChange(index, 'image', '', 'instagram')}
                                     />
                                 </div>
-                                <div style={{ flex: 1 }}>
-                                    <label>Link</label>
-                                    <input value={item.link} onChange={(e) => handleArrayChange(index, 'link', e.target.value, 'instagram')} placeholder="Link URL" style={{ width: '100%', padding: '0.5rem' }} />
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>Link</label>
+                                    <input value={item.link} onChange={(e) => handleArrayChange(index, 'link', e.target.value, 'instagram')} placeholder="Link URL" style={{ width: '100%', padding: '0.8rem', border: '1px solid #eee', borderRadius: '4px' }} />
                                 </div>
-                                <button onClick={() => deleteItem(index, 'instagram')} style={{ color: '#5D4037' }}>X</button>
                             </div >
                         ))}
                         <button onClick={() => addItem('instagram')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add Post</button>
@@ -1322,9 +1423,19 @@ const Admin = () => {
                     <div>
                         <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Manage Brand Logos</h2>
                         {content.brandLogos && content.brandLogos.map((item, index) => (
-                            <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
-                                <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
+                            <div key={item.id || index} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
+                                <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem', alignItems: 'center' }}>
+                                    <h4 style={{ margin: 0 }}>{item.name || `Brand ${index + 1}`}</h4>
                                     <button onClick={() => deleteItem(index, 'brands')} style={{ color: '#5D4037', marginLeft: 'auto' }}>X</button>
+                                </div>
+                                <div style={{ marginBottom: '1rem' }}>
+                                    <label style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.3rem', color: '#666' }}>Brand Name</label>
+                                    <input
+                                        value={item.name || ''}
+                                        onChange={(e) => handleArrayChange(index, 'name', e.target.value, 'brands')}
+                                        placeholder="Enter Brand Name"
+                                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                                    />
                                 </div>
                                 <FileUpload
                                     label="Brand Logo"
@@ -1368,7 +1479,7 @@ const Admin = () => {
                                 />
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                            <div className="admin-grid-2">
                                 {/* Founder 1 */}
                                 <div style={{ border: '1px solid #ddd', padding: '1.5rem', borderRadius: '8px' }}>
                                     <h3>Founder 1</h3>

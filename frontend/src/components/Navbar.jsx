@@ -12,15 +12,25 @@ export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [isDarkText, setIsDarkText] = useState(false);
     const [scrollY, setScrollY] = useState(0); // New state to track exact scroll position
+    const [isMobile, setIsMobile] = useState(false); // New state for mobile detection
     const [emailModalOpen, setEmailModalOpen] = useState(false);
     const location = useLocation();
 
     // Track scroll position for robust fallback
     useEffect(() => {
         const handleScroll = () => setScrollY(window.scrollY);
+        const handleResize = () => setIsMobile(window.innerWidth <= 1200); // Expanded to include Tablet
+
         window.addEventListener('scroll', handleScroll, { passive: true });
-        handleScroll(); // Init
-        return () => window.removeEventListener('scroll', handleScroll);
+        window.addEventListener('resize', handleResize);
+
+        handleScroll(); // Init scroll
+        handleResize(); // Init mobile state
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
 
     const toggleMenu = () => setIsOpen(!isOpen);
@@ -302,7 +312,7 @@ export default function Navbar() {
                                             />
                                             <motion.span
                                                 variants={{
-                                                    rest: { opacity: 0, y: 30, height: 0 },
+                                                    rest: { opacity: isMobile ? 1 : 0, y: isMobile ? 10 : 30, height: isMobile ? 'auto' : 0 },
                                                     hover: { opacity: 1, y: 10, height: 'auto' }
                                                 }}
                                                 className="nav-menu-text"

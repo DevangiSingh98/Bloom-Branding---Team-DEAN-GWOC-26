@@ -237,6 +237,22 @@ export default function Home() {
 
     const heroY = useTransform(scrollYProgress, [0, 0.2], [0, 200]);
 
+    // Lifted state for responsiveness
+    const [screenSize, setScreenSize] = useState('desktop');
+
+    useEffect(() => {
+        const handleResize = () => {
+            const width = window.innerWidth;
+            if (width < 768) setScreenSize('mobile');
+            else if (width < 1200) setScreenSize('tablet');
+            else setScreenSize('desktop');
+        };
+
+        handleResize(); // Initial check
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     // Independent Navbar Color Triggers for Home Page
     useEffect(() => {
         // 1. Initial State: Dark (Hero) - Dispatch immediately
@@ -316,46 +332,159 @@ export default function Home() {
 
                 {/* Thrown Magazines Animation - Layered Behind */}
                 <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {[
-                        { src: "/images/page1.png", start: { x: -1800, y: -1200 }, end: { x: -580, y: -180 }, rotate: -25, delay: 0.2, z: 1, finalScale: 1.0, scaleX: -1, scaleY: -1 },
-                        { src: "/images/page2.png", start: { x: 1800, y: -1200 }, end: { x: 600, y: -300 }, rotate: 10, delay: 0.0, z: 2, scaleY: -1, scaleX: -1 },
-                        { src: "/images/page3.png", start: { x: -1800, y: 1200 }, end: { x: -600, y: 300 }, rotate: 5, delay: 0.3, z: 3 },
-                        { src: "/images/page4.png", start: { x: 1800, y: 1200 }, end: { x: 600, y: 300 }, rotate: -10, delay: 0.1, z: 4 },
-                        { src: "/images/megaphone.png", start: { x: -1500, y: 0 }, end: { x: -450, y: -20 }, rotate: 25, delay: 0.5, z: 5, width: '180px' },
-                        { src: "/images/cam.png", start: { x: 1500, y: -500 }, end: { x: 350, y: -250 }, rotate: -15, delay: 0.7, z: 6, width: '250px' },
-                        { src: "/images/star.png", start: { x: 250, y: -290 }, end: { x: 250, y: -290 }, rotate: 45, delay: 1.3, z: 0, width: '130px' }
-                    ].map((mag, i) => (
-                        <motion.img
-                            key={i}
-                            src={mag.src}
-                            initial={{ opacity: 0, x: mag.start.x, y: mag.start.y, scaleX: 0.5 * (mag.scaleX || 1), scaleY: 0.5 * (mag.scaleY || 1), rotate: mag.rotate * 3 }}
-                            animate={{ opacity: 1, x: mag.end.x, y: mag.end.y, scaleX: mag.scaleX || 1, scaleY: mag.scaleY || 1, scale: mag.finalScale || 1, rotate: mag.rotate }}
-                            transition={{
-                                type: "spring",
-                                stiffness: 50,
-                                damping: 15,
-                                delay: 0.2 + mag.delay,
-                                duration: 1.5
-                            }}
-                            style={{
-                                position: 'absolute',
-                                width: mag.width || '400px',
-                                height: 'auto',
-                                zIndex: mag.z
-                            }}
-                        />
-                    ))}
+                    {(() => {
+                        const magazines = [
+                            {
+                                src: "/images/page1.png",
+                                start: { x: -1800, y: -1200 },
+                                end: { x: -580, y: -180 },
+                                tabletEnd: { x: -420, y: -180 }, // Moved Inside (was -500)
+                                mobileEnd: { x: -200, y: -240 },
+                                rotate: -25, // Synced Angle
+                                delay: 0.2, z: 1, finalScale: 1.0, scaleX: -1, scaleY: -1,
+                                width: '400px', tabletWidth: '350px', mobileWidth: '280px'
+                            },
+                            {
+                                src: "/images/page2.png",
+                                start: { x: 1800, y: -1200 },
+                                end: { x: 600, y: -300 },
+                                tabletEnd: { x: 420, y: -250 }, // Moved Inside (was 500)
+                                mobileEnd: { x: 200, y: -240 },
+                                rotate: 10, // Synced Angle
+                                delay: 0.0, z: 2, scaleY: -1, scaleX: -1,
+                                width: '400px', tabletWidth: '350px', mobileWidth: '280px'
+                            },
+                            {
+                                src: "/images/page3.png",
+                                start: { x: -1800, y: 1200 },
+                                end: { x: -600, y: 300 },
+                                tabletEnd: { x: -420, y: 250 }, // Moved Inside (was -500)
+                                mobileEnd: { x: -200, y: 260 },
+                                rotate: 5, // Synced Angle
+                                delay: 0.3, z: 3,
+                                width: '400px', tabletWidth: '350px', mobileWidth: '280px'
+                            },
+                            {
+                                src: "/images/page4.png",
+                                start: { x: 1800, y: 1200 },
+                                end: { x: 600, y: 300 },
+                                tabletEnd: { x: 420, y: 250 }, // Moved Inside (was 500)
+                                mobileEnd: { x: 200, y: 260 },
+                                rotate: -10, // Synced Angle
+                                delay: 0.1, z: 4,
+                                width: '400px', tabletWidth: '350px', mobileWidth: '280px'
+                            },
+                            {
+                                src: "/images/megaphone.png",
+                                start: { x: -1500, y: 0 },
+                                end: { x: -450, y: -20 },
+                                tabletEnd: { x: -260, y: -80 },
+                                mobileEnd: { x: -160, y: -140 },
+                                rotate: 25, delay: 0.5, z: 5, width: '180px', tabletWidth: '130px', mobileWidth: '110px'
+                            },
+                            {
+                                src: "/images/cam.png",
+                                start: { x: 1500, y: -500 },
+                                end: { x: 350, y: -250 },
+                                tabletEnd: { x: '35vw', y: '-25vh' }, // More Right
+                                mobileEnd: { x: '30vw', y: '-25vh' }, // Moved Left (was 40vw)
+                                rotate: -15, delay: 0.7, z: 6, width: '250px', tabletWidth: '180px', mobileWidth: '130px'
+                            },
+                            {
+                                src: "/images/star.png",
+                                start: { x: 250, y: -290 },
+                                end: { x: 250, y: -290 },
+                                tabletEnd: { x: '25vw', y: '-30vh' }, // More Right (was 20vw)
+                                mobileEnd: { x: '22vw', y: '-28vh' }, // More Left (was 26vw)
+                                rotate: 45, delay: 1.3, z: 5, width: '130px', tabletWidth: '100px', mobileWidth: '80px'
+                            }
+                        ];
+
+                        return magazines.map((mag, i) => {
+                            const isMobile = screenSize === 'mobile';
+                            const isTablet = screenSize === 'tablet';
+
+                            let targetX = mag.end.x;
+                            let targetY = mag.end.y;
+                            let targetWidth = mag.width;
+                            let targetRotate = mag.rotate;
+
+                            if (isMobile) {
+                                targetX = mag.mobileEnd.x;
+                                targetY = mag.mobileEnd.y;
+                                targetWidth = mag.mobileWidth;
+                                targetRotate = mag.mobileRotate || mag.rotate;
+                            } else if (isTablet) {
+                                targetX = mag.tabletEnd.x;
+                                targetY = mag.tabletEnd.y;
+                                targetWidth = mag.tabletWidth || mag.width;
+                                targetRotate = mag.rotate;
+                            }
+
+                            return (
+                                <motion.img
+                                    key={i}
+                                    src={mag.src}
+                                    initial={{
+                                        opacity: 0,
+                                        x: isMobile
+                                            ? (typeof mag.mobileEnd.x === 'string' ? `calc(${mag.mobileEnd.x} * 2)` : mag.mobileEnd.x * 2)
+                                            : mag.start.x,
+                                        y: isMobile
+                                            ? (typeof mag.mobileEnd.y === 'string' ? `calc(${mag.mobileEnd.y} * 2)` : mag.mobileEnd.y * 2)
+                                            : mag.start.y,
+                                        scaleX: 0.5 * (mag.scaleX || 1),
+                                        scaleY: 0.5 * (mag.scaleY || 1),
+                                        rotate: mag.rotate * 3
+                                    }}
+                                    animate={{
+                                        opacity: 1,
+                                        x: targetX,
+                                        y: targetY,
+                                        scaleX: mag.scaleX || 1,
+                                        scaleY: mag.scaleY || 1,
+                                        scale: mag.finalScale || 1,
+                                        rotate: targetRotate
+                                    }}
+                                    transition={{
+                                        type: "spring",
+                                        stiffness: 50,
+                                        damping: 15,
+                                        delay: 0.2 + mag.delay,
+                                        duration: 1.5
+                                    }}
+                                    style={{
+                                        position: 'absolute',
+                                        width: targetWidth,
+                                        height: 'auto',
+                                        zIndex: mag.z
+                                    }}
+                                />
+                            );
+                        });
+                    })()}
                 </div>
 
                 <ParallaxContent>
-                    <motion.div style={{ zIndex: 1, textAlign: 'center', maxWidth: '80%', margin: '0 auto' }}>
+                    <motion.div style={{
+                        zIndex: 1,
+                        textAlign: 'center',
+                        maxWidth: screenSize === 'mobile' ? '95%' : '80%',
+                        margin: '0 auto',
+                        transform: 'translateX(-20px)' // Visually centering adjustment
+                    }}>
                         <motion.img
                             src="/images/main logo.png"
                             alt="Bloom Branding Logo"
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 1, ease: 'easeOut' }}
-                            style={{ width: '450px', maxWidth: '90vw', objectFit: 'contain', marginBottom: '1rem' }}
+                            style={{
+                                width: screenSize === 'mobile' ? '300px' : '450px',
+                                maxWidth: screenSize === 'mobile' ? '75vw' : '90vw',
+                                objectFit: 'contain',
+                                marginBottom: '1rem'
+                            }}
                         />
 
                         <motion.p
@@ -364,12 +493,12 @@ export default function Home() {
                             transition={{ delay: 0.5, duration: 1 }}
                             className="font-subtitle"
                             style={{
-                                fontSize: '1.2rem',
+                                fontSize: screenSize === 'mobile' ? '1.5rem' : '1.2rem',
                                 margin: '0 auto 2rem auto',
                                 color: 'var(--color-white)',
                                 textShadow: '0 0 10px rgba(0,0,0,0.5)',
                                 textAlign: 'center',
-                                transform: 'translateX(50px)'
+                                whiteSpace: screenSize === 'mobile' ? 'nowrap' : 'normal'
                             }}
                         >
                             We build brands that bloom.

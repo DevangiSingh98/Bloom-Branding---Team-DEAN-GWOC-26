@@ -151,13 +151,17 @@ const defaultContent = {
         { id: 2, name: "Brand 2", logo: "/images/client2.png" },
         { id: 3, name: "Brand 3", logo: "/images/client3.png" }
     ],
-    enquiries: []
+    enquiries: [],
+    legal: {
+        privacy: '',
+        terms: ''
+    }
 };
 
 export const ContentProvider = ({ children }) => {
     // Initialize state from localStorage if available, else default
     const [content, setContent] = useState(() => {
-        const savedContent = localStorage.getItem('bloomContent_REVIEWS_FINAL_V3'); // Increment version to force reset
+        const savedContent = localStorage.getItem('bloomContent_v25'); // Bumped version for legal content
         console.log("Loading content...", savedContent ? "Found cached" : "Using default");
         const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
         // Merge with defaultContent to ensure all mandatory keys (like brandLogos) exist
@@ -256,7 +260,37 @@ export const ContentProvider = ({ children }) => {
             }
         };
 
+        const fetchLegalContent = async () => {
+            try {
+                const privacyRes = await fetch(`${API_BASE_URL}/api/legal-content/privacy`);
+                const termsRes = await fetch(`${API_BASE_URL}/api/legal-content/terms`);
+
+                let privacyText = '';
+                let termsText = '';
+
+                if (privacyRes.ok) {
+                    const pData = await privacyRes.json();
+                    privacyText = pData.content || '';
+                }
+                if (termsRes.ok) {
+                    const tData = await termsRes.json();
+                    termsText = tData.content || '';
+                }
+
+                setContent(prev => ({
+                    ...prev,
+                    legal: {
+                        privacy: privacyText,
+                        terms: termsText
+                    }
+                }));
+            } catch (error) {
+                console.error('Error fetching legal content:', error);
+            }
+        };
+
         fetchProjects();
+        fetchLegalContent();
     }, []);
 
     // Helper to sanitize content for localStorage (remove large media)
@@ -301,6 +335,11 @@ export const ContentProvider = ({ children }) => {
             sanitized.enquiries = [];
         }
 
+        // Do not save legal content to local storage (fetch fresh from DB)
+        if (sanitized.legal) {
+            sanitized.legal = { privacy: '', terms: '' };
+        }
+
         return sanitized;
     };
 
@@ -308,7 +347,7 @@ export const ContentProvider = ({ children }) => {
     useEffect(() => {
         try {
             const sanitized = sanitizeForStorage(content);
-            localStorage.setItem('bloomContent_v24', JSON.stringify(sanitized));
+            localStorage.setItem('bloomContent_v25', JSON.stringify(sanitized));
         } catch (e) {
             console.error('Failed to save to localStorage:', e);
         }
@@ -696,6 +735,32 @@ export const ContentProvider = ({ children }) => {
         try { await fetch(`${API_BASE_URL}/api/selected-work/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
     };
 
+    const updateLegalContent = async (type, contentText) => {
+        console.log(`[ContentContext] Updating ${type} with:`, contentText?.substring(0, 50));
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/legal-content/${type}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: contentText })
+            });
+            if (response.ok) {
+                const updated = await response.json();
+                setContent(prev => ({
+                    ...prev,
+                    legal: {
+                        ...prev.legal,
+                        [type]: updated.content
+                    }
+                }));
+                return updated;
+            } else {
+                console.error(`[ContentContext] Update failed: ${response.status} ${response.statusText}`);
+                const errText = await response.text();
+                console.error(`[ContentContext] Error details:`, errText);
+            }
+        } catch (e) { console.error(`[ContentContext] Exception:`, e); }
+    };
+
     return (
         <ContentContext.Provider value={{
             content,
@@ -727,7 +792,8 @@ export const ContentProvider = ({ children }) => {
             removeAllEnquiries,
             addEnquiry,
             resetContent,
-            resetFounders
+            resetFounders,
+            updateLegalContent
         }}>
             {children}
         </ContentContext.Provider>

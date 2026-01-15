@@ -339,7 +339,7 @@ export default function Home() {
                                 start: { x: -1800, y: -1200 },
                                 end: { x: -580, y: -180 },
                                 tabletEnd: { x: -420, y: -180 }, // Moved Inside (was -500)
-                                mobileEnd: { x: -250, y: -240 },
+                                mobileEnd: { x: -200, y: -240 },
                                 rotate: -25, // Synced Angle
                                 delay: 0.2, z: 1, finalScale: 1.0, scaleX: -1, scaleY: -1,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'
@@ -349,7 +349,7 @@ export default function Home() {
                                 start: { x: 1800, y: -1200 },
                                 end: { x: 600, y: -300 },
                                 tabletEnd: { x: 420, y: -250 }, // Moved Inside (was 500)
-                                mobileEnd: { x: 250, y: -240 },
+                                mobileEnd: { x: 200, y: -240 },
                                 rotate: 10, // Synced Angle
                                 delay: 0.0, z: 2, scaleY: -1, scaleX: -1,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'
@@ -359,7 +359,7 @@ export default function Home() {
                                 start: { x: -1800, y: 1200 },
                                 end: { x: -600, y: 300 },
                                 tabletEnd: { x: -420, y: 250 }, // Moved Inside (was -500)
-                                mobileEnd: { x: -250, y: 260 },
+                                mobileEnd: { x: -200, y: 260 },
                                 rotate: 5, // Synced Angle
                                 delay: 0.3, z: 3,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'
@@ -369,7 +369,7 @@ export default function Home() {
                                 start: { x: 1800, y: 1200 },
                                 end: { x: 600, y: 300 },
                                 tabletEnd: { x: 420, y: 250 }, // Moved Inside (was 500)
-                                mobileEnd: { x: 250, y: 260 },
+                                mobileEnd: { x: 200, y: 260 },
                                 rotate: -10, // Synced Angle
                                 delay: 0.1, z: 4,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'

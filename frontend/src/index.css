@@ -797,4 +797,91 @@ img {
     height: 350px !important;
     /* Reduce height from 500px */
   }
+
+  /* --- Contact Page Mobile Adjustments --- */
+  .contact-form-wrapper {
+    width: 90% !important;
+    margin: 0 auto !important;
+    border-radius: 10px !important;
+  }
+
+  .contact-form-inner {
+    padding: 1.5rem !important;
+    /* Reduce padding from 4rem */
+  }
+
+  .contact-form-grid {
+    grid-template-columns: 1fr !important;
+    /* Stack inputs vertically */
+    gap: 1.5rem !important;
+  }
+
+  /* Form Text Scaling */
+  /* Form Text Scaling */
+  .contact-form-inner h3,
+  .contact-form-inner label,
+  .contact-form-inner input,
+  .contact-form-inner select,
+  .contact-form-inner textarea,
+  .collab-section p,
+  .collab-section button,
+  .map-section p,
+  .map-section a,
+  .container>div>p.font-subtitle {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Titles for Collab and Map Sections */
+  .collab-section h2,
+  .map-section h4 {
+    font-size: 2.5rem !important;
+    font-weight: bold !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Adjust padding for the shrunk text */
+  .contact-form-inner label,
+  .contact-form-inner input,
+  .contact-form-inner select,
+  .contact-form-inner textarea {
+    padding: 0.6rem !important;
+  }
+
+  .collab-section h2,
+  .map-section h4,
+  .contact-form-inner h3 {
+    font-weight: bold !important;
+    /* Keep hierarchy via weight since size is same */
+    margin-bottom: 0.5rem !important;
+  }
+
+  .collab-section {
+    margin-top: 3rem !important;
+    padding: 3rem 1rem !important;
+    /* Reduce padding */
+  }
+
+  .collab-decor-1,
+  .collab-decor-2 {
+    width: 100px !important;
+    height: 100px !important;
+  }
+
+  .map-section {
+    margin-top: 3rem !important;
+  }
+
+  .contact-form-inner select,
+  .contact-form-inner textarea {
+    padding: 0.6rem !important;
+  }
+
+  .collab-section h2,
+  .map-section h4,
+  .contact-form-inner h3 {
+    font-weight: bold !important;
+    /* Keep hierarchy via weight since size is same */
+    margin-bottom: 0.5rem !important;
+  }
 }

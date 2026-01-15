@@ -64,14 +64,14 @@ export default function Contact() {
                     </div>
 
                     {/* PROJECT FORM */}
-                    <div style={{ maxWidth: '900px', margin: '0 auto', backgroundColor: 'var(--color-white)', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-                        <div style={{ padding: '4rem' }}>
+                    <div className="contact-form-wrapper" style={{ maxWidth: '900px', margin: '0 auto', backgroundColor: 'var(--color-white)', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                        <div className="contact-form-inner" style={{ padding: '4rem' }}>
                             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
 
                                 {/* Section 1: contact Info */}
                                 <div>
                                     <h3 className="font-subtitle" style={{ fontSize: '2rem', marginBottom: '1.5rem', color: 'var(--color-dark-choc)', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>01. You & Your Brand</h3>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                                    <div className="contact-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                             <label className="font-subtitle" htmlFor="name" style={{ fontSize: '1.2rem', color: '#888' }}>Name *</label>
                                             <input type="text" name="name" required value={formData.name} onChange={handleChange} style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#FCFCFC', fontSize: '1.2rem' }} placeholder="Name" />
@@ -92,7 +92,7 @@ export default function Contact() {
                                     <h3 className="font-subtitle" style={{ fontSize: '2rem', marginBottom: '1.5rem', color: 'var(--color-dark-choc)', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
                                         02. Project Details
                                     </h3>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                                    <div className="contact-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                             <label className="font-subtitle" htmlFor="service" style={{ fontSize: '1.2rem', color: '#888' }}>Service of Interest *</label>
                                             <select name="service" required value={formData.service} onChange={handleChange} style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#FCFCFC', fontSize: '1.2rem' }}>
@@ -160,7 +160,7 @@ export default function Contact() {
                     </div>
 
                     {/* COLLABORATIONS CTA */}
-                    <div style={{
+                    <div className="collab-section" style={{
                         marginTop: '6rem',
                         textAlign: 'center',
                         padding: '4rem 2rem',
@@ -198,12 +198,12 @@ export default function Contact() {
                             </button>
                         </div>
                         {/* Decor */}
-                        <div style={{ position: 'absolute', top: -50, left: -50, width: 200, height: 200, backgroundColor: '#fff', borderRadius: '50%', opacity: 0.3 }}></div>
-                        <div style={{ position: 'absolute', bottom: -50, right: -50, width: 150, height: 150, backgroundColor: '#fff', borderRadius: '50%', opacity: 0.3 }}></div>
+                        <div className="collab-decor-1" style={{ position: 'absolute', top: -50, left: -50, width: 200, height: 200, backgroundColor: '#fff', borderRadius: '50%', opacity: 0.3 }}></div>
+                        <div className="collab-decor-2" style={{ position: 'absolute', bottom: -50, right: -50, width: 150, height: 150, backgroundColor: '#fff', borderRadius: '50%', opacity: 0.3 }}></div>
                     </div>
 
                     {/* GOOGLE MAP & ADDRESS */}
-                    <div style={{ marginTop: '6rem' }}>
+                    <div className="map-section" style={{ marginTop: '6rem' }}>
                         <div style={{ marginBottom: '2rem', textAlign: 'center', fontFamily: 'var(--font-subtitle)' }}>
                             <h4 style={{ fontSize: '3rem', color: 'var(--color-dark-choc)', fontWeight: 'bold', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '2px' }}>
                                 Visit Our Office

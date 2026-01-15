@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import Footer from '../components/Footer';
@@ -104,78 +104,62 @@ const ParallaxItem = ({ children, yOffset = 50, style = {}, className = '', cont
 };
 
 // Service Card Component for Animation
-const ServiceCard = ({ service, index, containerRef, id }) => {
-    // Pure Sticky Stacking - No entry animation (scale/fade) as requested.
-    // The "Slide Over" effect is naturally handled by position: sticky and scrolling.
+const ServiceCard = ({ service, index, containerRef, id, isMobile }) => {
+    // Desktop: Pure Sticky Stacking (via CSS class .service-card-sticky)
+    // Mobile: Scroll Entry Animation (via Framer Motion)
 
     const isEven = index % 2 === 0;
+
+    // Mobile Animation Variants
+    const mobileVariants = {
+        offscreen: {
+            opacity: 0,
+            y: 100,
+            scale: 0.95,
+            rotate: isEven ? -2 : 2
+        },
+        onscreen: {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotate: 0,
+            transition: {
+                type: "spring",
+                bounce: 0.2,
+                duration: 0.8
+            }
+        }
+    };
 
     return (
         <motion.div
             id={id} // Add ID for hash linking
+            className="service-card-sticky"
             style={{
-                top: 0,
-                position: 'sticky',
-                minHeight: '100vh',
-                scrollSnapAlign: 'start',
-                backgroundColor: '#FFFFFF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '40px',
-                boxSizing: 'border-box',
                 zIndex: index + 1,
-                borderTop: '1px solid rgba(0,0,0,0.1)',
-                borderRadius: '40px 40px 0 0',
-                boxShadow: '0 -10px 30px rgba(0,0,0,0.05)',
             }}
+            initial={isMobile ? "offscreen" : undefined}
+            whileInView={isMobile ? "onscreen" : undefined}
+            viewport={{ once: true, amount: 0.1 }}
+            variants={isMobile ? mobileVariants : undefined}
         >
-            <div style={{
-                width: '100%',
-                maxWidth: '1400px',
-                display: 'flex',
-                flexDirection: isEven ? 'row' : 'row-reverse',
-                alignItems: 'center',
-                gap: '80px',
-                flexWrap: 'wrap',
-                position: 'relative'
-            }}>
+            <div className={`service-content-wrapper ${isEven ? 'row-normal' : 'row-reverse'}`}>
                 {/* DECORATIVE TRIANGLE ARROW */}
 
 
                 {/* A. TEXT CARD SIDE */}
-                <div style={{ flex: '1 1 450px', position: 'relative', zIndex: 5 }}>
+                <div className="service-text-side">
                     {/* SPECIFIC STICKERS */}
                     {service.title === 'Production' && (
                         <motion.img
                             src="/images/f1.png"
                             animate={{ rotate: [0, 10, 0] }}
                             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                            style={{
-                                position: 'absolute',
-                                top: '-30px',
-                                left: '-30px',
-                                width: '80px',
-                                zIndex: 0,
-                                opacity: 0.9
-                            }}
+                            className="sticker-production"
                         />
                     )}
                     {service.title === 'Social Media' && (
-                        <div style={{
-                            position: 'absolute',
-                            bottom: '-20px',
-                            right: '-20px',
-                            width: '50px',
-                            height: '50px',
-                            backgroundColor: '#004AAD',
-                            borderRadius: '50%',
-                            zIndex: 10,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
-                        }}>
+                        <div className="sticker-social-circle">
                             <span style={{ color: '#fff', fontSize: '1.2rem', transform: 'rotate(-45deg)' }}>➜</span>
                         </div>
                     )}
@@ -187,59 +171,31 @@ const ServiceCard = ({ service, index, containerRef, id }) => {
                                 y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
                                 rotate: { duration: 10, repeat: Infinity, ease: "linear" }
                             }}
-                            style={{
-                                position: 'absolute',
-                                top: '-15px',
-                                left: '30px',
-                                width: '20px',
-                                height: '20px',
-                                backgroundColor: '#004AAD',
-                                transform: 'rotate(45deg)',
-                                zIndex: 10,
-                                boxShadow: '0 5px 15px rgba(0,0,0,0.1)'
-                            }}
+                            className="sticker-social-diamond"
                         />
                     )}
 
                     <motion.div
                         whileHover={{ scale: 1.02 }}
+                        className="service-text-card"
                         style={{
                             backgroundColor: service.bg,
-                            padding: '60px 50px',
-                            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-                            position: 'relative',
                             transform: isEven ? 'rotate(-1deg)' : 'rotate(1deg)',
-                            zIndex: 1
                         }}
                     >
                         <Tape top={-20} />
-                        <h2 style={{
-                            fontFamily: 'var(--font-brand)',
-                            fontSize: '4rem',
-                            color: '#333',
-                            marginBottom: '20px',
-                            lineHeight: 0.9,
-                            letterSpacing: '-2px'
-                        }}>
+                        <h2 className="service-card-title">
                             {service.title.toUpperCase()}
                         </h2>
-                        <p style={{ fontSize: '1.4rem', fontStyle: 'italic', marginBottom: '30px', color: '#555', fontFamily: 'Georgia, serif' }}>
+                        <p className="service-card-desc">
                             "{service.desc}"
                         </p>
-                        <p style={{ fontSize: '1.1rem', marginBottom: '40px', color: '#444', lineHeight: 1.6 }}>
+                        <p className="service-card-impact">
                             {service.impact}
                         </p>
                         <ul style={{ listStyle: 'none', padding: 0 }}>
                             {service.details.map((detail, idx) => (
-                                <li key={idx} style={{
-                                    marginBottom: '15px',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    fontSize: '1rem',
-                                    fontFamily: 'monospace',
-                                    borderBottom: '1px solid rgba(0,0,0,0.1)',
-                                    paddingBottom: '5px'
-                                }}>
+                                <li key={idx} className="service-card-detail">
                                     <span>{detail}</span>
                                     <span>→</span>
                                 </li>
@@ -249,22 +205,19 @@ const ServiceCard = ({ service, index, containerRef, id }) => {
                 </div>
 
                 {/* B. IMAGE SIDE (Polaroid) */}
-                <div style={{ flex: '1 1 450px', position: 'relative', zIndex: 1 }}>
+                <div className="service-image-side">
                     <motion.div
                         whileHover={{ scale: 1.02, rotate: isEven ? 2 : -2 }}
+                        className="service-image-card"
                         style={{
-                            position: 'relative',
-                            padding: '20px 20px 80px 20px',
-                            backgroundColor: '#fff',
-                            boxShadow: '0 20px 50px rgba(0,0,0,0.15)',
                             transform: `rotate(${isEven ? '2deg' : '-3deg'})`
                         }}
                     >
                         <Tape top={-20} />
-                        <div style={{ width: '100%', height: '400px', backgroundColor: '#f0f0f0', overflow: 'hidden', position: 'relative' }}>
+                        <div className="service-image-inner">
                             <img src={service.img} alt={service.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </div>
-                        <div style={{ position: 'absolute', bottom: '25px', right: '30px', fontFamily: 'var(--font-brand)', fontSize: '1.2rem', color: '#333' }}>
+                        <div className="service-image-footer">
                             bloom branding // 2024
                         </div>
                     </motion.div>
@@ -281,6 +234,16 @@ export default function Services() {
         offset: ["start start", "end end"]
     });
     const { hash } = useLocation();
+
+    // Track Mobile State for Animations
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
+        handleResize(); // Init
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Handle Hash Scroll
     useEffect(() => {
@@ -324,29 +287,20 @@ export default function Services() {
         >
 
             {/* 1. NEW SPLIT HERO SECTION */}
-            <div className="services-hero" style={{ height: '100vh', width: '100%', display: 'flex', position: 'relative' }}>
+            <div className="services-hero">
 
                 {/* LEFT: DARK TEXT SIDE */}
-                <div style={{
-                    flex: '1',
-                    backgroundColor: '#2C2B2B',
-                    color: '#F4F1EA',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    padding: '140px 5% 0', // Reduced top padding to move text higher
-                    position: 'relative'
-                }}>
+                <div className="services-hero-text">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
                     >
-                        <h4 style={{ fontFamily: 'var(--font-subtitle)', fontSize: '0.9rem', letterSpacing: '2px', opacity: 0.7, marginBottom: '40px', textTransform: 'uppercase' }}>
+                        <h4 className="services-subtitle">
                             Our Services
                         </h4>
 
-                        <h1 style={{ fontFamily: 'var(--font-brand)', fontSize: 'clamp(2.5rem, 4vw, 4rem)', lineHeight: 1.1, marginBottom: '30px', fontWeight: 'normal' }}>
+                        <h1 className="services-title">
                             Building brands that <br /> command attention. <br />
                             <span style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontWeight: "lighter" }}>Your vision, fully realized.</span>
                         </h1>
@@ -356,7 +310,7 @@ export default function Services() {
                 </div>
 
                 {/* RIGHT: FEATURE IMAGE SIDE */}
-                <div style={{ flex: '1', backgroundColor: '#EADDCD', position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="services-hero-image">
 
                     {/* Background Texture */}
                     <div style={{ position: 'absolute', inset: 0, opacity: 0.1, backgroundImage: 'url("/images/noise.png")' }}></div>
@@ -366,31 +320,13 @@ export default function Services() {
                         initial={{ opacity: 0, scale: 0.9, rotate: 5 }}
                         whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
                         transition={{ duration: 1, ease: 'easeOut' }}
-                        style={{
-                            width: '70%',
-                            height: 'auto',
-                            aspectRatio: '0.8',
-                            position: 'relative',
-                            backgroundColor: '#fff',
-                            padding: '20px 20px 60px 20px',
-                            boxShadow: '0 30px 60px rgba(0,0,0,0.15)',
-                            transform: 'rotate(-3deg)'
-                        }}
+                        className="hero-image-card"
                     >
                         <Tape top={-25} />
                         <div style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}>
                             <img src="/images/service_lifestyle.png" style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Bloom Services" />
                         </div>
-                        <div style={{
-                            position: 'absolute',
-                            bottom: '20px',
-                            left: '0',
-                            width: '100%',
-                            textAlign: 'center',
-                            fontFamily: 'var(--font-brand)',
-                            fontSize: '1.5rem',
-                            color: '#333'
-                        }}>
+                        <div className="hero-image-caption">
                             Bloom Studios ©
                         </div>
                     </motion.div>
@@ -404,12 +340,12 @@ export default function Services() {
                     {/* STATS BANNER REMOVED */}
 
                     {/* THE BLOOM DIFFERENCE (White Cards with Stickers) */}
-                    <div style={{ padding: '40px 5%', maxWidth: '1400px', margin: '0 auto' }}>
+                    <div className="difference-section">
                         <div style={{ textAlign: 'center', marginBottom: '80px' }}>
                             <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '4rem', color: '#333', textTransform: 'uppercase', letterSpacing: '-2px' }}>The Bloom Difference</h2>
                             <p style={{ fontFamily: 'monospace', fontSize: '1rem', color: '#666', marginTop: '10px' }}>We can't just make things pretty. We build brands that work.</p>
                         </div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '30px' }}>
+                        <div className="difference-grid">
                             {[
                                 { title: 'STRATEGIC STORYTELLING', desc: 'We turn passive scrollers into loyal customers.', icon: '📖' },
                                 { title: 'BESPOKE AESTHETICS', desc: 'No templates. No cookie-cutter trends. Every pixel is crafted.', icon: '✨' },
@@ -421,17 +357,7 @@ export default function Services() {
                                         initial={{ opacity: 0, y: 30 }}
                                         whileInView={{ opacity: 1, y: 0 }}
                                         transition={{ delay: i * 0.2 }}
-                                        style={{
-                                            width: '350px',
-                                            padding: '60px 40px',
-                                            backgroundColor: '#fff',
-                                            boxShadow: '0 20px 50px rgba(0,0,0,0.08)',
-                                            position: 'relative',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            textAlign: 'center'
-                                        }}
+                                        className="difference-card"
                                     >
                                         {/* Tape at top */}
                                         <div style={{ position: 'absolute', top: '-15px', left: '50%', transform: 'translateX(-50%)', width: '100px', height: '30px', backgroundColor: 'rgba(255,255,255,0.8)', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}></div>
@@ -455,13 +381,13 @@ export default function Services() {
                         // Generate ID: e.g. "Branding" -> "branding", "Social Media" -> "social-media"
                         const id = service.title.toLowerCase().replace(/\s+/g, '-');
                         return (
-                            <ServiceCard key={index} service={service} index={index} containerRef={ref} id={id} />
+                            <ServiceCard key={index} service={service} index={index} containerRef={ref} id={id} isMobile={isMobile} />
                         );
                     })}
                 </div>
 
                 {/* CTA */}
-                <div style={{ textAlign: 'center', padding: '100px 20px 50px', minHeight: '50vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                <div className="services-cta">
                     <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '3rem', marginBottom: '30px' }}>Ready to create something beautiful?</h2>
                     <AnimatedButton to="/contact" className="btn-primary" style={{ backgroundColor: '#333', color: '#fff' }}>
                         Start a Project

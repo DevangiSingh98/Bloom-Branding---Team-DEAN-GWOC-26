@@ -60,6 +60,11 @@
 
 html {
   scroll-behavior: smooth;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -68,6 +73,10 @@ body {
   color: var(--color-dark-choc);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 h1,
@@ -428,7 +437,7 @@ button {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background-color: var(--color-electric-blue);
   color: var(--color-earl-gray);
@@ -547,7 +556,7 @@ img {
 
 /* About Page Split Layout */
 .about-split-layout {
-  width: 100vw;
+  width: 100%;
   height: 100%;
   position: relative;
   flex-shrink: 0;

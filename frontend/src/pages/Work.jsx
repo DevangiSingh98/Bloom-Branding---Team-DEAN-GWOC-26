@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -20,30 +21,30 @@ const ProjectSlide = ({ project }) => (
             scrollSnapAlign: 'start'
         }}
     >
-        <div style={{
-            display: 'flex',
-            gap: '6rem',
-            alignItems: 'center',
-            width: '100%',
-            maxWidth: '1400px',
-            justifyContent: 'center'
-        }}>
-            {/* Text Section */}
+        <div className="project-slide-inner">
+            {/* Text Section Wrapper */}
             <motion.div
                 initial={{ opacity: 0, x: -50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
-                style={{ width: '450px', textAlign: 'left', flexShrink: 0 }}
+                className="project-info-wrapper"
             >
-                <h3 className="font-subtitle" style={{ fontSize: '1.2rem', color: '#fdfd96', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8 }}>
-                    {project.category}
-                </h3>
-                <h2 style={{ fontSize: 'clamp(2.5rem, 4vw, 4.5rem)', marginBottom: '1.5rem', lineHeight: 0.9, color: '#fdfd96' }}>
-                    {project.title}
-                </h2>
-                <p style={{ fontSize: '1.2rem', opacity: 0.9, marginBottom: '2.5rem', lineHeight: 1.6, color: '#fdfd96' }}>
-                    {project.description}
-                </p>
+                {/* Header: Category + Title */}
+                <div className="project-slide-header">
+                    <h3 className="font-subtitle" style={{ fontSize: '1.2rem', color: '#fdfd96', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '2px', opacity: 0.8 }}>
+                        {project.category}
+                    </h3>
+                    <h2 style={{ marginBottom: '1.5rem', lineHeight: 0.9, color: '#fdfd96' }}>
+                        {project.title}
+                    </h2>
+                </div>
+
+                {/* Description - Separate for mobile ordering */}
+                <div className="project-slide-desc">
+                    <p style={{ fontSize: '1.2rem', opacity: 0.9, marginBottom: '2.5rem', lineHeight: 1.6, color: '#fdfd96' }}>
+                        {project.description}
+                    </p>
+                </div>
             </motion.div>
 
             {/* Media Section */}
@@ -51,7 +52,7 @@ const ProjectSlide = ({ project }) => (
                 initial={{ opacity: 0, x: 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.8 }}
-                style={{ flexShrink: 0, display: 'flex', justifyContent: 'center' }}
+                className="project-slide-media"
             >
                 {project.video ? (
                     <video
@@ -60,27 +61,13 @@ const ProjectSlide = ({ project }) => (
                         autoPlay
                         loop
                         muted
-                        style={{
-                            maxHeight: '80vh',
-                            maxWidth: '50vw',
-                            width: 'auto',
-                            borderRadius: '5px',
-                            boxShadow: '0 20px 40px rgba(0,0,0,0.8)',
-                            display: 'block'
-                        }}
+                        className="project-slide-media-element"
                     />
                 ) : (
                     <img
                         src={project.image}
                         alt={project.title}
-                        style={{
-                            maxHeight: '80vh',
-                            maxWidth: '50vw',
-                            width: 'auto',
-                            borderRadius: '5px',
-                            boxShadow: '0 20px 40px rgba(0,0,0,0.8)',
-                            display: 'block'
-                        }}
+                        className="project-slide-media-element"
                     />
                 )}
             </motion.div>
@@ -320,24 +307,10 @@ export default function Work() {
                     OUR WORKS
                 </h1>
 
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: '2rem',
-                }}>
-                    <style>{`
-                        @media (max-width: 1200px) {
-                            .grid-container { grid-template-columns: repeat(2, 1fr) !important; }
-                        }
-                        @media (max-width: 768px) {
-                            .grid-container { grid-template-columns: 1fr !important; }
-                        }
-                    `}</style>
-
+                <div className="work-grid">
                     {projects.map((project, index) => (
                         <motion.div
                             key={index}
-                            className="grid-container" // Hook for media queries
                             whileHover={{ scale: 1.05 }}
                             onClick={() => {
                                 setInitialSlide(index);

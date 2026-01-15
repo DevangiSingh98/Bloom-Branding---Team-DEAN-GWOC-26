@@ -542,10 +542,6 @@ img {
   -ms-user-select: none;
 }
 
-.mobile-break {
-  display: none;
-}
-
 /* Story Page Scrolling Text */
 .story-scrolling-text {
   font-size: 4rem;
@@ -601,8 +597,6 @@ img {
   opacity: 0;
 }
 
-
-
 /* Mobile (375px / Phone) */
 @media (max-width: 600px) {
   .about-image-half {
@@ -611,10 +605,6 @@ img {
     /* Image takes top 40% */
     left: 0;
     top: 0;
-  }
-
-  .about-image-half img {
-    object-fit: cover !important;
   }
 
   .about-text-half {
@@ -627,7 +617,7 @@ img {
   }
 
   .about-text-item {
-    padding: 1rem;
+    padding: 2rem;
     padding-top: 1rem;
     justify-content: flex-start;
   }
@@ -648,18 +638,8 @@ img {
 
   /* Unify text size and reduce line spacing for all about items on mobile */
   .about-text-item p {
-    font-size: 1.1rem !important;
+    font-size: 1.5rem !important;
     line-height: 1.1 !important;
-  }
-
-  .mobile-break {
-    display: inline !important;
-  }
-
-  .vision-item,
-  .values-item,
-  .approach-item {
-    justify-content: center !important;
   }
 }
 
@@ -927,5 +907,527 @@ img {
   .nav-contact-section {
     margin-top: 1.5rem !important;
     font-size: 1.2rem !important;
+  }
+}
+
+/* --- SERVICES PAGE RESPONSIVENESS --- */
+
+/* Base Styles (Desktop) */
+.services-hero {
+  display: flex;
+}
+
+.services-hero-text {
+  flex: 1;
+}
+
+.services-hero-image {
+  flex: 1;
+}
+
+.service-card-content {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  align-items: center;
+  gap: 80px;
+  flex-wrap: wrap;
+  position: relative;
+  justify-content: center;
+}
+
+.service-card-content.row {
+  flex-direction: row;
+}
+
+.service-card-content.row-reverse {
+  flex-direction: row-reverse;
+}
+
+.service-text-side {
+  flex: 1 1 450px;
+}
+
+.service-image-side {
+  flex: 1 1 450px;
+}
+
+.difference-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* Mobile & Tablet Styles (< 1024px) */
+@media (max-width: 1024px) {
+  .service-card-content {
+    gap: 40px;
+  }
+
+  .service-text-side,
+  .service-image-side {
+    flex: 1 1 100%;
+    /* Force full width easier */
+  }
+}
+
+/* Mobile Styles (< 768px) */
+@media (max-width: 768px) {
+
+  /* 1. Hero Section */
+  .services-hero {
+    flex-direction: column;
+    /* Image Top (or Text Bottom) - let's do Text Bottom for impact */
+    height: auto !important;
+    /* Allow auto height */
+    min-height: 100vh;
+  }
+
+  .services-hero-text {
+    padding: 140px 20px 60px 20px !important;
+    /* increased top padding to clear logo */
+    text-align: center;
+    align-items: center;
+  }
+
+  .services-hero-image {
+    min-height: 40vh;
+    /* Ensure image takes up space */
+  }
+
+  /* 2. Service Cards */
+  /* 2. Service Cards - Mobile Layout Refinement */
+  .service-card-content.row,
+  .service-card-content.row-reverse {
+    flex-direction: column !important;
+    /* Stack: Image Top, Text Bottom */
+    gap: 0;
+    padding: 0;
+    height: 100vh;
+    /* Restore 100vh for sticky scrolling */
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .service-image-side {
+    width: 85% !important;
+    margin: 0 auto -20px auto !important;
+    /* Slight overlap to save space */
+    z-index: 10 !important;
+    flex: 0 0 auto !important;
+    order: 1;
+    /* Image Top */
+  }
+
+  .service-text-side {
+    width: 90% !important;
+    margin-top: 0;
+    z-index: 20 !important;
+    flex: 0 0 auto !important;
+    order: 2;
+    /* Text Bottom */
+  }
+
+  /* Ensure text card is compact and fits */
+  .service-text-side>div {
+    background-color: #EADDCD;
+    padding: 20px 15px !important;
+    /* Reduced padding */
+    border-radius: 20px !important;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Compact Polaroid size */
+  .service-image-side>div {
+    transform: rotate(2deg) !important;
+    padding: 10px 10px 30px 10px !important;
+    /* Minimal frame */
+    width: 100% !important;
+    background-color: #fff;
+  }
+
+  /* FIX TAPE ON MOBILE - Horizontal and non-obstructive */
+  .service-tape {
+    transform: translateX(-50%) rotate(0deg) !important;
+    top: -10px !important;
+    width: 60px !important;
+    height: 20px !important;
+    opacity: 0.8;
+  }
+
+  /* Image height - constrained but bigger */
+  .service-image-side img {
+    max-height: 35vh;
+    /* Increased from 25vh to 35vh */
+    object-fit: cover;
+    width: 100%;
+    display: block;
+  }
+
+  /* Target the Image Container Div specifically to override height:400px */
+  /* Tape is first child, Image Container is second */
+  .service-image-side>div>div:nth-of-type(2) {
+    height: auto !important;
+    min-height: 0 !important;
+    background-color: transparent !important;
+  }
+
+  /* Adjust Text Card Typography for compact fit */
+  .service-text-side h2 {
+    font-size: 2rem !important;
+    /* Increased from 1.8rem */
+    margin-bottom: 5px !important;
+    line-height: 1 !important;
+  }
+
+  /* Reposition the 'bloom branding' signature for tight layout */
+  /* Reposition the 'bloom branding' signature for tight layout */
+  .service-image-side>div>div:last-child {
+    bottom: 10px !important;
+    right: auto !important;
+    left: 0 !important;
+    width: 100% !important;
+    text-align: center !important;
+    font-size: 0.8rem !important;
+  }
+
+  .service-text-side p {
+    font-size: 0.95rem !important;
+    /* Slightly bigger */
+    margin-bottom: 10px !important;
+    line-height: 1.4 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    /* Allow even more text */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Ensure text card is padded/bigger */
+  /* Ensure text card is padded/bigger */
+  .service-text-side>div {
+    background-color: #EADDCD;
+    padding: 40px 25px !important;
+    /* increased padding */
+    border-radius: 20px !important;
+    min-height: 350px;
+    /* Force even larger minimum vertical size */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .service-text-side ul li {
+    margin-bottom: 4px !important;
+    font-size: 0.9rem !important;
+    padding-bottom: 2px !important;
+  }
+
+  /* Make the card container sticky again */
+  .service-card-item {
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden;
+    /* Prevent overflow */
+  }
+
+  /* 3. The Difference Section */
+  .difference-grid {
+    gap: 40px;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  /* GLOBAL OVERRIDE FOR SIGNATURE CENTER ALIGNMENT (ANY SCREEN) */
+  .service-image-side>div>div:last-child {
+    right: auto !important;
+    left: 0 !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .difference-grid>div {
+    width: 100% !important;
+    max-width: 400px !important;
+    /* Ensure they don't get too wide if centered */
+  }
+}
+
+/* --- WORK PAGE MODAL RESPONSIVENESS --- */
+
+.project-slide-inner {
+  display: flex;
+  gap: 6rem;
+  align-items: center;
+  width: 100%;
+  max-width: 1400px;
+  justify-content: center;
+  flex-direction: row;
+}
+
+/* Wrapper essentially replaces old .project-slide-text on desktop */
+.project-info-wrapper {
+  width: 450px;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+.project-slide-media {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.project-slide-media-element {
+  max-height: 80vh;
+  max-width: 50vw;
+  width: auto;
+  border-radius: 5px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .project-slide-inner {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-top: 60px;
+    /* Space for close button */
+    justify-content: center;
+  }
+
+  /* UNWRAP the container so children become flex items of .project-slide-inner */
+  .project-info-wrapper {
+    display: contents;
+  }
+
+  /* REORDERING MAGIC */
+  .project-slide-header {
+    order: 1;
+    /* Title First */
+    width: 100%;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .project-slide-media {
+    order: 2;
+    /* Image Second */
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .project-slide-desc {
+    order: 3;
+    /* Description Third */
+    width: 100%;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .project-slide-media-element {
+    max-width: 90vw !important;
+    max-height: 50vh !important;
+    /* Limit height so text fits */
+  }
+
+  .project-slide-header h2 {
+    font-size: 2.5rem !important;
+  }
+}
+
+/* --- WORK PAGE GRID --- */
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* Back to 3 columns for Big Screens */
+  gap: 2rem;
+}
+
+@media (max-width: 1200px) {
+  .work-grid {
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 Columns for Tablet/Laptop */
+  }
+}
+
+@media (max-width: 768px) {
+  .work-grid {
+    grid-template-columns: repeat(2, 1fr);
+    /* Keep 2 Columns for Mobile as requested */
+    gap: 0.8rem;
+  }
+}
+
+/* =========================================
+   RESTORED HOME PAGE STYLES
+   ========================================= */
+
+/* Blooming the Brand (Home Page) Layout (Desktop) */
+@media (min-width: 769px) {
+  .blooming-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "title image"
+      "text image";
+    gap: 0 4rem;
+    align-items: center;
+  }
+
+  .blooming-title {
+    grid-area: title;
+  }
+
+  .blooming-image {
+    grid-area: image;
+  }
+
+  .blooming-text {
+    grid-area: text;
+    align-self: start;
+  }
+}
+
+/* Blooming the Brand (Home Page) Layout (Mobile) */
+@media (max-width: 768px) {
+  .blooming-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .blooming-title,
+  .blooming-image,
+  .blooming-text {
+    width: 100%;
+  }
+}
+
+/* Specific text adjustment for Mobile Blooming Section */
+@media (max-width: 600px) {
+  .blooming-text p {
+    font-size: 1.2rem !important;
+    text-align: justify !important;
+  }
+}
+
+/* Brands Section */
+.brands-title {
+  color: var(--color-dark-choc);
+  text-align: center;
+  margin-bottom: 3rem;
+  font-size: 6rem;
+  font-family: Bigilla, serif;
+  letter-spacing: 1px;
+}
+
+.brands-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 5rem;
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+}
+
+.brand-logo-item {
+  width: 220px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  cursor: default;
+}
+
+@media (max-width: 768px) {
+  .brands-title {
+    font-size: 3rem;
+    /* Smaller title on mobile */
+    margin-bottom: 2rem;
+  }
+
+  .brands-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    /* Force 3 per row */
+    gap: 1.5rem !important;
+    /* Reduced gap */
+  }
+
+  .brand-logo-item {
+    width: 100%;
+    height: 60px;
+    /* Even Smaller height for 3-up */
+  }
+
+  .brand-logo-item img {
+    max-width: 100%;
+    max-height: 100%;
+    /* Ensure logos scale down */
+  }
+
+  /* Global Page Margin for Mobile */
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
+/* Instagram Section */
+.insta-title {
+  font-size: 4rem;
+  margin-bottom: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.insta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  justify-content: center;
+  width: 100%;
+}
+
+.insta-item {
+  width: 100%;
+  aspect-ratio: 1;
+  /* Force square */
+  border-radius: 1px;
+  display: block;
+  overflow: hidden;
+  max-width: 350px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .insta-title {
+    font-size: 2rem !important;
+    /* Smaller title mobile */
+  }
+
+  .insta-title svg {
+    width: 30px;
+    height: 30px;
+  }
+
+  .insta-grid {
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 posts per row */
+    gap: 0.75rem;
+    /* Smaller gap */
+  }
+
+  .insta-item {
+    max-width: none;
+    /* Fill the grid cell */
+    width: 100%;
   }
 }

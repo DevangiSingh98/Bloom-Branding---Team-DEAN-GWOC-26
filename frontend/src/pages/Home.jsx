@@ -516,11 +516,22 @@ export default function Home() {
                             initial="initial"
                             whileInView="animate"
                             viewport={{ once: true }}
-                            className="grid"
-                            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', alignItems: 'center' }}
+                            className="blooming-grid"
                         >
-                            <motion.div variants={fadeInUp}>
-                                <h2 style={{ fontSize: '3.8rem', marginBottom: '2rem', color: 'var(--color-electric-blue)' }}>Blooming the Brand</h2>
+                            {/* 1. Title */}
+                            <motion.div variants={fadeInUp} className="blooming-title">
+                                <h2 style={{ fontSize: '3.8rem', marginBottom: '1rem', color: 'var(--color-electric-blue)' }}>Blooming the Brand</h2>
+                            </motion.div>
+
+                            {/* 2. Image (Placed 2nd for Mobile Flow) */}
+                            <motion.div variants={fadeInUp} className="blooming-image">
+                                <div className="img-placeholder" style={{ width: '100%', height: '400px', borderRadius: '20px', overflow: 'hidden' }}>
+                                    <img src="/images/bloomingthebrand.png" alt="Blooming the Brand" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                </div>
+                            </motion.div>
+
+                            {/* 3. Text + Button */}
+                            <motion.div variants={fadeInUp} className="blooming-text">
                                 <motion.p
                                     className="font-subtitle"
                                     style={{ fontSize: '1.6rem', lineHeight: 1.6, textAlign: 'justify' }}
@@ -533,11 +544,6 @@ export default function Home() {
                                 </motion.p>
                                 <br />
                                 <AnimatedButton to="/about" className="btn-primary" style={{ marginTop: '1rem' }}>Our Story</AnimatedButton>
-                            </motion.div>
-                            <motion.div variants={fadeInUp}>
-                                <div className="img-placeholder" style={{ width: '100%', height: '400px', borderRadius: '20px', overflow: 'hidden' }}>
-                                    <img src="/images/bloomingthebrand.png" alt="Blooming the Brand" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                </div>
                             </motion.div>
                         </motion.div>
                     </div>
@@ -559,22 +565,47 @@ export default function Home() {
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
-                            {content.selectedWork.map((item) => (
-                                <motion.div
-                                    key={item.id}
-                                    className="group"
-                                    style={{ cursor: 'pointer' }}
-                                    whileHover={{ scale: 0.98 }}
-                                >
-                                    {item.image ? (
-                                        <img src={item.image} alt={item.title} style={{ width: '100%', height: '500px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem' }} />
-                                    ) : (
-                                        <div className="img-placeholder" style={{ width: '100%', height: '500px', backgroundColor: '#4a3832', borderRadius: '10px', marginBottom: '1rem' }} />
-                                    )}
-                                    <h3 style={{ fontSize: '2rem' }}>{item.title}</h3>
-                                    <p className="font-subtitle">{item.category}</p>
-                                </motion.div>
-                            ))}
+                            {content.selectedWork.map((item, index) => {
+                                const isMobile = screenSize === 'mobile';
+
+                                // Clean variants approach
+                                const cardVariants = {
+                                    mobileInitial: {
+                                        opacity: 0,
+                                        x: index % 2 === 0 ? -100 : 100 // Alternating directions
+                                    },
+                                    mobileAnimate: {
+                                        opacity: 1,
+                                        x: 0,
+                                        transition: { duration: 0.8, ease: "easeOut" }
+                                    },
+                                    desktop: {
+                                        opacity: 1,
+                                        x: 0
+                                    }
+                                };
+
+                                return (
+                                    <motion.div
+                                        key={`${isMobile ? 'm' : 'd'}-${item.id}`} // Force remount on screen change
+                                        className="group"
+                                        style={{ cursor: 'pointer' }}
+                                        whileHover={{ scale: 0.98 }}
+                                        initial={isMobile ? "mobileInitial" : "desktop"}
+                                        whileInView={isMobile ? "mobileAnimate" : "desktop"}
+                                        viewport={{ once: true, margin: "-10%" }} // Trigger a bit earlier
+                                        variants={cardVariants}
+                                    >
+                                        {item.image ? (
+                                            <img src={item.image} alt={item.title} style={{ width: '100%', height: '500px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem' }} />
+                                        ) : (
+                                            <div className="img-placeholder" style={{ width: '100%', height: '500px', backgroundColor: '#4a3832', borderRadius: '10px', marginBottom: '1rem' }} />
+                                        )}
+                                        <h3 style={{ fontSize: '2rem' }}>{item.title}</h3>
+                                        <p className="font-subtitle">{item.category}</p>
+                                    </motion.div>
+                                );
+                            })}
                         </div>
                     </div>
                 </ParallaxContent>
@@ -646,7 +677,7 @@ export default function Home() {
                                     x: {
                                         repeat: Infinity,
                                         repeatType: "loop",
-                                        duration: 600, // Extremely slow scroll
+                                        duration: screenSize === 'mobile' ? 90 : 400, // Faster on mobile
                                         ease: "linear"
                                     }
                                 }}
@@ -739,25 +770,11 @@ export default function Home() {
             {/* Brands We Have Worked With Section */}
             <section style={{ background: 'linear-gradient(to bottom, var(--color-earl-gray), #d8d6c8)', padding: '5rem 0', overflow: 'hidden' }}>
                 <div className="container">
-                    <h2 style={{
-                        color: 'var(--color-dark-choc)',
-                        textAlign: 'center',
-                        marginBottom: '3rem',
-                        fontSize: '6rem',
-                        fontFamily: 'Bigilla, serif',
-                        letterSpacing: '1px'
-                    }}>
+                    <h2 className="brands-title">
                         BRANDS WE HAVE BLOOMED
                     </h2>
 
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                        gap: '5rem',
-                        alignItems: 'center',
-                        justifyItems: 'center',
-                        width: '100%'
-                    }}>
+                    <div className="brands-grid">
                         {content.brandLogos && content.brandLogos.map((brand, idx) => (
                             <motion.div
                                 key={brand.id || idx}
@@ -765,16 +782,7 @@ export default function Home() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: idx * 0.1, duration: 0.5 }}
-                                style={{
-                                    width: '220px',
-                                    height: '120px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    // filter: 'brightness(0) invert(1)', // Removed to show original logo colors
-                                    opacity: 0.8,
-                                    cursor: 'default'
-                                }}
+                                className="brand-logo-item"
                                 whileHover={{ opacity: 1, scale: 1.05 }}
                             >
                                 {brand.logo && (
@@ -795,11 +803,11 @@ export default function Home() {
                 <ParallaxContent>
                     <div className="container" style={{ textAlign: 'center' }}>
                         <a href="https://www.instagram.com/bloom.branding_/?hl=en" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <h2 style={{ fontSize: '4rem', marginBottom: '3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                            <h2 className="insta-title" style={{ cursor: 'pointer' }}>
                                 @bloom.branding_ <ArrowUpRight size={56} strokeWidth={0.75} />
                             </h2>
                         </a>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '1.5rem' }}>
+                        <div className="insta-grid">
                             {content.instagram.map((item, index) => (
                                 <motion.a
                                     href={item.link}
@@ -811,8 +819,7 @@ export default function Home() {
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.8, delay: index * 0.2, ease: "easeOut" }}
                                     whileHover={{ opacity: 0.8, scale: 1.02 }}
-                                    className="img-placeholder"
-                                    style={{ width: '280px', flexGrow: 1, maxWidth: '350px', aspectRatio: '1', borderRadius: '1px', display: 'block', overflow: 'hidden' }}
+                                    className="img-placeholder insta-item"
                                 >
                                     {item.image ? (
                                         <img src={item.image} alt="Insta" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

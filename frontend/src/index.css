@@ -684,4 +684,16 @@ img {
     gap: 0.5rem;
     /* Reduce gap slightly */
   }
+
+  .admin-upload-btn {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .admin-remove-btn {
+    width: 24px !important;
+    height: 24px !important;
+    padding: 0 !important;
+    font-size: 0.9rem !important;
+  }
 }

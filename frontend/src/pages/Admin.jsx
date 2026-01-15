@@ -88,6 +88,7 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
                 />
                 <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                     <button
+                        className="admin-upload-btn"
                         onClick={() => fileInputRef.current.click()}
                         style={{
                             padding: '0.5rem 0.8rem',
@@ -103,6 +104,7 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
                     </button>
                     {(value || type === 'video') && (
                         <button
+                            className="admin-remove-btn"
                             disabled={!value}
                             onClick={() => {
                                 setFileName("No file chosen");

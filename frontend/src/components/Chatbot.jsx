@@ -306,7 +306,9 @@ export default function Chatbot() {
                     justifyContent: 'center',
                     fontSize: '30px',
                     zIndex: 1001,
-                    position: 'relative'
+                    position: 'fixed',
+                    right: '20px',
+                    bottom: '20px'
                 }}
             >
                 {isOpen ? '×' : '💬'}

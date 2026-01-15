@@ -754,3 +754,47 @@ img {
     font-size: 2.5rem;
   }
 }
+
+/* Mobile adjustments for Selected Work section on Home Page */
+@media (max-width: 600px) {
+
+  /* Header Container: Title and Button */
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:first-child {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+    margin-bottom: 2rem !important;
+  }
+
+  /* View All Projects Button */
+  section.section-padding[style*="var(--color-dark-choc)"] .btn-primary {
+    margin-left: 0 !important;
+    /* Shift slightly left if needed, but in column layout align-self works better */
+    align-self: flex-start;
+    font-size: 0.9rem !important;
+    padding: 0.8rem 1.5rem !important;
+  }
+
+  /* Selected Work Grid - Re-targeting more specifically to override inline grid styles */
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:last-child {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    /* Center align the project cards */
+  }
+
+  /* Individual Project Card Wrapper */
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:last-child>div {
+    width: 90% !important;
+    /* Make projects smaller width-wise */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Project Image */
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:last-child>div img,
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:last-child>div .img-placeholder {
+    height: 350px !important;
+    /* Reduce height from 500px */
+  }
+}

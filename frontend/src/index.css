@@ -513,8 +513,8 @@ button {
   .nav-menu-img {
     max-width: 100%;
     height: auto !important;
-    max-height: 85px !important;
-    /* Increased size for visibility */
+    max-height: 150px !important;
+    /* Increased size per user request */
   }
 
   .nav-menu-text {
@@ -531,4 +531,212 @@ img {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+}
+
+/* Story Page Scrolling Text */
+.story-scrolling-text {
+  font-size: 4rem;
+}
+
+@media (max-width: 480px) {
+  .story-scrolling-text {
+    font-size: 1.5rem;
+    /* Further reduced */
+  }
+}
+
+/* About Page Split Layout */
+.about-split-layout {
+  width: 100vw;
+  height: 100%;
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+}
+
+.about-image-half {
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 20;
+}
+
+.about-text-half {
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.about-text-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+  opacity: 0;
+}
+
+/* Mobile (375px / Phone) */
+@media (max-width: 600px) {
+  .about-image-half {
+    width: 100%;
+    height: 40%;
+    /* Image takes top 40% */
+    left: 0;
+    top: 0;
+  }
+
+  .about-text-half {
+    width: 100%;
+    height: 60%;
+    /* Text takes bottom 60% */
+    left: 0;
+    top: 40%;
+    right: auto;
+  }
+
+  .about-text-item {
+    padding: 2rem;
+    padding-top: 1rem;
+    justify-content: flex-start;
+  }
+
+  /* Heading adjustments for mobile about-text-items */
+  .about-text-item h2,
+  .about-text-item h3 {
+    font-size: 3rem !important;
+    /* Force smaller size on mobile */
+  }
+}
+
+/* Founders Section Styles */
+.founders-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  align-items: end;
+  position: relative;
+  z-index: 10;
+}
+
+.founder-info {
+  align-self: center;
+  padding-bottom: 4rem;
+  position: relative;
+  z-index: 5;
+}
+
+.founder-info.text-right {
+  text-align: right;
+}
+
+.founder-info.text-left {
+  text-align: left;
+}
+
+.founder-name {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-subtitle);
+  color: var(--color-butter-yellow);
+}
+
+.founder-role {
+  color: var(--color-butter-yellow);
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+}
+
+.founder-bio {
+  line-height: 1.6;
+  color: var(--color-white);
+}
+
+.founder-bio.margin-bottom {
+  margin-bottom: 1rem;
+}
+
+.founder-image-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: -60px;
+  position: relative;
+  z-index: 20;
+}
+
+.founder-main-image {
+  width: 250%;
+  max-width: none;
+  margin-left: 0%;
+  height: auto;
+  border-radius: 10px 10px 0 0;
+  display: block;
+}
+
+/* Mobile Founders Layout */
+@media (max-width: 768px) {
+  .founders-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0rem;
+    padding-bottom: 2rem;
+    padding-top: 4rem;
+    /* Added top space */
+  }
+
+  .founder-info {
+    text-align: center !important;
+    padding-bottom: 0;
+    width: 100%;
+    padding: 0 1rem;
+    transform: none !important;
+  }
+
+  /* Order: Left Founder (1), Image (2), Right Founder (3) */
+  .founder-info-left {
+    order: 1;
+    margin-top: 6rem;
+    /* Shifted down more */
+    margin-bottom: 1rem;
+  }
+
+  .founder-image-wrapper {
+    order: 2;
+    margin-bottom: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .founder-info-right {
+    order: 3;
+    margin-top: 2rem;
+    /* Shifted down more */
+    padding-top: 0;
+  }
+
+  .founder-main-image {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin-left: 0;
+    border-radius: 10px;
+    position: relative;
+  }
+
+  .founder-name {
+    font-size: 2.5rem;
+  }
 }

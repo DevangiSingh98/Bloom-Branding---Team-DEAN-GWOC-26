@@ -605,3 +605,23 @@ img {
     /* Increased height available since no sidebar */
   }
 }
+
+/* Admin Tabs Horizontal Scroll */
+.admin-tabs-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.admin-tabs-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.admin-tabs-container::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}

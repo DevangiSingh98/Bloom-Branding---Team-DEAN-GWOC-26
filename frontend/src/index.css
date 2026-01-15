@@ -619,7 +619,9 @@ img {
   .about-text-item {
     padding: 2rem;
     padding-top: 1rem;
-    justify-content: flex-start;
+    padding-top: 1rem;
+    justify-content: center;
+    text-align: center !important;
   }
 
   /* Shift Rooted text up specifically - REVERTED per user request */
@@ -633,6 +635,7 @@ img {
   .about-text-item h2,
   .about-text-item h3 {
     font-size: 3rem !important;
+    text-align: center !important;
     /* Force smaller size on mobile */
   }
 
@@ -640,6 +643,7 @@ img {
   .about-text-item p {
     font-size: 1.5rem !important;
     line-height: 1.1 !important;
+    text-align: center !important;
   }
 }
 

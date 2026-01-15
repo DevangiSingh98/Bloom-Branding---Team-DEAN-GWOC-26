@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useContent } from '../context/ContentContext';
-import { motion, useScroll, useTransform, animate, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform, animate, useInView, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Star, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AnimatedButton from '../components/AnimatedButton';
@@ -48,6 +48,55 @@ const Counter = ({ to, label }) => {
             >
                 {label}
             </motion.p>
+        </div>
+    );
+};
+
+const BrandRotator = ({ brands }) => {
+    const [index, setIndex] = useState(0);
+    const BATCH_SIZE = 15;
+
+    useEffect(() => {
+        if (!brands || brands.length <= BATCH_SIZE) return;
+
+        const interval = setInterval(() => {
+            setIndex((prev) => (prev + 1) % Math.ceil(brands.length / BATCH_SIZE));
+        }, 4000);
+
+        return () => clearInterval(interval);
+    }, [brands]);
+
+    const visibleBrands = brands ? brands.slice(index * BATCH_SIZE, (index + 1) * BATCH_SIZE) : [];
+
+    return (
+        <div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.05 }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                    className="brands-grid"
+                    style={{ width: '100%' }}
+                >
+                    {visibleBrands.map((brand, idx) => (
+                        <motion.div
+                            key={brand.id || (index * BATCH_SIZE + idx)}
+                            className="brand-logo-item"
+                            whileHover={{ opacity: 1, scale: 1.05 }}
+                        >
+                            {brand.logo && (
+                                <img
+                                    src={brand.logo}
+                                    alt="Brand Logo"
+                                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                                />
+                            )}
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </AnimatePresence>
         </div>
     );
 };
@@ -339,7 +388,7 @@ export default function Home() {
                                 start: { x: -1800, y: -1200 },
                                 end: { x: -580, y: -180 },
                                 tabletEnd: { x: -420, y: -180 }, // Moved Inside (was -500)
-                                mobileEnd: { x: -200, y: -240 },
+                                mobileEnd: { x: -240, y: -290 },
                                 rotate: -25, // Synced Angle
                                 delay: 0.2, z: 1, finalScale: 1.0, scaleX: -1, scaleY: -1,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'
@@ -349,7 +398,7 @@ export default function Home() {
                                 start: { x: 1800, y: -1200 },
                                 end: { x: 600, y: -300 },
                                 tabletEnd: { x: 420, y: -250 }, // Moved Inside (was 500)
-                                mobileEnd: { x: 200, y: -240 },
+                                mobileEnd: { x: 240, y: -290 },
                                 rotate: 10, // Synced Angle
                                 delay: 0.0, z: 2, scaleY: -1, scaleX: -1,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'
@@ -359,7 +408,7 @@ export default function Home() {
                                 start: { x: -1800, y: 1200 },
                                 end: { x: -600, y: 300 },
                                 tabletEnd: { x: -420, y: 250 }, // Moved Inside (was -500)
-                                mobileEnd: { x: -200, y: 260 },
+                                mobileEnd: { x: -240, y: 310 },
                                 rotate: 5, // Synced Angle
                                 delay: 0.3, z: 3,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'
@@ -369,7 +418,7 @@ export default function Home() {
                                 start: { x: 1800, y: 1200 },
                                 end: { x: 600, y: 300 },
                                 tabletEnd: { x: 420, y: 250 }, // Moved Inside (was 500)
-                                mobileEnd: { x: 200, y: 260 },
+                                mobileEnd: { x: 240, y: 310 },
                                 rotate: -10, // Synced Angle
                                 delay: 0.1, z: 4,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'
@@ -379,7 +428,7 @@ export default function Home() {
                                 start: { x: -1500, y: 0 },
                                 end: { x: -450, y: -20 },
                                 tabletEnd: { x: -260, y: -80 },
-                                mobileEnd: { x: -160, y: -140 },
+                                mobileEnd: { x: -160, y: -60 },
                                 rotate: 25, delay: 0.5, z: 5, width: '180px', tabletWidth: '130px', mobileWidth: '110px'
                             },
                             {
@@ -471,7 +520,7 @@ export default function Home() {
                         textAlign: 'center',
                         maxWidth: screenSize === 'mobile' ? '95%' : '80%',
                         margin: '0 auto',
-                        transform: 'translateX(-20px)' // Visually centering adjustment
+                        transform: 'translateX(10px)' // Visually centering adjustment
                     }}>
                         <motion.img
                             src="/images/main logo.png"
@@ -480,10 +529,10 @@ export default function Home() {
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 1, ease: 'easeOut' }}
                             style={{
-                                width: screenSize === 'mobile' ? '300px' : '450px',
+                                width: screenSize === 'mobile' ? '180px' : '450px',
                                 maxWidth: screenSize === 'mobile' ? '75vw' : '90vw',
                                 objectFit: 'contain',
-                                marginBottom: '1rem'
+                                marginBottom: '0.5rem'
                             }}
                         />
 
@@ -493,7 +542,7 @@ export default function Home() {
                             transition={{ delay: 0.5, duration: 1 }}
                             className="font-subtitle"
                             style={{
-                                fontSize: screenSize === 'mobile' ? '1.5rem' : '1.2rem',
+                                fontSize: screenSize === 'mobile' ? '0.9rem' : '1.2rem',
                                 margin: '0 auto 2rem auto',
                                 color: 'var(--color-white)',
                                 textShadow: '0 0 10px rgba(0,0,0,0.5)',
@@ -667,6 +716,7 @@ export default function Home() {
                             paddingBottom: '4rem'
                         }}>
                             <motion.div
+                                key={screenSize} // Force re-initialization on screen resize
                                 style={{
                                     display: 'flex',
                                     gap: '1rem',
@@ -677,23 +727,24 @@ export default function Home() {
                                     x: {
                                         repeat: Infinity,
                                         repeatType: "loop",
-                                        duration: screenSize === 'mobile' ? 90 : 400, // Faster on mobile
+                                        duration: screenSize === 'mobile' ? 20 : 400, // Faster on mobile
                                         ease: "linear"
                                     }
                                 }}
                             >
                                 {(() => {
-                                    // Duplicate the array to ensure seamless infinite scroll
+                                    // Duplicate the array to ensure seamless infinite scroll (Even number required for 50% shift)
                                     const allTestimonials = [
                                         ...content.testimonials,
                                         ...content.testimonials,
                                         ...content.testimonials,
                                         ...content.testimonials,
-                                        ...content.testimonials // Extra buffer
+                                        ...content.testimonials,
+                                        ...content.testimonials // 6 copies
                                     ];
 
                                     return (
-                                        <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'flex-start', paddingLeft: '1rem', paddingRight: '1rem' }}>
+                                        <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'flex-start' }}> {/* Removed padding to fix loop jump */}
                                             {allTestimonials.map((item, index) => {
                                                 // Asymmetrical layout: Alternating up and down
                                                 const marginTop = index % 2 === 1 ? '3rem' : '0rem';
@@ -774,26 +825,8 @@ export default function Home() {
                         BRANDS WE HAVE BLOOMED
                     </h2>
 
-                    <div className="brands-grid">
-                        {content.brandLogos && content.brandLogos.map((brand, idx) => (
-                            <motion.div
-                                key={brand.id || idx}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: idx * 0.1, duration: 0.5 }}
-                                className="brand-logo-item"
-                                whileHover={{ opacity: 1, scale: 1.05 }}
-                            >
-                                {brand.logo && (
-                                    <img
-                                        src={brand.logo}
-                                        alt="Brand Logo"
-                                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                                    />
-                                )}
-                            </motion.div>
-                        ))}
+                    <div style={{ width: '100%' }}>
+                        <BrandRotator brands={content.brandLogos} />
                     </div>
                 </div>
             </section>

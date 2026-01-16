@@ -14,6 +14,7 @@ import brandRoutes from './routes/brandRoutes.js';
 import selectedWorkRoutes from './routes/selectedWorkRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import heroRoutes from './routes/heroRoutes.js';
+import legalContentRoutes from './routes/legalContentRoutes.js';
 
 // Load env vars from root directory
 dotenv.config({ path: '../.env' });
@@ -47,6 +48,7 @@ app.use('/api/values', valueRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/selected-work', selectedWorkRoutes);
 app.use('/api/hero', heroRoutes);
+app.use('/api/legal-content', legalContentRoutes);
 app.use('/api/chat', chatRoutes);
 
 app.get('/', (req, res) => {

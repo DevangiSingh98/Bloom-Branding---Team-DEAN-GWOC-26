@@ -420,11 +420,28 @@ const Admin = () => {
         syncBrand, removeBrand,
         syncSelectedWork, removeSelectedWork,
         updateHero, updateAllProjects, updateSelectedWork, updateTestimonials, updateBrandLogos, updateInstagram, updateFounders, updateValues, updateEnquiries,
-        removeEnquiry, removeEnquiries, removeAllEnquiries, resetContent
+        removeEnquiry, removeEnquiries, removeAllEnquiries, resetContent,
+        updateLegalContent
     } = useContent();
     const [activeTab, setActiveTab] = useState('enquiries');
     const [openEnquiryId, setOpenEnquiryId] = useState(null);
     const [isInitializing, setIsInitializing] = useState(false);
+    const [legalForm, setLegalForm] = useState({ privacy: '', terms: '' });
+
+    // Sync legal form with content when loaded or tab changed
+    useEffect(() => {
+        if (activeTab === 'legal') {
+            console.log("Admin: Legal tab active, syncing form...");
+            // Force refresh from context if available, or maybe allow context to refresh?
+            // Actually, let's just rely on what's in context but ensure we log it.
+            if (content.legal) {
+                setLegalForm({
+                    privacy: content.legal.privacy || '',
+                    terms: content.legal.terms || ''
+                });
+            }
+        }
+    }, [content.legal, activeTab]);
 
     // Enquiry Deletion Logic
     const [selectedEnquiries, setSelectedEnquiries] = useState(new Set());
@@ -524,7 +541,7 @@ const Admin = () => {
         showAlert(title, message, 'confirm', onConfirm, confirmText, confirmColor);
     };
 
-    const API_URL = import.meta.env.VITE_API_URL || 'https://bloom-backend-pq68.onrender.com';
+    const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -965,7 +982,7 @@ const Admin = () => {
             </div>
 
             <div className="admin-tabs-container">
-                {['enquiries', 'projects', 'selected work', 'founder', 'testimonials', 'instagram', 'brands'].map(tab => (
+                {['enquiries', 'projects', 'selected work', 'founder', 'testimonials', 'instagram', 'brands', 'legal'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -1506,6 +1523,98 @@ const Admin = () => {
 
                     )
                 }
+
+                {activeTab === 'legal' && (
+                    <div>
+                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Legal Content</h2>
+                        <div style={{ display: 'grid', gap: '2rem' }}>
+                            {/* Privacy Policy */}
+                            <div style={{ border: '1px solid #eee', padding: '1.5rem', borderRadius: '8px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                    <h3 style={{ margin: 0 }}>Privacy Policy</h3>
+                                    <button
+                                        onClick={async () => {
+                                            console.log("Admin: Saving Privacy...", legalForm.privacy);
+                                            if (!legalForm.privacy) {
+                                                if (!window.confirm("Warning: Privacy Policy is empty. Save anyway?")) return;
+                                            }
+                                            try {
+                                                const result = await updateLegalContent('privacy', legalForm.privacy);
+                                                console.log("Admin: Save Result", result);
+                                                if (result) showAlert("Saved", "Privacy Policy updated!", "success");
+                                                else showAlert("Error", "Failed to save. Check console.", "error");
+                                            } catch (err) {
+                                                console.error("Admin: Save Exception", err);
+                                                showAlert("Error", "Exception during save: " + err.message, "error");
+                                            }
+                                        }}
+                                        className="btn-primary"
+                                        style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
+                                <textarea
+                                    value={legalForm.privacy}
+                                    onChange={(e) => setLegalForm({ ...legalForm, privacy: e.target.value })}
+                                    placeholder="Enter HTML content for Privacy Policy..."
+                                    style={{
+                                        width: '100%',
+                                        padding: '1rem',
+                                        minHeight: '300px',
+                                        fontSize: '1rem',
+                                        fontFamily: 'monospace',
+                                        lineHeight: '1.5',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
+                                        resize: 'vertical'
+                                    }}
+                                />
+                            </div>
+
+                            {/* Terms of Service */}
+                            <div style={{ border: '1px solid #eee', padding: '1.5rem', borderRadius: '8px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                    <h3 style={{ margin: 0 }}>Terms of Service</h3>
+                                    <button
+                                        onClick={async () => {
+                                            console.log("Admin: Saving Terms...", legalForm.terms);
+                                            try {
+                                                const result = await updateLegalContent('terms', legalForm.terms);
+                                                console.log("Admin: Save Result", result);
+                                                if (result) showAlert("Saved", "Terms updated!", "success");
+                                                else showAlert("Error", "Failed to save. Check console.", "error");
+                                            } catch (err) {
+                                                console.error("Admin: Save Exception", err);
+                                                showAlert("Error", "Exception: " + err.message, "error");
+                                            }
+                                        }}
+                                        className="btn-primary"
+                                        style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
+                                <textarea
+                                    value={legalForm.terms}
+                                    onChange={(e) => setLegalForm({ ...legalForm, terms: e.target.value })}
+                                    placeholder="Enter HTML content for Terms of Service..."
+                                    style={{
+                                        width: '100%',
+                                        padding: '1rem',
+                                        minHeight: '300px',
+                                        fontSize: '1rem',
+                                        fontFamily: 'monospace',
+                                        lineHeight: '1.5',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
+                                        resize: 'vertical'
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
 
             </div >
             <CustomModal {...modal} />

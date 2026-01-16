@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -90,7 +91,7 @@ function ConditionalFooter() {
     // However, usually detailed pages also might want this or not. 
     // Let's stick to strict equality for now or strict equality to /work.
     // The user said "remove the footer from THIS page".
-    if (location.pathname === '/about') {
+    if (location.pathname === '/about' || location.pathname === '/services') {
         return null;
     }
     return <Footer />;

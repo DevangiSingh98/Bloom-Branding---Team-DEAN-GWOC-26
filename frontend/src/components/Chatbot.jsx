@@ -94,6 +94,22 @@ export default function Chatbot() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         className="chatbot-wrapper"
+                        style={{
+                            position: 'fixed',
+                            bottom: '100px',
+                            right: '20px',
+                            width: '350px',
+                            maxWidth: '90vw',
+                            height: '500px',
+                            maxHeight: '70vh',
+                            zIndex: 1000,
+                            boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+                            borderRadius: '20px',
+                            overflow: 'hidden',
+                            backgroundColor: '#fff',
+                            display: 'flex',
+                            flexDirection: 'column'
+                        }}
                     >
 
 

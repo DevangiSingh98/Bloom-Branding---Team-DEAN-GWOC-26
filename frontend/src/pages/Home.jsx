@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useContent } from '../context/ContentContext';
-import { motion, useScroll, useTransform, animate, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform, animate, useInView, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Star, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import AnimatedButton from '../components/AnimatedButton';
@@ -11,8 +11,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const fadeInUp = {
-    initial: { opacity: 0, x: -60 }, // Left to Right
-    animate: { opacity: 1, x: 0, transition: { duration: 0.8, ease: "easeOut" } }
+    initial: { opacity: 0, y: 60 },
+    animate: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
 };
 
 const staggerContainer = {
@@ -48,6 +48,55 @@ const Counter = ({ to, label }) => {
             >
                 {label}
             </motion.p>
+        </div>
+    );
+};
+
+const BrandRotator = ({ brands }) => {
+    const [index, setIndex] = useState(0);
+    const BATCH_SIZE = 15;
+
+    useEffect(() => {
+        if (!brands || brands.length <= BATCH_SIZE) return;
+
+        const interval = setInterval(() => {
+            setIndex((prev) => (prev + 1) % Math.ceil(brands.length / BATCH_SIZE));
+        }, 4000);
+
+        return () => clearInterval(interval);
+    }, [brands]);
+
+    const visibleBrands = brands ? brands.slice(index * BATCH_SIZE, (index + 1) * BATCH_SIZE) : [];
+
+    return (
+        <div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.05 }}
+                    transition={{ duration: 0.8, ease: "easeInOut" }}
+                    className="brands-grid"
+                    style={{ width: '100%' }}
+                >
+                    {visibleBrands.map((brand, idx) => (
+                        <motion.div
+                            key={brand.id || (index * BATCH_SIZE + idx)}
+                            className="brand-logo-item"
+                            whileHover={{ opacity: 1, scale: 1.05 }}
+                        >
+                            {brand.logo && (
+                                <img
+                                    src={brand.logo}
+                                    alt="Brand Logo"
+                                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                                />
+                            )}
+                        </motion.div>
+                    ))}
+                </motion.div>
+            </AnimatePresence>
         </div>
     );
 };
@@ -159,8 +208,7 @@ const ServiceList = () => {
                     lineHeight: 0.9,
                     zIndex: 0,
                     position: 'relative',
-                    whiteSpace: 'nowrap',
-                    opacity: 1 // Ensure visibility
+                    whiteSpace: 'nowrap'
                 }}
             >
                 Our Expertise
@@ -175,18 +223,17 @@ const ServiceList = () => {
                     >
                         <motion.div
                             whileHover="hover"
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true, amount: 0.1 }} // Trigger when 10% visible
+                            initial="rest"
+                            animate="rest"
                             className="service-card"
                             variants={{
-                                hidden: { opacity: 0, x: -50 }, // Start Left
-                                visible: { opacity: 1, x: 0, y: 0, transition: { duration: 0.6, ease: "easeOut" } }, // Move to Center
+                                rest: { y: 0 },
                                 hover: { y: -10 }
                             }}
+                            transition={{ duration: 0.3, ease: 'easeOut' }}
                         >
                             {/* Top Title */}
-                            <h3 className="service-title" style={{ fontSize: '2rem' }}>
+                            <h3 className="service-title">
                                 {service.title}
                             </h3>
 
@@ -217,7 +264,6 @@ const ServiceList = () => {
                                     rest: { backgroundColor: 'transparent', color: 'var(--color-butter-yellow)' },
                                     hover: { backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-electric-blue)' }
                                 }}
-                                style={{ fontSize: '1rem', padding: '12px 35px' }}
                             >
                                 Explore
                             </motion.div>
@@ -342,8 +388,8 @@ export default function Home() {
                                 start: { x: -1800, y: -1200 },
                                 end: { x: -580, y: -180 },
                                 tabletEnd: { x: -420, y: -180 }, // Moved Inside (was -500)
-                                mobileEnd: { x: -240, y: -280 }, // "Outside" more (was -220, -260)
-                                rotate: -10, // Restored Desktop Angle (was -25)
+                                mobileEnd: { x: -240, y: -290 },
+                                rotate: -25, // Synced Angle
                                 delay: 0.2, z: 1, finalScale: 1.0, scaleX: -1, scaleY: -1,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'
                             },
@@ -352,8 +398,8 @@ export default function Home() {
                                 start: { x: 1800, y: -1200 },
                                 end: { x: 600, y: -300 },
                                 tabletEnd: { x: 420, y: -250 }, // Moved Inside (was 500)
-                                mobileEnd: { x: 240, y: -280 }, // "Outside" more
-                                rotate: 15, // "7:30ish" / Clockwise (was -15) (or 20)
+                                mobileEnd: { x: 240, y: -290 },
+                                rotate: 10, // Synced Angle
                                 delay: 0.0, z: 2, scaleY: -1, scaleX: -1,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'
                             },
@@ -362,7 +408,7 @@ export default function Home() {
                                 start: { x: -1800, y: 1200 },
                                 end: { x: -600, y: 300 },
                                 tabletEnd: { x: -420, y: 250 }, // Moved Inside (was -500)
-                                mobileEnd: { x: -220, y: 280 }, // Down & Outside a tiny bit
+                                mobileEnd: { x: -240, y: 310 },
                                 rotate: 5, // Synced Angle
                                 delay: 0.3, z: 3,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'
@@ -372,7 +418,7 @@ export default function Home() {
                                 start: { x: 1800, y: 1200 },
                                 end: { x: 600, y: 300 },
                                 tabletEnd: { x: 420, y: 250 }, // Moved Inside (was 500)
-                                mobileEnd: { x: 220, y: 280 }, // Down & Outside a tiny bit
+                                mobileEnd: { x: 240, y: 310 },
                                 rotate: -10, // Synced Angle
                                 delay: 0.1, z: 4,
                                 width: '400px', tabletWidth: '350px', mobileWidth: '280px'
@@ -382,7 +428,7 @@ export default function Home() {
                                 start: { x: -1500, y: 0 },
                                 end: { x: -450, y: -20 },
                                 tabletEnd: { x: -260, y: -80 },
-                                mobileEnd: { x: -160, y: -140 },
+                                mobileEnd: { x: -160, y: -60 },
                                 rotate: 25, delay: 0.5, z: 5, width: '180px', tabletWidth: '130px', mobileWidth: '110px'
                             },
                             {
@@ -474,7 +520,7 @@ export default function Home() {
                         textAlign: 'center',
                         maxWidth: screenSize === 'mobile' ? '95%' : '80%',
                         margin: '0 auto',
-                        transform: 'none' // Removed centering offset per request
+                        transform: 'translateX(10px)' // Visually centering adjustment
                     }}>
                         <motion.img
                             src="/images/main logo.png"
@@ -483,10 +529,10 @@ export default function Home() {
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 1, ease: 'easeOut' }}
                             style={{
-                                width: screenSize === 'mobile' ? '300px' : '450px',
+                                width: screenSize === 'mobile' ? '180px' : '450px',
                                 maxWidth: screenSize === 'mobile' ? '75vw' : '90vw',
                                 objectFit: 'contain',
-                                marginBottom: '1rem'
+                                marginBottom: '0.5rem'
                             }}
                         />
 
@@ -496,7 +542,7 @@ export default function Home() {
                             transition={{ delay: 0.5, duration: 1 }}
                             className="font-subtitle"
                             style={{
-                                fontSize: screenSize === 'mobile' ? '1.5rem' : '1.2rem',
+                                fontSize: screenSize === 'mobile' ? '0.9rem' : '1.2rem',
                                 margin: '0 auto 2rem auto',
                                 color: 'var(--color-white)',
                                 textShadow: '0 0 10px rgba(0,0,0,0.5)',
@@ -519,56 +565,35 @@ export default function Home() {
                             initial="initial"
                             whileInView="animate"
                             viewport={{ once: true }}
-                            className="grid"
-                            style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', alignItems: 'center', textAlign: window.innerWidth < 768 ? 'left' : 'justify' }}
+                            className="blooming-grid"
                         >
-                            {/* Mobile Order: Title -> Image -> Text -> Button */}
-                            {window.innerWidth < 768 ? (
-                                <>
-                                    <motion.div variants={fadeInUp}>
-                                        <h2 style={{ fontSize: '3.8rem', marginBottom: '2rem', color: 'var(--color-electric-blue)' }}>Blooming the Brand</h2>
-                                    </motion.div>
-                                    <motion.div variants={fadeInUp}>
-                                        <div className="img-placeholder" style={{ width: '100%', height: '400px', borderRadius: '20px', overflow: 'hidden' }}>
-                                            <img src="/images/bloomingthebrand.png" alt="Blooming the Brand" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        </div>
-                                    </motion.div>
-                                    <motion.div variants={fadeInUp}>
-                                        <motion.p
-                                            className="font-subtitle"
-                                            style={{ fontSize: '1.6rem', lineHeight: 1.6, textAlign: 'left', marginTop: '2rem' }}
-                                        // inherents parent animation for visibility
-                                        >
-                                            We are a creative branding studio that helps brands grow through strategic storytelling, content creation, and high-impact digital experiences. We focus on modern, bold, and growth-driven brand identities.
-                                        </motion.p>
-                                        <br />
-                                        <AnimatedButton to="/about" className="btn-primary" style={{ marginTop: '1rem' }}>Our Story</AnimatedButton>
-                                    </motion.div>
-                                </>
-                            ) : (
-                                <>
-                                    <motion.div variants={fadeInUp}>
-                                        <h2 style={{ fontSize: '3.8rem', marginBottom: '2rem', color: 'var(--color-electric-blue)' }}>Blooming the Brand</h2>
-                                        <motion.p
-                                            className="font-subtitle"
-                                            style={{ fontSize: '1.6rem', lineHeight: 1.6, textAlign: 'left' }} // Kept left for consistent "no gap"
-                                            initial={{ opacity: 0, y: -30 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            viewport={{ once: true }}
-                                            transition={{ duration: 0.8, ease: "easeOut" }}
-                                        >
-                                            We are a creative branding studio that helps brands grow through strategic storytelling, content creation, and high-impact digital experiences. We focus on modern, bold, and growth-driven brand identities.
-                                        </motion.p>
-                                        <br />
-                                        <AnimatedButton to="/about" className="btn-primary" style={{ marginTop: '1rem' }}>Our Story</AnimatedButton>
-                                    </motion.div>
-                                    <motion.div variants={fadeInUp}>
-                                        <div className="img-placeholder" style={{ width: '100%', height: '400px', borderRadius: '20px', overflow: 'hidden' }}>
-                                            <img src="/images/bloomingthebrand.png" alt="Blooming the Brand" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        </div>
-                                    </motion.div>
-                                </>
-                            )}
+                            {/* 1. Title */}
+                            <motion.div variants={fadeInUp} className="blooming-title">
+                                <h2 style={{ fontSize: '3.8rem', marginBottom: '1rem', color: 'var(--color-electric-blue)' }}>Blooming the Brand</h2>
+                            </motion.div>
+
+                            {/* 2. Image (Placed 2nd for Mobile Flow) */}
+                            <motion.div variants={fadeInUp} className="blooming-image">
+                                <div className="img-placeholder" style={{ width: '100%', height: '400px', borderRadius: '20px', overflow: 'hidden' }}>
+                                    <img src="/images/bloomingthebrand.png" alt="Blooming the Brand" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                </div>
+                            </motion.div>
+
+                            {/* 3. Text + Button */}
+                            <motion.div variants={fadeInUp} className="blooming-text">
+                                <motion.p
+                                    className="font-subtitle"
+                                    style={{ fontSize: '1.6rem', lineHeight: 1.6, textAlign: 'justify' }}
+                                    initial={{ opacity: 0, y: -30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.8, ease: "easeOut" }}
+                                >
+                                    We are a creative branding studio that helps brands grow through strategic storytelling, content creation, and high-impact digital experiences. We focus on modern, bold, and growth-driven brand identities.
+                                </motion.p>
+                                <br />
+                                <AnimatedButton to="/about" className="btn-primary" style={{ marginTop: '1rem' }}>Our Story</AnimatedButton>
+                            </motion.div>
                         </motion.div>
                     </div>
                 </ParallaxContent>
@@ -583,28 +608,53 @@ export default function Home() {
             <section className="section-padding" style={{ backgroundColor: 'var(--color-dark-choc)', color: 'var(--color-earl-gray)' }}>
                 <ParallaxContent>
                     <div className="container">
-                        <div style={{ display: 'flex', flexDirection: window.innerWidth < 768 ? 'column' : 'row', justifyContent: window.innerWidth < 768 ? 'flex-start' : 'space-between', alignItems: window.innerWidth < 768 ? 'flex-start' : 'center', marginBottom: '4rem' }}>
-                            <h2 style={{ fontSize: '4.5rem', color: 'var(--color-butter-yellow)', marginBottom: window.innerWidth < 768 ? '1rem' : '0' }}>Selected Work</h2>
-                            <AnimatedButton to="/work" className="btn-primary" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)', whiteSpace: 'nowrap', fontSize: window.innerWidth < 768 ? '0.7rem' : '1rem', padding: window.innerWidth < 768 ? '0.4rem 0.8rem' : '1rem 2rem' }}>View All Projects</AnimatedButton>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4rem' }}>
+                            <h2 style={{ fontSize: '4.5rem', color: 'var(--color-butter-yellow)' }}>Selected Work</h2>
+                            <AnimatedButton to="/work" className="btn-primary" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)' }}>View All Projects</AnimatedButton>
                         </div>
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
-                            {content.selectedWork.map((item) => (
-                                <motion.div
-                                    key={item.id}
-                                    className="group"
-                                    style={{ cursor: 'pointer' }}
-                                    whileHover={{ scale: 0.98 }}
-                                >
-                                    {item.image ? (
-                                        <img src={item.image} alt={item.title} style={{ width: window.innerWidth < 768 ? '70%' : '100%', height: '500px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem', margin: window.innerWidth < 768 ? '0 auto 1rem' : '0 0 1rem', display: 'block' }} />
-                                    ) : (
-                                        <div className="img-placeholder" style={{ width: '100%', height: '500px', backgroundColor: '#4a3832', borderRadius: '10px', marginBottom: '1rem' }} />
-                                    )}
-                                    <h3 style={{ fontSize: '2rem' }}>{item.title}</h3>
-                                    <p className="font-subtitle">{item.category}</p>
-                                </motion.div>
-                            ))}
+                            {content.selectedWork.map((item, index) => {
+                                const isMobile = screenSize === 'mobile';
+
+                                // Clean variants approach
+                                const cardVariants = {
+                                    mobileInitial: {
+                                        opacity: 0,
+                                        x: index % 2 === 0 ? -100 : 100 // Alternating directions
+                                    },
+                                    mobileAnimate: {
+                                        opacity: 1,
+                                        x: 0,
+                                        transition: { duration: 0.8, ease: "easeOut" }
+                                    },
+                                    desktop: {
+                                        opacity: 1,
+                                        x: 0
+                                    }
+                                };
+
+                                return (
+                                    <motion.div
+                                        key={`${isMobile ? 'm' : 'd'}-${item.id}`} // Force remount on screen change
+                                        className="group"
+                                        style={{ cursor: 'pointer' }}
+                                        whileHover={{ scale: 0.98 }}
+                                        initial={isMobile ? "mobileInitial" : "desktop"}
+                                        whileInView={isMobile ? "mobileAnimate" : "desktop"}
+                                        viewport={{ once: true, margin: "-10%" }} // Trigger a bit earlier
+                                        variants={cardVariants}
+                                    >
+                                        {item.image ? (
+                                            <img src={item.image} alt={item.title} style={{ width: '100%', height: '500px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem' }} />
+                                        ) : (
+                                            <div className="img-placeholder" style={{ width: '100%', height: '500px', backgroundColor: '#4a3832', borderRadius: '10px', marginBottom: '1rem' }} />
+                                        )}
+                                        <h3 style={{ fontSize: '2rem' }}>{item.title}</h3>
+                                        <p className="font-subtitle">{item.category}</p>
+                                    </motion.div>
+                                );
+                            })}
                         </div>
                     </div>
                 </ParallaxContent>
@@ -614,7 +664,7 @@ export default function Home() {
             <section id="journey-stats" className="section-padding light-section">
                 <ParallaxContent>
                     <div className="container">
-                        <div className="hide-scrollbar" style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'nowrap', gap: '1rem', textAlign: 'center', overflowX: 'auto', paddingBottom: '1rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap', gap: '2rem', textAlign: 'center' }}>
                             <Counter to={5} label="Years of Experience" />
                             <Counter to={50} label="Happy Clients" />
                             <Counter to={100} label="Projects Delivered" />
@@ -660,14 +710,13 @@ export default function Home() {
                         {/* Horizontal Marquee Container - Pinterest Style */}
                         <div style={{
                             width: '100%',
-                            overflowX: 'auto', // Horizontal scroll enabled
+                            overflow: 'hidden',
                             position: 'relative',
                             paddingTop: '0',
-                            paddingBottom: '4rem',
-                            scrollbarWidth: 'none', // Hide scrollbar Firefox
-                            msOverflowStyle: 'none' // Hide scrollbar IE/Edge
-                        }} className="hide-scrollbar">
+                            paddingBottom: '4rem'
+                        }}>
                             <motion.div
+                                key={screenSize} // Force re-initialization on screen resize
                                 style={{
                                     display: 'flex',
                                     gap: '1rem',
@@ -678,23 +727,24 @@ export default function Home() {
                                     x: {
                                         repeat: Infinity,
                                         repeatType: "loop",
-                                        duration: 40, // Increased speed (was 600)
+                                        duration: screenSize === 'mobile' ? 20 : 400, // Faster on mobile
                                         ease: "linear"
                                     }
                                 }}
                             >
                                 {(() => {
-                                    // Duplicate the array to ensure seamless infinite scroll
+                                    // Duplicate the array to ensure seamless infinite scroll (Even number required for 50% shift)
                                     const allTestimonials = [
                                         ...content.testimonials,
                                         ...content.testimonials,
                                         ...content.testimonials,
                                         ...content.testimonials,
-                                        ...content.testimonials // Extra buffer
+                                        ...content.testimonials,
+                                        ...content.testimonials // 6 copies
                                     ];
 
                                     return (
-                                        <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'flex-start', paddingLeft: '1rem', paddingRight: '1rem' }}>
+                                        <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'flex-start' }}> {/* Removed padding to fix loop jump */}
                                             {allTestimonials.map((item, index) => {
                                                 // Asymmetrical layout: Alternating up and down
                                                 const marginTop = index % 2 === 1 ? '3rem' : '0rem';
@@ -771,53 +821,12 @@ export default function Home() {
             {/* Brands We Have Worked With Section */}
             <section style={{ background: 'linear-gradient(to bottom, var(--color-earl-gray), #d8d6c8)', padding: '5rem 0', overflow: 'hidden' }}>
                 <div className="container">
-                    <h2 style={{
-                        color: 'var(--color-dark-choc)',
-                        textAlign: 'center',
-                        marginBottom: '3rem',
-                        fontSize: window.innerWidth < 768 ? '3.5rem' : '6rem',
-                        fontFamily: 'Bigilla, serif',
-                        letterSpacing: '1px'
-                    }}>
+                    <h2 className="brands-title">
                         BRANDS WE HAVE BLOOMED
                     </h2>
 
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: window.innerWidth < 768 ? 'repeat(3, 1fr)' : 'repeat(auto-fit, minmax(150px, 1fr))',
-                        gap: window.innerWidth < 768 ? '0.5rem' : '5rem', // Tighter gap on mobile
-                        alignItems: 'center',
-                        justifyItems: 'center',
-                        width: '100%'
-                    }}>
-                        {content.brandLogos && content.brandLogos.map((brand, idx) => (
-                            <motion.div
-                                key={brand.id || idx}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: idx * 0.1, duration: 0.5 }}
-                                style={{
-                                    width: window.innerWidth < 768 ? '100%' : '220px', // Maximize width on mobile
-                                    height: window.innerWidth < 768 ? 'auto' : '120px', // Auto height
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    // filter: 'brightness(0) invert(1)', // Removed to show original logo colors
-                                    opacity: 0.8,
-                                    cursor: 'default'
-                                }}
-                                whileHover={{ opacity: 1, scale: 1.05 }}
-                            >
-                                {brand.logo && (
-                                    <img
-                                        src={brand.logo}
-                                        alt="Brand Logo"
-                                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                                    />
-                                )}
-                            </motion.div>
-                        ))}
+                    <div style={{ width: '100%' }}>
+                        <BrandRotator brands={content.brandLogos} />
                     </div>
                 </div>
             </section>
@@ -827,11 +836,11 @@ export default function Home() {
                 <ParallaxContent>
                     <div className="container" style={{ textAlign: 'center' }}>
                         <a href="https://www.instagram.com/bloom.branding_/?hl=en" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <h2 style={{ fontSize: window.innerWidth < 768 ? '2.2rem' : '4rem', marginBottom: '3rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                                @bloom.branding_ <ArrowUpRight size={window.innerWidth < 768 ? 36 : 56} strokeWidth={0.75} />
+                            <h2 className="insta-title" style={{ cursor: 'pointer' }}>
+                                @bloom.branding_ <ArrowUpRight size={56} strokeWidth={0.75} />
                             </h2>
                         </a>
-                        <div style={{ display: 'grid', gridTemplateColumns: window.innerWidth < 768 ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.5rem' }}>
+                        <div className="insta-grid">
                             {content.instagram.map((item, index) => (
                                 <motion.a
                                     href={item.link}
@@ -843,8 +852,7 @@ export default function Home() {
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.8, delay: index * 0.2, ease: "easeOut" }}
                                     whileHover={{ opacity: 0.8, scale: 1.02 }}
-                                    className="img-placeholder"
-                                    style={{ width: '100%', flexGrow: 1, maxWidth: '350px', aspectRatio: '1', borderRadius: '1px', display: 'block', overflow: 'hidden' }}
+                                    className="img-placeholder insta-item"
                                 >
                                     {item.image ? (
                                         <img src={item.image} alt="Insta" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

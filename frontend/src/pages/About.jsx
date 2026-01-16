@@ -203,6 +203,7 @@ export default function About() {
                     {/* 3. Image Section (Flush Left) */}
                     <div
                         className="image-section about-split-layout"
+                        style={{ width: '100vw' }} // Added width to ensure it fills the viewport
                     >
                         {/* The Image (Flush Left, Full Height, 50% Width on Desktop) */}
                         <div className="about-image-half">
@@ -238,7 +239,7 @@ export default function About() {
                                 <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '5rem', marginBottom: '2rem', color: 'var(--color-dark-choc)', lineHeight: 0.9 }}>
                                     Rooted in <br /> Authenticity
                                 </h2>
-                                <p style={{ fontFamily: 'var(--font-subtitle)', fontSize: '1.5rem', lineHeight: 1.4, color: '#333' }}>
+                                <p style={{ fontFamily: 'var(--font-subtitle)', fontSize: '1.2rem', lineHeight: 1.4, color: '#333', textAlign: 'justify' }}>
                                     We realized that the most powerful brands, like the strongest trees, have deep roots. Our story is about digging deep to find the unique "seed" of every business—its truth, its passion, its reason for being.
                                 </p>
                             </div>
@@ -246,24 +247,24 @@ export default function About() {
                             {/* 2. Vision */}
                             <div className="vision-item about-text-item">
                                 <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '6rem', color: 'var(--color-electric-blue)', marginBottom: '1rem', lineHeight: 1 }}>VISION</h3>
-                                <p style={{ fontFamily: 'var(--font-subtitle)', fontSize: '2rem', lineHeight: 1.4 }}>
-                                    To cultivate distinct identities that stand the test of time.
+                                <p style={{ fontFamily: 'var(--font-subtitle)', fontSize: '1.6rem', lineHeight: 1.4, textAlign: 'justify' }}>
+                                    To cultivate distinct <br className="mobile-break" /> identities that stand the test of time.
                                 </p>
                             </div>
 
                             {/* 3. Values */}
                             <div className="values-item about-text-item">
                                 <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '6rem', color: 'var(--color-electric-blue)', marginBottom: '1rem', lineHeight: 1 }}>VALUES</h3>
-                                <p style={{ fontFamily: 'var(--font-subtitle)', fontSize: '2rem', lineHeight: 1.4 }}>
-                                    Authenticity, Growth, and Creative Courage.
+                                <p style={{ fontFamily: 'var(--font-subtitle)', fontSize: '1.6rem', lineHeight: 1.4, textAlign: 'justify' }}>
+                                    Authenticity, Growth, <br className="mobile-break" /> and Creative Courage.
                                 </p>
                             </div>
 
                             {/* 4. Creative Approach */}
                             <div className="approach-item about-text-item">
                                 <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '5rem', color: 'var(--color-electric-blue)', marginBottom: '1rem', lineHeight: 0.9 }}>CREATIVE <br /> APPROACH</h3>
-                                <p style={{ fontFamily: 'var(--font-subtitle)', fontSize: '2rem', lineHeight: 1.4 }}>
-                                    Merging strategy with fluid, artistic expression.
+                                <p style={{ fontFamily: 'var(--font-subtitle)', fontSize: '1.6rem', lineHeight: 1.4, textAlign: 'justify' }}>
+                                    Merging strategy with fluid, <br className="mobile-break" /> artistic expression.
                                 </p>
                             </div>
 

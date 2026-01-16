@@ -155,7 +155,7 @@ export default function Navbar() {
         if (scrollY < 50) {
             if (location.pathname === '/about') return 'var(--color-dark-choc)'; // About starts Dark
             if (location.pathname === '/') return 'var(--color-dark-choc)';  // Home starts Dark (Hero)
-            if (location.pathname.startsWith('/services')) return 'var(--color-butter-yellow)'; // Services starts Yellow
+            if (location.pathname.startsWith('/services')) return 'var(--color-dark-choc)'; // Services starts Dark
         }
 
         // 2. Normal Logic (Dynamic via events)
@@ -163,10 +163,7 @@ export default function Navbar() {
             return isDarkText ? 'var(--color-dark-choc)' : 'var(--color-butter-yellow)';
         }
 
-        if (!isServices) return 'var(--color-dark-choc)';
-
-        // Services Page Logic
-        return isDarkText ? 'var(--color-dark-choc)' : 'var(--color-butter-yellow)';
+        if (isServices) return 'var(--color-dark-choc)'; // ALWAYS Dark Chocolate per user request
     };
 
     const logoColor = getColor();

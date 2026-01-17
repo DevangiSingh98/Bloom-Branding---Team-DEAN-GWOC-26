@@ -264,7 +264,7 @@ export default function Work() {
     const [modalOpen, setModalOpen] = useState(false);
     const [initialSlide, setInitialSlide] = useState(0);
 
-    const titleContainerVariants = { hidden: { scale: 1.4, y: 0 }, visible: { scale: 1, y: '-32vh', transition: { delay: 1.8, duration: 1.2, ease: [0.16, 1, 0.3, 1] } } };
+    const titleContainerVariants = { hidden: { scale: 1.4, y: 0 }, visible: { scale: 1, y: '-32vh', transition: { delay: 0.5, duration: 1.2, ease: [0.16, 1, 0.3, 1] } } };
     const letterVariants = { hidden: { opacity: 0, y: 50 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8 } } };
 
     return (
@@ -276,7 +276,7 @@ export default function Work() {
                     </h1>
                 </motion.div>
             </div>
-            <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.8, duration: 1.2 }} style={{ position: 'relative', zIndex: 20, paddingTop: '35vh', paddingBottom: '100px' }}>
+            <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 1.2 }} style={{ position: 'relative', zIndex: 20, paddingTop: '35vh', paddingBottom: '100px' }}>
                 <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '0 5%' }}>
                     <div className="work-grid">
                         {projects.map((project, index) => (

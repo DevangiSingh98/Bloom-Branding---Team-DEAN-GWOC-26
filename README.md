@@ -93,8 +93,8 @@ blooms-branding/
 ### 🛠 Developer Experience
 When running `npm run dev` in the frontend, the terminal will automatically display both the **Main Site** and **Admin Dashboard** URLs for quick access:
 
-- `➜  Local: http://localhost:5173/`
-- `➜  Admin: http://localhost:5173/admin`
+- `➜  Main Site: https://bloom-branding-3bdab.web.app/`
+- `➜  Admin: https://bloom-branding-3bdab.web.app/admin`
 
 ---
 

@@ -309,9 +309,11 @@ export default function Chatbot() {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
-                    width: '70px',
+                    width: 'auto',
+                    minWidth: '70px',
                     height: '70px',
-                    borderRadius: '50%',
+                    padding: '0 25px',
+                    borderRadius: '50px',
                     backgroundColor: 'var(--color-electric-blue)',
                     color: 'white',
                     border: 'none',
@@ -320,7 +322,8 @@ export default function Chatbot() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '30px',
+                    fontSize: '18px', // Smaller font for text fit
+                    fontWeight: 'bold',
                     zIndex: 1001,
                     position: 'fixed',
                     right: '20px',

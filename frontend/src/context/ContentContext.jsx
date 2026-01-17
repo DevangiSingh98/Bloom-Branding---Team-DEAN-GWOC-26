@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { storage } from '../firebase';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const ContentContext = createContext();
 
@@ -12,54 +14,99 @@ const defaultContent = {
     },
     allProjects: [
         {
+            id: 1,
             title: "Vardhaman Diam",
             category: "Jewellery Brand",
             image: "/images/project1.png",
+            images: [
+                "/images/project1.png",
+                "https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1618220048045-10a6dbdf83e0?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2400&auto=format&fit=crop"
+            ],
             description: "A luxurious brand identity reflecting the brilliance and precision of fine diamonds."
         },
         {
+            id: 2,
             title: "Binal Patel",
             category: "Fashion Brand",
             image: "/images/project2.png",
+            images: [
+                "/images/project2.png",
+                "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1616486338812-3dadae4b4f9d?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1616137466211-f939a420be63?q=80&w=2400&auto=format&fit=crop"
+            ],
             description: "An elegant, heritage-inspired visual system tailored for a contemporary fashion label."
         },
         {
+            id: 3,
             title: "Life's A Beach",
             category: "Other Lifestyle Brand",
             image: "/images/project3.png",
+            images: [
+                "/images/project3.png",
+                "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1515405295579-ba7b45403062?q=80&w=2400&auto=format&fit=crop"
+            ],
             description: "Vibrant storytelling and strategic positioning for a spirited lifestyle brand."
         },
         {
+            id: 4,
             title: "Thyme & Whisk",
             category: "Cafes & Restaurants",
             image: "/images/project4.png",
+            images: [
+                "/images/project4.png",
+                "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1504384308090-c54be3855833?q=80&w=2400&auto=format&fit=crop"
+            ],
             description: "A flavorful brand experience designed to capture the culinary soul of the restaurant."
         },
         {
+            id: 5,
             title: "AMBC Gems",
             category: "Jewellery Brand",
             image: "/images/project5.png",
+            images: [
+                "/images/project5.png",
+                "https://images.unsplash.com/photo-1449824913929-49aa262918a5?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1518005020951-ecc8e1213ac4?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=2400&auto=format&fit=crop"
+            ],
             description: "Exquisite craftsmanship meets timeless elegance in this jewellery brand identity."
         },
         {
+            id: 6,
             title: "Moire Rugs",
             category: "Home Furnishing Brand",
             image: "/images/project6.png",
+            images: [
+                "/images/project6.png",
+                "https://images.unsplash.com/photo-1516939884455-1445c8652f83?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2400&auto=format&fit=crop"
+            ],
             description: "Weaving tradition with modernity to create a distinct home furnishing identity."
         },
         {
+            id: 7,
             title: "The Right Cut",
             category: "Fashion Brand",
             image: "/images/project7.png",
             description: "Sharp, stylish, and sophisticated branding for a contemporary fashion house."
         },
         {
+            id: 8,
             title: "ShoP",
             category: "Luxury Sourcing Brand",
             image: "/images/project8.png",
             description: "Connecting discernment with luxury through a refined and exclusive brand persona."
         },
         {
+            id: 9,
             title: "Kaffyn",
             category: "Cafes & Restaurants",
             image: "/images/project9.png",
@@ -151,37 +198,117 @@ const defaultContent = {
         { id: 2, name: "Brand 2", logo: "/images/client2.png" },
         { id: 3, name: "Brand 3", logo: "/images/client3.png" }
     ],
+    siteImages: {
+        // Fallbacks for Home Page
+        hero_bg: "/images/herosecbg(2).jpg",
+        home_mag_1: "/images/page1.png",
+        home_mag_2: "/images/page2.png",
+        home_mag_3: "/images/page3.png",
+        home_mag_4: "/images/page4.png",
+        home_main_logo: "/images/main logo.png",
+        home_blooming: "/images/bloomingthebrand.png",
+        home_story: "/images/ourstory.png", // Assuming user wants this editable too
+        home_service_branding: "/images/service_branding.png",
+        home_service_social: "/images/service_jewellery.png",
+        home_service_production: "/images/service_decor.png",
+        home_service_influencer: "/images/service_fashion.png",
+        home_service_creative: "/images/service_lifestyle.png",
+
+        // About Page
+        about_blooming: "/images/dummy9.png",
+        about_vision: "/images/dummy6.png",
+        about_values: "/images/dummy8.png",
+        about_approach: "/images/dummy7.png",
+
+        // Navbar / Menu Icons
+        nav_home: "/images/home.png",
+        nav_story: "/images/ourstory.png",
+        nav_services: "/images/services.png",
+        nav_work: "/images/Ourwork.png",
+        nav_contact: "/images/tele.png"
+    },
     enquiries: [],
     legal: {
-        privacy: '',
-        terms: ''
+        privacy: `<h2>Privacy Policy</h2>
+<p><strong>Effective Date:</strong> January 16, 2026</p>
+
+<h3>1. Introduction</h3>
+<p>Welcome to Bloom Branding. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you as to how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you.</p>
+
+<h3>2. Information We Collect</h3>
+<p>We may collect, use, store and transfer different kinds of personal data about you which we have grouped together follows:</p>
+<ul>
+    <li><strong>Identity Data:</strong> includes first name, last name, username or similar identifier.</li>
+    <li><strong>Contact Data:</strong> includes email address and telephone number.</li>
+    <li><strong>Technical Data:</strong> includes internet protocol (IP) address, your login data, browser type and version, time zone setting and location, browser plug-in types and versions, operating system and platform and other technology on the devices you use to access this website.</li>
+</ul>
+
+<h3>3. How We Use Your Data</h3>
+<p>We will only use your personal data when the law allows us to. Most commonly, we will use your personal data in the following circumstances:</p>
+<ul>
+    <li>Where we need to perform the contract we are about to enter into or have entered into with you.</li>
+    <li>Where it is necessary for our legitimate interests (or those of a third party) and your interests and fundamental rights do not override those interests.</li>
+    <li>Where we need to comply with a legal or regulatory obligation.</li>
+</ul>
+
+<h3>4. Data Security</h3>
+<p>We have put in place appropriate security measures to prevent your personal data from being accidentally lost, used or accessed in an unauthorized way, altered or disclosed.</p>
+
+<h3>5. Your Legal Rights</h3>
+<p>Under certain circumstances, you have rights under data protection laws in relation to your personal data, including the right to request access, correction, erasure, restriction, transfer, to object to processing, to portability of data and (where the lawful ground of processing is consent) to withdraw consent.</p>
+
+<p>If you wish to exercise any of the rights set out above, please contact us.</p>`,
+        terms: `<h2>Terms of Service</h2>
+<p><strong>Last Updated:</strong> January 16, 2026</p>
+
+<h3>1. Terms</h3>
+<p>By accessing the website at Bloom Branding, you are agreeing to be bound by these terms of service, all applicable laws and regulations, and agree that you are responsible for compliance with any applicable local laws. If you do not agree with any of these terms, you are prohibited from using or accessing this site.</p>
+
+<h3>2. Use License</h3>
+<p>Permission is granted to temporarily download one copy of the materials (information or software) on Bloom Branding's website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:</p>
+<ul>
+    <li>modify or copy the materials;</li>
+    <li>use the materials for any commercial purpose, or for any public display (commercial or non-commercial);</li>
+    <li>attempt to decompile or reverse engineer any software contained on Bloom Branding's website;</li>
+    <li>remove any copyright or other proprietary notations from the materials; or</li>
+    <li>transfer the materials to another person or "mirror" the materials on any other server.</li>
+</ul>
+
+<h3>3. Disclaimer</h3>
+<p>The materials on Bloom Branding's website are provided on an 'as is' basis. Bloom Branding makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
+
+<h3>4. Limitations</h3>
+<p>In no event shall Bloom Branding or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Bloom Branding's website.</p>
+
+<h3>5. Governing Law</h3>
+<p>These terms and conditions are governed by and construed in accordance with the laws and you irrevocably submit to the exclusive jurisdiction of the courts in that location.</p>`
     }
 };
 
 export const ContentProvider = ({ children }) => {
-    // Initialize state from localStorage if available, else default
+    // Initialize state from localStorage if available, else default (Forcing Refresh)
     const [content, setContent] = useState(() => {
-        const savedContent = localStorage.getItem('bloomContent_v25'); // Bumped version for legal content
+        const savedContent = localStorage.getItem('bloomContent_v26'); // Bumped version for IDs
         console.log("Loading content...", savedContent ? "Found cached" : "Using default");
         const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
-        // Merge with defaultContent to ensure all mandatory keys (like brandLogos) exist
         return { ...defaultContent, ...parsed };
     });
 
     // Use environment variable for API URL, fallback to localhost for dev
-    const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     // 1. Fetch live projects from MongoDB on mount
     useEffect(() => {
         const fetchProjects = async () => {
             try {
+                // Fetch Projects
                 const response = await fetch(`${API_BASE_URL}/api/projects`);
                 if (response.ok) {
                     const projects = await response.json();
                     if (projects && projects.length > 0) {
                         const mappedProjects = projects.map(p => ({
                             _id: p._id,
-                            id: p._id, // Add id for consistency
+                            id: p._id,
                             title: p.title,
                             category: p.category,
                             image: p.imageUrl,
@@ -214,7 +341,6 @@ export const ContentProvider = ({ children }) => {
                 const fResponse = await fetch(`${API_BASE_URL}/api/founders`);
                 if (fResponse.ok) {
                     const foundersArr = await fResponse.json();
-                    console.log("Fetched Founders:", foundersArr);
                     if (foundersArr && foundersArr.length > 0) {
                         const foundersObj = { ...content.founders };
                         foundersArr.forEach(f => {
@@ -255,43 +381,84 @@ export const ContentProvider = ({ children }) => {
                         setContent(prev => ({ ...prev, selectedWork: mappedWork }));
                     }
                 }
+
+                // Fetch Site Images (NEW)
+                const siResponse = await fetch(`${API_BASE_URL}/api/site-images`);
+                if (siResponse.ok) {
+                    const images = await siResponse.json();
+                    if (images && Object.keys(images).length > 0) {
+                        setContent(prev => ({
+                            ...prev,
+                            siteImages: { ...prev.siteImages, ...images } // Merge with defaults
+                        }));
+                    }
+                }
+
+                // Fetch Legal
+                const lResponse = await fetch(`${API_BASE_URL}/api/legal`);
+                if (lResponse.ok) {
+                    const legalMap = await lResponse.json();
+                    setContent(prev => ({
+                        ...prev,
+                        legal: { ...prev.legal, ...legalMap }
+                    }));
+                }
+
+
             } catch (error) {
                 console.error('Error fetching data from backend:', error);
             }
         };
 
-        const fetchLegalContent = async () => {
-            try {
-                const privacyRes = await fetch(`${API_BASE_URL}/api/legal-content/privacy`);
-                const termsRes = await fetch(`${API_BASE_URL}/api/legal-content/terms`);
-
-                let privacyText = '';
-                let termsText = '';
-
-                if (privacyRes.ok) {
-                    const pData = await privacyRes.json();
-                    privacyText = pData.content || '';
-                }
-                if (termsRes.ok) {
-                    const tData = await termsRes.json();
-                    termsText = tData.content || '';
-                }
-
-                setContent(prev => ({
-                    ...prev,
-                    legal: {
-                        privacy: privacyText,
-                        terms: termsText
-                    }
-                }));
-            } catch (error) {
-                console.error('Error fetching legal content:', error);
-            }
-        };
-
         fetchProjects();
-        fetchLegalContent();
     }, []);
+
+    const updateSiteImage = async (key, section, label, image, token) => {
+        // Optimistic Update
+        setContent(prev => ({
+            ...prev,
+            siteImages: { ...prev.siteImages, [key]: image }
+        }));
+
+        try {
+            await fetch(`${API_BASE_URL}/api/site-images`, {
+                method: 'POST', // Only POST needed as per controller logic (upsert)
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ key, section, label, image })
+            });
+
+        } catch (error) {
+            console.error('Failed to update site image:', error);
+            // Revert optimistic update if needed, but risky without deep copy
+        }
+    };
+
+    const updateLegalContent = async (type, rawContent) => {
+        // Optimistic
+        setContent(prev => ({
+            ...prev,
+            legal: { ...prev.legal, [type]: rawContent }
+        }));
+
+        try {
+            await fetch(`${API_BASE_URL}/api/legal`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${content.founders?.main?.token || localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')).token : ''}` // Fallback token logic
+                },
+                body: JSON.stringify({ type, content: rawContent })
+            });
+            return true;
+        } catch (error) {
+            console.error('Failed to update legal:', error);
+            return false;
+        }
+    };
+
 
     // Helper to sanitize content for localStorage (remove large media)
     const sanitizeForStorage = (data) => {
@@ -335,11 +502,6 @@ export const ContentProvider = ({ children }) => {
             sanitized.enquiries = [];
         }
 
-        // Do not save legal content to local storage (fetch fresh from DB)
-        if (sanitized.legal) {
-            sanitized.legal = { privacy: '', terms: '' };
-        }
-
         return sanitized;
     };
 
@@ -353,16 +515,23 @@ export const ContentProvider = ({ children }) => {
         }
     }, [content]);
 
-    const updateHero = async (updates) => {
+    const updateHero = async (updates, token) => {
         setContent(prev => ({
             ...prev,
             hero: { ...prev.hero, ...updates }
         }));
         // Sync to backend
         try {
+            if (!token) {
+                console.warn("updateHero called without token, skipping backend sync");
+                return;
+            }
             await fetch(`${API_BASE_URL}/api/hero`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ ...content.hero, ...updates })
             });
         } catch (e) { console.error(e); }
@@ -477,7 +646,7 @@ export const ContentProvider = ({ children }) => {
         setContent(defaultContent);
     };
 
-    const resetFounders = () => {
+    const resetFounders = async (token) => {
         const defaults = {
             left: { ...defaultContent.founders.left, key: 'left' },
             right: { ...defaultContent.founders.right, key: 'right' },
@@ -494,16 +663,79 @@ export const ContentProvider = ({ children }) => {
             }
         }));
 
-        // Sync these resets to the backend (updating the active records)
-        // Token is needed effectively, but for now we rely on the Admin component calling us or updating state first.
-        // Wait, Admin calls syncFounder for edits. Reset should also persist.
-        // Since we don't have the token here easily without passing it, we'll return the defaults 
-        // and let the caller handle sync, OR we just update state and let user click "Initialize Database" or similar.
-        // Updates state immediately to defaults. User can then "Save" by acting on it or we can auto-save if token passed.
+        if (token) {
+            // Auto-sync if token is provided
+            try {
+                // Must fetch to get current IDs if they exist to perform updates, 
+                // but syncFounder handles fetch logic or we just overwrite. 
+                // Actually syncFounder uses _id if present in object passed. 
+                // defaults objects won't have _id. 
+                // We need to merge with existing IDs from content state so we UPDATE instead of CREATE duplicates.
+
+                const currentFounders = content.founders;
+
+                // Helper to merge and sync
+                const mergeAndSync = async (key) => {
+                    const defaultData = defaults[key];
+                    const currentData = currentFounders[key];
+                    const merged = { ...defaultData, _id: currentData?._id }; // Preseve ID
+                    await syncFounder(merged, token);
+                };
+
+                await mergeAndSync('left');
+                await mergeAndSync('right');
+                await mergeAndSync('main');
+                console.log("Founders reset and synced to database.");
+            } catch (e) {
+                console.error("Error auto-syncing reset founders:", e);
+            }
+        }
+
         return defaults;
     };
 
-    const syncProject = async (project) => {
+    const resetLegal = async (token) => {
+        const defaults = {
+            privacy: defaultContent.legal.privacy,
+            terms: defaultContent.legal.terms
+        };
+        setContent(prev => ({ ...prev, legal: defaults }));
+
+        if (token) {
+            try {
+                await fetch(`${API_BASE_URL}/api/legal`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ type: 'privacy', content: defaults.privacy })
+                });
+                await fetch(`${API_BASE_URL}/api/legal`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ type: 'terms', content: defaults.terms })
+                });
+                console.log("Legal content reset to defaults.");
+            } catch (e) {
+                console.error("Error resetting legal content:", e);
+            }
+        }
+    };
+
+    const refreshEnquiries = async (token) => {
+        if (!token) return;
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/messages`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const msgs = await response.json();
+                setContent(prev => ({ ...prev, enquiries: msgs }));
+            }
+        } catch (e) {
+            console.error("Failed to refresh enquiries:", e);
+        }
+    };
+
+    const syncProject = async (project, token) => {
         try {
             const body = {
                 title: project.title,
@@ -518,17 +750,19 @@ export const ContentProvider = ({ children }) => {
                 ? `${API_BASE_URL}/api/projects/${project._id}`
                 : `${API_BASE_URL}/api/projects`;
 
-            const method = project._id ? 'PUT' : 'POST'; // Assuming PUT exists for update
+            const method = project._id ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(body)
             });
 
             if (response.ok) {
                 const savedProject = await response.json();
-                // Refresh local state with backend data (especially for new projects with IDs)
                 if (!project._id) {
                     setContent(prev => ({
                         ...prev,
@@ -538,17 +772,21 @@ export const ContentProvider = ({ children }) => {
                     }));
                 }
                 return savedProject;
+            } else {
+                console.error("Sync Project Failed:", await response.text());
+                alert("Failed to save project. Ensure you are logged in.");
             }
         } catch (error) {
             console.error('Error syncing project to backend:', error);
         }
     };
 
-    const removeProject = async (id) => {
+    const removeProject = async (id, token) => {
         if (!id) return;
         try {
             const response = await fetch(`${API_BASE_URL}/api/projects/${id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             return response.ok;
         } catch (error) {
@@ -556,13 +794,16 @@ export const ContentProvider = ({ children }) => {
         }
     };
 
-    const syncTestimonial = async (t) => {
+    const syncTestimonial = async (t, token) => {
         try {
             const url = t._id ? `${API_BASE_URL}/api/testimonials/${t._id}` : `${API_BASE_URL}/api/testimonials`;
             const method = t._id ? 'PUT' : 'POST';
             const response = await fetch(url, {
                 method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(t)
             });
             if (response.ok) {
@@ -576,24 +817,33 @@ export const ContentProvider = ({ children }) => {
                     }));
                 }
                 return saved;
+            } else {
+                console.error("Sync Testimonial Failed");
+                alert("Failed to save testimonial. Ensure you are logged in.");
             }
         } catch (e) { console.error(e); }
     };
 
-    const removeTestimonial = async (id) => {
+    const removeTestimonial = async (id, token) => {
         if (!id) return;
         try {
-            await fetch(`${API_BASE_URL}/api/testimonials/${id}`, { method: 'DELETE' });
+            await fetch(`${API_BASE_URL}/api/testimonials/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
         } catch (e) { console.error(e); }
     };
 
-    const syncInstagram = async (post) => {
+    const syncInstagram = async (post, token) => {
         try {
             const url = post._id ? `${API_BASE_URL}/api/instagram/${post._id}` : `${API_BASE_URL}/api/instagram`;
             const method = post._id ? 'PUT' : 'POST';
             const response = await fetch(url, {
                 method,
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(post)
             });
             if (response.ok) {
@@ -607,14 +857,20 @@ export const ContentProvider = ({ children }) => {
                     }));
                 }
                 return saved;
+            } else {
+                console.error("Sync Instagram Failed");
+                alert("Failed to save Instagram post.");
             }
         } catch (e) { console.error(e); }
     };
 
-    const removeInstagram = async (id) => {
+    const removeInstagram = async (id, token) => {
         if (!id) return;
         try {
-            await fetch(`${API_BASE_URL}/api/instagram/${id}`, { method: 'DELETE' });
+            await fetch(`${API_BASE_URL}/api/instagram/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
         } catch (e) { console.error(e); }
     };
 
@@ -631,7 +887,6 @@ export const ContentProvider = ({ children }) => {
             });
             if (response.ok) {
                 const saved = await response.json();
-                // Ensure we update the LOCAL state with the database ID to prevent future duplicates
                 setContent(prev => {
                     const newFounders = { ...prev.founders };
                     if (saved.key && newFounders[saved.key]) {
@@ -639,21 +894,32 @@ export const ContentProvider = ({ children }) => {
                     }
                     return { ...prev, founders: newFounders };
                 });
+            } else {
+                console.error("Sync Founder Failed");
+                alert("Failed to save founder data.");
             }
         } catch (e) { console.error(e); }
     };
 
-    const removeFounder = async (id) => {
+    const removeFounder = async (id, token) => {
         if (!id) return;
-        try { await fetch(`${API_BASE_URL}/api/founders/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+        try {
+            await fetch(`${API_BASE_URL}/api/founders/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+        } catch (e) { console.error(e); }
     };
 
-    const syncValue = async (v) => {
+    const syncValue = async (v, token) => {
         try {
             const url = v._id ? `${API_BASE_URL}/api/values/${v._id}` : `${API_BASE_URL}/api/values`;
             const response = await fetch(url, {
                 method: v._id ? 'PUT' : 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(v)
             });
             if (response.ok) {
@@ -664,31 +930,39 @@ export const ContentProvider = ({ children }) => {
                         values: prev.values.map(item => (item.id === v.id && !item._id) ? { ...saved, id: saved._id } : item)
                     }));
                 }
+            } else {
+                console.error("Sync Value Failed");
+                alert("Failed to save value.");
             }
         } catch (e) { console.error(e); }
     };
 
-    const removeValue = async (id) => {
+    const removeValue = async (id, token) => {
         if (!id) return;
-        try { await fetch(`${API_BASE_URL}/api/values/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+        try {
+            await fetch(`${API_BASE_URL}/api/values/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+        } catch (e) { console.error(e); }
     };
 
-    const syncBrand = async (c) => {
-        console.log("Syncing Brand:", c); // Debug log
+    const syncBrand = async (c, token) => {
+        console.log("Syncing Brand:", c);
         try {
             const url = c._id ? `${API_BASE_URL}/api/brands/${c._id}` : `${API_BASE_URL}/api/brands`;
-            console.log("Sync URL:", url, "Method:", c._id ? 'PUT' : 'POST');
 
             const response = await fetch(url, {
                 method: c._id ? 'PUT' : 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(c)
             });
-            console.log("Sync Response Status:", response.status);
 
             if (response.ok) {
                 const saved = await response.json();
-                console.log("Saved Brand:", saved);
                 if (!c._id) {
                     setContent(prev => ({
                         ...prev,
@@ -696,28 +970,39 @@ export const ContentProvider = ({ children }) => {
                     }));
                 }
             } else {
-                console.error("Sync Failed:", await response.text());
-                alert("Failed to save brand to database. Please ensure the backend server is running.");
+                console.error("Sync Brand Failed:", await response.text());
+                alert("Failed to save brand to database. Please ensure you are logged in.");
             }
         } catch (e) {
             console.error("Sync Exception:", e);
-            alert("Connection Error: Could not reach the server. Please check if the backend is running on port 5000.");
+            alert("Connection Error: Could not reach the server.");
         }
     };
 
-    const removeBrand = async (id) => {
+    const removeBrand = async (id, token) => {
         if (!id) return;
-        try { await fetch(`${API_BASE_URL}/api/brands/` + id, { method: 'DELETE' }); } catch (e) { console.error(e); }
+        try {
+            await fetch(`${API_BASE_URL}/api/brands/` + id, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+        } catch (e) { console.error(e); }
     };
 
-    const syncSelectedWork = async (w) => {
+    const syncSelectedWork = async (w, token) => {
         try {
             const url = w._id ? `${API_BASE_URL}/api/selected-work/${w._id}` : `${API_BASE_URL}/api/selected-work`;
+            const method = w._id ? 'PUT' : 'POST';
+
             const response = await fetch(url, {
-                method: w._id ? 'PUT' : 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(w)
             });
+
             if (response.ok) {
                 const saved = await response.json();
                 if (!w._id) {
@@ -726,39 +1011,60 @@ export const ContentProvider = ({ children }) => {
                         selectedWork: prev.selectedWork.map(item => (item.id === w.id && !item._id) ? { ...saved, id: saved._id } : item)
                     }));
                 }
+                return saved;
+            } else {
+                console.error("Sync Selected Work Failed");
+                alert("Failed to save selected work.");
             }
         } catch (e) { console.error(e); }
     };
 
-    const removeSelectedWork = async (id) => {
+    const removeSelectedWork = async (id, token) => {
         if (!id) return;
-        try { await fetch(`${API_BASE_URL}/api/selected-work/${id}`, { method: 'DELETE' }); } catch (e) { console.error(e); }
+        try {
+            await fetch(`${API_BASE_URL}/api/selected-work/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+        } catch (e) { console.error(e); }
     };
 
-    const updateLegalContent = async (type, contentText) => {
-        console.log(`[ContentContext] Updating ${type} with:`, contentText?.substring(0, 50));
+    // --- Cloud Storage Upload ---
+    // --- Cloud Storage Upload (Cloudinary) ---
+    const uploadFile = async (file) => {
+        if (!file) return null;
+
+        const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+        const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+        if (!cloudName || !uploadPreset) {
+            console.error("Cloudinary credentials missing! Check .env file.");
+            alert("Cloudinary configuration missing. Please check console.");
+            return null; // Stops the upload attempt
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', uploadPreset);
+
         try {
-            const response = await fetch(`${API_BASE_URL}/api/legal-content/${type}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content: contentText })
+            // Using 'auto' allows both image and video uploads
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
+                method: 'POST',
+                body: formData,
             });
-            if (response.ok) {
-                const updated = await response.json();
-                setContent(prev => ({
-                    ...prev,
-                    legal: {
-                        ...prev.legal,
-                        [type]: updated.content
-                    }
-                }));
-                return updated;
-            } else {
-                console.error(`[ContentContext] Update failed: ${response.status} ${response.statusText}`);
-                const errText = await response.text();
-                console.error(`[ContentContext] Error details:`, errText);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error.message || 'Upload failed');
             }
-        } catch (e) { console.error(`[ContentContext] Exception:`, e); }
+
+            const data = await response.json();
+            return data.secure_url; // Returns the HTTPS URL
+        } catch (error) {
+            console.error("Cloudinary Upload Error:", error);
+            throw error;
+        }
     };
 
     return (
@@ -793,7 +1099,11 @@ export const ContentProvider = ({ children }) => {
             addEnquiry,
             resetContent,
             resetFounders,
-            updateLegalContent
+            resetLegal,
+            refreshEnquiries,
+            uploadFile, // Export this
+            updateLegalContent,
+            updateSiteImage
         }}>
             {children}
         </ContentContext.Provider>

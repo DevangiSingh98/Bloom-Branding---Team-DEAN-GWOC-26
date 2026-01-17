@@ -2,6 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
+import { notFound, errorHandler } from './middleware/errorMiddleware.js';
+
 import projectRoutes from './routes/projectRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
@@ -14,7 +16,8 @@ import brandRoutes from './routes/brandRoutes.js';
 import selectedWorkRoutes from './routes/selectedWorkRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import heroRoutes from './routes/heroRoutes.js';
-import legalContentRoutes from './routes/legalContentRoutes.js';
+import siteImageRoutes from './routes/siteImageRoutes.js';
+import legalRoutes from './routes/legalRoutes.js';
 
 // Load env vars from root directory
 dotenv.config({ path: '../.env' });
@@ -27,6 +30,12 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
+// Custom Logger Middleware
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} | ${req.method} ${req.originalUrl}`);
+    next();
+});
+
 // Database Connection
 // Check if URI is loaded
 if (!process.env.MONGODB_URI) {
@@ -34,6 +43,11 @@ if (!process.env.MONGODB_URI) {
     console.warn('Attempting to look for .env in current directory...');
     dotenv.config(); // Try current directory as fallback
 }
+// Security Check
+if (!process.env.JWT_SECRET) {
+    console.warn('⚠️ WARNING: JWT_SECRET is not defined! Using fallback "secret". THIS IS INSECURE FOR PRODUCTION.');
+}
+
 connectDB();
 
 // Routes
@@ -48,13 +62,17 @@ app.use('/api/values', valueRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/selected-work', selectedWorkRoutes);
 app.use('/api/hero', heroRoutes);
-app.use('/api/legal-content', legalContentRoutes);
+app.use('/api/site-images', siteImageRoutes);
+app.use('/api/legal', legalRoutes);
 app.use('/api/chat', chatRoutes);
 
 app.get('/', (req, res) => {
     res.send('API is running...');
 });
 
+// Error Handling Middleware (Must be last)
+app.use(notFound);
+app.use(errorHandler);
 
 // Start Server
 const PORT = process.env.PORT || 5000;

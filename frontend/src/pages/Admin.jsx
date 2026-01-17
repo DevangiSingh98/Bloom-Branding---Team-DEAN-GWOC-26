@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useContent } from '../context/ContentContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) => {
+const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image", onUpload, pathPrefix }) => {
     const [fileName, setFileName] = useState("No file chosen");
     const fileInputRef = React.useRef(null);
 
@@ -10,15 +10,34 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
         const file = e.target.files[0];
         if (file) {
             setFileName(file.name);
+
+            // OPTIMIZATION: If onUpload is provided (Cloud Storage), upload RAW file immediately.
+            // Skipping client-side compression to ensure <10s upload speeds for large files.
+            if (onUpload) {
+                const folder = pathPrefix || 'uploads';
+                const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+                const storagePath = `${folder}/${Date.now()}_${cleanName}`;
+
+                setFileName("Uploading (Raw)...");
+                onUpload(file, storagePath).then(url => {
+                    setFileName(file.name + " (Uploaded)");
+                    onFileSelect(url);
+                }).catch(err => {
+                    setFileName("Upload Failed");
+                    console.error(err);
+                });
+                return;
+            }
+
+            // Legacy Logic (Base64/Canvas) - Only used if no onUpload provided
             const reader = new FileReader();
             reader.onloadend = () => {
-                // If it's a video, don't try to compress with canvas (image only)
                 if (type === 'video') {
                     onFileSelect(reader.result);
                     return;
                 }
 
-                // Image compression logic
+                // Image compression logic (Legacy)
                 const img = new Image();
                 img.src = reader.result;
                 img.onload = () => {
@@ -44,6 +63,7 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
+
                     const compressedDataUrl = canvas.toDataURL('image/png');
                     onFileSelect(compressedDataUrl);
                 };
@@ -55,10 +75,10 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
     return (
         <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', fontSize: '1.1rem', marginBottom: '0.5rem', color: '#666' }}>{label}</label>
-            <div className="file-upload-container" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'nowrap' }}>
+            <div className="file-upload-container" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                 <div style={{
-                    width: '60px',
-                    height: '60px',
+                    width: '80px',
+                    height: '80px',
                     borderRadius: '5px',
                     overflow: 'hidden',
                     border: '1px solid #ddd',
@@ -91,8 +111,8 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
                         className="admin-upload-btn"
                         onClick={() => fileInputRef.current.click()}
                         style={{
-                            padding: '0.5rem 0.8rem',
-                            fontSize: '0.85rem',
+                            padding: '0.8rem 1.2rem',
+                            fontSize: '1rem',
                             border: '1px solid #ccc',
                             borderRadius: '4px',
                             backgroundColor: '#f0f0f0',
@@ -138,6 +158,22 @@ const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image" }) =>
         </div>
     );
 };
+
+// ... (Rest of code)
+
+// Helper for Instagram Preview
+// Helper for Instagram Preview
+const getInstagramSrc = (src) => {
+    if (!src) return null;
+    if (src.includes('instagram.com/p/')) {
+        // Strip query params (?...) and trailing slash, then append media modifier
+        const baseUrl = src.split('?')[0].replace(/\/$/, '');
+        return baseUrl + '/media/?size=l';
+    }
+    return src;
+};
+
+
 
 const CustomModal = ({ show, title, message, type = 'info', onConfirm, onCancel, confirmText, confirmColor }) => {
     if (!show) return null;
@@ -315,6 +351,44 @@ const AuthButton = ({ onClick, children, disabled, variant = 'primary', style })
     </button>
 );
 
+const InstagramPreview = ({ item }) => {
+    const [imgError, setImgError] = React.useState(false);
+
+    // 1. Video Support
+    if (item.link && item.link.match(/\.(mp4|webm|ogg)$/i)) {
+        return <video src={item.link} style={{ width: '100%', height: '100%', objectFit: 'cover' }} muted />;
+    }
+
+    // 2. Placeholder Logic
+    // If we have an error, OR if it's an IG link without a custom image update
+    // (We assume if image === link, it's basically just the default state)
+    const isIgLink = item.link && item.link.includes('instagram.com');
+    const isDefaultImage = item.image && item.image.includes('instagram.com');
+
+    if (imgError || (isIgLink && isDefaultImage)) {
+        return (
+            <div style={{
+                width: '100%', height: '100%',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)',
+                color: 'white', fontSize: '0.8rem', textAlign: 'center', padding: '5px'
+            }}>
+                <span style={{ fontSize: '0.7rem' }}>{imgError ? 'No Preview' : 'IG Post'}</span>
+            </div>
+        );
+    }
+
+    // 3. Image Render
+    return (
+        <img
+            src={item.image || item.link}
+            alt="Preview"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            onError={() => setImgError(true)}
+        />
+    );
+};
+
 const Admin = () => {
     // Auth State
     const [userInfo, setUserInfo] = useState(() => {
@@ -412,18 +486,35 @@ const Admin = () => {
 
     const {
         content,
-        syncProject, removeProject,
-        syncTestimonial, removeTestimonial,
-        syncInstagram, removeInstagram,
-        syncFounder, removeFounder,
-        syncValue, removeValue,
-        syncBrand, removeBrand,
-        syncSelectedWork, removeSelectedWork,
-        updateHero, updateAllProjects, updateSelectedWork, updateTestimonials, updateBrandLogos, updateInstagram, updateFounders, updateValues, updateEnquiries,
-        removeEnquiry, removeEnquiries, removeAllEnquiries, resetContent,
-        updateLegalContent
+        updateHero,
+        updateAllProjects,
+        addProject,
+        removeProject,
+        updateSelectedWork,
+        addSelectedWork,
+        removeSelectedWork,
+        updateInstagram,
+        syncInstagram,
+        uploadFile,
+        updateFounders,
+        resetFounders,
+        updateSiteImage,
+        updateLegalContent,
+        resetLegal,
+        refreshEnquiries,
+        enquiries,
+        removeEnquiry,
+        removeEnquiries,
+        removeAllEnquiries
     } = useContent();
-    const [activeTab, setActiveTab] = useState('enquiries');
+
+    const [activeTab, setActiveTab] = useState('projects');
+
+    useEffect(() => {
+        if (userInfo && userInfo.token) {
+            refreshEnquiries(userInfo.token);
+        }
+    }, [userInfo]);
     const [openEnquiryId, setOpenEnquiryId] = useState(null);
     const [isInitializing, setIsInitializing] = useState(false);
     const [legalForm, setLegalForm] = useState({ privacy: '', terms: '' });
@@ -431,9 +522,6 @@ const Admin = () => {
     // Sync legal form with content when loaded or tab changed
     useEffect(() => {
         if (activeTab === 'legal') {
-            console.log("Admin: Legal tab active, syncing form...");
-            // Force refresh from context if available, or maybe allow context to refresh?
-            // Actually, let's just rely on what's in context but ensure we log it.
             if (content.legal) {
                 setLegalForm({
                     privacy: content.legal.privacy || '',
@@ -541,7 +629,7 @@ const Admin = () => {
         showAlert(title, message, 'confirm', onConfirm, confirmText, confirmColor);
     };
 
-    const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL || 'https://bloom-backend-pq68.onrender.com';
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -581,47 +669,47 @@ const Admin = () => {
                 setIsInitializing(true);
                 try {
                     // Sync Hero
-                    if (content.hero) await updateHero(content.hero);
+                    if (content.hero) await updateHero(content.hero); // updateHero already handles its own sync internally in ContentContext without token param? Checks... updateHero in ContentContext uses fetch but NO token? need to check updateHero too.
 
                     // Sync All Projects
                     if (content.allProjects) {
                         for (const item of content.allProjects) {
-                            await syncProject(item);
+                            await syncProject(item, userInfo.token);
                         }
                     }
 
                     // Sync Selected Work (Projects on Work page)
                     if (content.selectedWork) {
                         for (const item of content.selectedWork) {
-                            await syncSelectedWork(item);
+                            await syncSelectedWork(item, userInfo.token);
                         }
                     }
 
                     // Sync Testimonials
                     if (content.testimonials) {
                         for (const item of content.testimonials) {
-                            await syncTestimonial(item);
+                            await syncTestimonial(item, userInfo.token);
                         }
                     }
 
                     // Sync Instagram
                     if (content.instagram) {
                         for (const item of content.instagram) {
-                            await syncInstagram(item);
+                            await syncInstagram(item, userInfo.token);
                         }
                     }
 
                     // Sync Values
                     if (content.values) {
                         for (const item of content.values) {
-                            await syncValue(item);
+                            await syncValue(item, userInfo.token);
                         }
                     }
 
                     // Sync Brands
                     if (content.brandLogos) {
                         for (const item of content.brandLogos) {
-                            await syncBrand(item);
+                            await syncBrand(item, userInfo.token);
                         }
                     }
 
@@ -654,7 +742,7 @@ const Admin = () => {
     });
 
     const handleHeroChange = (e) => {
-        updateHero({ [e.target.name]: e.target.value });
+        updateHero({ [e.target.name]: e.target.value }, userInfo.token);
     };
 
     const handleFoundersChange = (section, field, value) => {
@@ -674,55 +762,56 @@ const Admin = () => {
             newArray = [...content.selectedWork];
             newArray[index] = { ...newArray[index], [field]: value };
             updateSelectedWork(newArray);
-            syncSelectedWork(newArray[index]);
+            syncSelectedWork(newArray[index], userInfo.token);
         } else if (type === 'projects') {
             newArray = [...content.allProjects];
             newArray[index] = { ...newArray[index], [field]: value };
             updateAllProjects(newArray);
-            syncProject(newArray[index]);
+            syncProject(newArray[index], userInfo.token);
         } else if (type === 'testimonials') {
             newArray = [...content.testimonials];
             newArray[index] = { ...newArray[index], [field]: value };
             updateTestimonials(newArray);
-            syncTestimonial(newArray[index]);
+            syncTestimonial(newArray[index], userInfo.token);
         } else if (type === 'instagram') {
             newArray = [...content.instagram];
             newArray[index] = { ...newArray[index], [field]: value };
             updateInstagram(newArray);
-            syncInstagram(newArray[index]);
+            syncInstagram(newArray[index], userInfo.token);
         } else if (type === 'values') {
             newArray = [...content.values];
             newArray[index] = { ...newArray[index], [field]: value };
             updateValues(newArray);
-            syncValue(newArray[index]);
+            syncValue(newArray[index], userInfo.token);
         } else if (type === 'brands') {
             newArray = [...content.brandLogos];
             newArray[index] = { ...newArray[index], [field]: value };
             updateBrandLogos(newArray);
-            syncBrand(newArray[index]);
+            syncBrand(newArray[index], userInfo.token);
         }
     };
 
     const addItem = async (type) => {
         const tempId = Date.now() + Math.random();
+        // PREPEND new items to make them appear at the top
         if (type === 'work') {
             const newItem = { id: tempId, title: "New Project", category: "Category", image: "" };
-            updateSelectedWork([...content.selectedWork, newItem]);
+            updateSelectedWork([newItem, ...content.selectedWork]);
         } else if (type === 'projects') {
             const newProject = { id: tempId, title: "New Project", category: "Category", image: "", description: "Description" };
-            updateAllProjects([...content.allProjects, newProject]);
+            updateAllProjects([newProject, ...content.allProjects]);
         } else if (type === 'testimonials') {
             const newItem = { id: tempId, text: "New testimonial", author: "Author", rating: 5 };
-            updateTestimonials([...content.testimonials, newItem]);
+            updateTestimonials([newItem, ...content.testimonials]);
         } else if (type === 'instagram') {
             const newItem = { id: tempId, image: "", link: "#" };
-            updateInstagram([...content.instagram, newItem]);
+            updateInstagram([newItem, ...content.instagram]);
         } else if (type === 'values') {
             const newItem = { id: tempId, title: "New Value", text: "Description" };
-            updateValues([...content.values, newItem]);
+            updateValues([newItem, ...content.values]);
         } else if (type === 'brands') {
             const newItem = { id: tempId, logo: "" };
-            updateBrandLogos([...content.brandLogos, newItem]);
+            updateBrandLogos([newItem, ...content.brandLogos]);
         }
     };
 
@@ -734,22 +823,22 @@ const Admin = () => {
                 let newArray;
                 if (type === 'projects') {
                     const item = content.allProjects[index];
-                    if (item._id) await removeProject(item._id);
+                    if (item._id) await removeProject(item._id, userInfo.token);
                 } else if (type === 'testimonials') {
                     const item = content.testimonials[index];
-                    if (item._id) await removeTestimonial(item._id);
+                    if (item._id) await removeTestimonial(item._id, userInfo.token);
                 } else if (type === 'instagram') {
                     const item = content.instagram[index];
-                    if (item._id) await removeInstagram(item._id);
+                    if (item._id) await removeInstagram(item._id, userInfo.token);
                 } else if (type === 'work') {
                     const item = content.selectedWork[index];
-                    if (item._id) await removeSelectedWork(item._id);
+                    if (item._id) await removeSelectedWork(item._id, userInfo.token);
                 } else if (type === 'values') {
                     const item = content.values[index];
-                    if (item._id) await removeValue(item._id);
+                    if (item._id) await removeValue(item._id, userInfo.token);
                 } else if (type === 'brands') {
                     const item = content.brandLogos[index];
-                    if (item._id) await removeBrand(item._id);
+                    if (item._id) await removeBrand(item._id, userInfo.token);
                 }
 
                 if (type === 'work') newArray = content.selectedWork.filter((_, i) => i !== index);
@@ -982,7 +1071,7 @@ const Admin = () => {
             </div>
 
             <div className="admin-tabs-container">
-                {['enquiries', 'projects', 'selected work', 'founder', 'testimonials', 'instagram', 'brands', 'legal'].map(tab => (
+                {['enquiries', 'projects', 'selected work', 'founder', 'testimonials', 'instagram', 'brands', 'site-images', 'legal'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -1085,7 +1174,7 @@ const Admin = () => {
             <div style={{ backgroundColor: 'white', padding: '2rem', borderRadius: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.05)' }}>
                 {activeTab === 'enquiries' && (
                     <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', alignItems: 'center' }}>
+                        <div className="admin-section-header">
                             <h2 style={{ fontSize: '2.5rem', margin: 0, color: 'var(--color-electric-blue)' }}>Enquiries</h2>
                             <div style={{ display: 'flex', gap: '1rem' }}>
                                 {selectedEnquiries.size > 0 && (
@@ -1249,8 +1338,13 @@ const Admin = () => {
                 {/* PROJECT MANAGEMENT (BRAND PROFILES) */}
                 {activeTab === 'projects' && (
                     <div>
-                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Manage All Projects</h2>
-                        <p style={{ fontSize: '1.3rem', color: '#666', marginBottom: '1.5rem' }}>Add, edit, or remove projects from the global portfolio.</p>
+                        <div className="admin-section-header">
+                            <div>
+                                <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Manage All Projects</h2>
+                                <p style={{ fontSize: '1.3rem', color: '#666', margin: 0 }}>Add, edit, or remove projects from the global portfolio.</p>
+                            </div>
+                            <button onClick={() => addItem('projects')} className="btn-primary" style={{ fontSize: '1rem', padding: '0.8rem 1.5rem', whiteSpace: 'nowrap' }}>+ Add New Project</button>
+                        </div>
                         {content.allProjects.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
@@ -1282,6 +1376,8 @@ const Admin = () => {
                                         value={item.image}
                                         onFileSelect={(val) => handleArrayChange(index, 'image', val, 'projects')}
                                         onRemove={() => handleArrayChange(index, 'image', '', 'projects')}
+                                        onUpload={uploadFile}
+                                        pathPrefix="projects"
                                     />
                                     <FileUpload
                                         label="Project Video"
@@ -1289,18 +1385,24 @@ const Admin = () => {
                                         type="video"
                                         onFileSelect={(val) => handleArrayChange(index, 'video', val, 'projects')}
                                         onRemove={() => handleArrayChange(index, 'video', '', 'projects')}
+                                        onUpload={uploadFile}
+                                        pathPrefix="projects/videos"
                                     />
                                 </div>
                             </div>
                         ))}
-                        <button onClick={() => addItem('projects')} className="btn-primary" style={{ fontSize: '1.1rem', padding: '0.8rem 1.5rem' }}>Add New Project</button>
                     </div>
                 )}
 
                 {activeTab === 'selected work' && (
                     <div>
-                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Selected Work (Home Page)</h2>
-                        <p style={{ fontSize: '1.3rem', color: '#666', marginBottom: '1.5rem' }}>Select which projects to feature on the Home page.</p>
+                        <div className="admin-section-header">
+                            <div>
+                                <h2 style={{ fontSize: '2.5rem', margin: 0 }}>Selected Work</h2>
+                                <p style={{ fontSize: '1.3rem', color: '#666', margin: 0 }}>Select which projects to feature on the Home page.</p>
+                            </div>
+                            <button onClick={() => addItem('work')} className="btn-primary" style={{ fontSize: '0.9rem', padding: '0.6rem 1.2rem', whiteSpace: 'nowrap' }}>+ Add Slot</button>
+                        </div>
                         {content.selectedWork.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ marginBottom: '0.5rem' }}>
@@ -1323,8 +1425,8 @@ const Admin = () => {
                                         style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid #ccc', fontSize: '1.15rem' }}
                                     >
                                         <option value="" disabled>Select a project...</option>
-                                        {content.allProjects && content.allProjects.map((proj) => (
-                                            <option key={proj.title || proj.id} value={proj.title}>
+                                        {content.allProjects && content.allProjects.map((proj, idx) => (
+                                            <option key={proj._id || proj.id || idx} value={proj.title}>
                                                 {proj.title}
                                             </option>
                                         ))}
@@ -1346,6 +1448,8 @@ const Admin = () => {
                                         value={item.image}
                                         onFileSelect={(val) => handleArrayChange(index, 'image', val, 'work')}
                                         onRemove={() => handleArrayChange(index, 'image', '', 'work')}
+                                        onUpload={uploadFile}
+                                        pathPrefix="work"
                                     />
                                     <FileUpload
                                         label="Override Video"
@@ -1353,17 +1457,21 @@ const Admin = () => {
                                         type="video"
                                         onFileSelect={(val) => handleArrayChange(index, 'video', val, 'work')}
                                         onRemove={() => handleArrayChange(index, 'video', '', 'work')}
+                                        onUpload={uploadFile}
+                                        pathPrefix="work/videos"
                                     />
                                 </div>
                             </div>
                         ))}
-                        <button onClick={() => addItem('work')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add Project Slot</button>
                     </div>
                 )}
 
                 {activeTab === 'testimonials' && (
                     <div>
-                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Testimonials</h2>
+                        <div className="admin-section-header">
+                            <h2 style={{ fontSize: '2.5rem', margin: 0 }}>Testimonials</h2>
+                            <button onClick={() => addItem('testimonials')} className="btn-primary" style={{ fontSize: '0.9rem', padding: '0.6rem 1.2rem', whiteSpace: 'nowrap' }}>+ Add Testimonial</button>
+                        </div>
                         {content.testimonials.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ marginBottom: '1rem' }}>
@@ -1387,7 +1495,6 @@ const Admin = () => {
 
                             </div>
                         ))}
-                        <button onClick={() => addItem('testimonials')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add Testimonial</button>
                     </div>
                 )}
 
@@ -1416,7 +1523,7 @@ const Admin = () => {
                                         zIndex: 10
                                     }}
                                 >
-                                    ✕
+                                    X
                                 </button>
                                 <div style={{ marginBottom: '1rem', paddingRight: '40px' }}>
                                     <FileUpload
@@ -1430,10 +1537,10 @@ const Admin = () => {
                                     <label style={{ display: 'block', marginBottom: '0.5rem', color: '#666' }}>Link</label>
                                     <input value={item.link} onChange={(e) => handleArrayChange(index, 'link', e.target.value, 'instagram')} placeholder="Link URL" style={{ width: '100%', padding: '0.8rem', border: '1px solid #eee', borderRadius: '4px' }} />
                                 </div>
-                            </div >
+                            </div>
                         ))}
                         <button onClick={() => addItem('instagram')} className="btn-primary" style={{ fontSize: '0.8rem' }}>Add Post</button>
-                    </div >
+                    </div>
                 )}
 
                 {activeTab === 'brands' && (
@@ -1470,17 +1577,13 @@ const Admin = () => {
                     activeTab === 'founder' && (
                         <div style={{ display: 'grid', gap: '2rem' }}>
                             <div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                <div className="admin-section-header">
                                     <h2 style={{ fontSize: '2.5rem', margin: 0 }}>Founders</h2>
                                     <button
                                         onClick={() => {
                                             if (window.confirm("Are you sure you want to reset Founders data to defaults?")) {
-                                                const defaults = resetFounders();
-                                                // After resetting state, we should ideally sync if we have the token
-                                                // Since resetFounders updates state, we can rely on the user clicking "Initialize Database" 
-                                                // OR we can explicitly call sync here if we expose a return value.
-                                                // For now, let's notify the user to save.
-                                                alert("Founders reset to default values. Please click 'Initialize Database' to save these changes permanently.");
+                                                resetFounders(userInfo.token);
+                                                alert("Founders reset to default values and synced to database.");
                                             }
                                         }}
                                         style={{ padding: '0.5rem 1rem', backgroundColor: '#666', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
@@ -1493,10 +1596,12 @@ const Admin = () => {
                                     value={content.founders.main?.image || ''}
                                     onFileSelect={(val) => handleFoundersChange('main', 'image', val)}
                                     onRemove={() => handleFoundersChange('main', 'image', '')}
+                                    onUpload={uploadFile}
+                                    pathPrefix="founders"
                                 />
                             </div>
 
-                            <div className="admin-grid-2">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                                 {/* Founder 1 */}
                                 <div style={{ border: '1px solid #ddd', padding: '1.5rem', borderRadius: '8px' }}>
                                     <h3>Founder 1</h3>
@@ -1520,13 +1625,147 @@ const Admin = () => {
                                 </div>
                             </div>
                         </div>
-
                     )
                 }
 
+                {activeTab === 'site-images' && (
+                    <div>
+                        <div className="admin-section-header">
+                            <h2 style={{ fontSize: '2.5rem', margin: 0 }}>Site Images Management</h2>
+                        </div>
+                        <p style={{ marginBottom: '2rem', color: '#666' }}>Manage static images across the website (Hero, Backgrounds, Service Icons, etc).</p>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
+                            {/* Hero Section */}
+                            <div className="admin-card">
+                                <h3>Home: Hero Section</h3>
+                                <FileUpload
+                                    label="Hero Background"
+                                    value={content.siteImages?.hero_bg || ''}
+                                    onFileSelect={(val) => updateSiteImage('hero_bg', 'Home', 'Hero Background', val, userInfo.token)}
+                                    onRemove={() => updateSiteImage('hero_bg', 'Home', 'Hero Background', '', userInfo.token)}
+                                    onUpload={uploadFile}
+                                    pathPrefix="site_assets"
+                                />
+                                {[1, 2, 3, 4].map(num => (
+                                    <FileUpload
+                                        key={`mag${num}`}
+                                        label={`Magazine/Poster ${num}`}
+                                        value={content.siteImages?.[`home_mag_${num}`] || ''}
+                                        onFileSelect={(val) => updateSiteImage(`home_mag_${num}`, 'Home', `Magazine ${num}`, val, userInfo.token)}
+                                        onRemove={() => updateSiteImage(`home_mag_${num}`, 'Home', `Magazine ${num}`, '', userInfo.token)}
+                                        onUpload={uploadFile}
+                                        pathPrefix="site_assets"
+                                    />
+                                ))}
+                                <FileUpload
+                                    label="Main Logo (Center)"
+                                    value={content.siteImages?.home_main_logo || ''}
+                                    onFileSelect={(val) => updateSiteImage('home_main_logo', 'Home', 'Main Logo', val, userInfo.token)}
+                                    onRemove={() => updateSiteImage('home_main_logo', 'Home', 'Main Logo', '', userInfo.token)}
+                                    onUpload={uploadFile}
+                                    pathPrefix="site_assets"
+                                />
+                            </div>
+
+                            {/* Info Sections */}
+                            <div className="admin-card">
+                                <h3>Home: Info Sections</h3>
+                                <FileUpload
+                                    label="Blooming the Brand"
+                                    value={content.siteImages?.home_blooming || ''}
+                                    onFileSelect={(val) => updateSiteImage('home_blooming', 'Home', 'Blooming Image', val, userInfo.token)}
+                                    onRemove={() => updateSiteImage('home_blooming', 'Home', 'Blooming Image', '', userInfo.token)}
+                                    onUpload={uploadFile}
+                                    pathPrefix="site_assets"
+                                />
+
+                            </div>
+
+                            {/* Service Icons */}
+                            <div className="admin-card">
+                                <h3>Home: Service Images</h3>
+                                {[
+                                    { k: 'home_service_branding', l: 'Branding' },
+                                    { k: 'home_service_social', l: 'Social Media' },
+                                    { k: 'home_service_production', l: 'Production' },
+                                    { k: 'home_service_influencer', l: 'Influencer' },
+                                    { k: 'home_service_creative', l: 'Creative' }
+                                ].map(s => (
+                                    <FileUpload
+                                        key={s.k}
+                                        label={s.l}
+                                        value={content.siteImages?.[s.k] || ''}
+                                        onFileSelect={(val) => updateSiteImage(s.k, 'Home', s.l, val, userInfo.token)}
+                                        onRemove={() => updateSiteImage(s.k, 'Home', s.l, '', userInfo.token)}
+                                        onUpload={uploadFile}
+                                        pathPrefix="site_assets"
+                                    />
+                                ))}
+                            </div>
+
+                            {/* About Page */}
+                            <div className="admin-card">
+                                <h3>About Page: Our Story</h3>
+                                {[
+                                    { k: 'about_vision', l: 'Vision Image' },
+                                    { k: 'about_values', l: 'Values Image' },
+                                    { k: 'about_approach', l: 'Approach Image' }
+                                ].map(s => (
+                                    <FileUpload
+                                        key={s.k}
+                                        label={s.l}
+                                        value={content.siteImages?.[s.k] || ''}
+                                        onFileSelect={(val) => updateSiteImage(s.k, 'About', s.l, val, userInfo.token)}
+                                        onRemove={() => updateSiteImage(s.k, 'About', s.l, '', userInfo.token)}
+                                        onUpload={uploadFile}
+                                        pathPrefix="site_assets"
+                                    />
+                                ))}
+                            </div>
+
+                            {/* Navbar / Menu Icons */}
+                            <div className="admin-card">
+                                <h3>Navbar / Menu Icons</h3>
+                                {[
+                                    { k: 'nav_home', l: 'Menu: Home Icon' },
+                                    { k: 'nav_story', l: 'Menu: Our Story Icon' },
+                                    { k: 'nav_services', l: 'Menu: Services Icon' },
+                                    { k: 'nav_work', l: 'Menu: Works Icon' },
+                                    { k: 'nav_contact', l: 'Menu: Contact Icon' }
+                                ].map(s => (
+                                    <FileUpload
+                                        key={s.k}
+                                        label={s.l}
+                                        value={content.siteImages?.[s.k] || ''}
+                                        onFileSelect={(val) => updateSiteImage(s.k, 'Navbar', s.l, val, userInfo.token)}
+                                        onRemove={() => updateSiteImage(s.k, 'Navbar', s.l, '', userInfo.token)}
+                                        onUpload={uploadFile}
+                                        pathPrefix="site_assets"
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {activeTab === 'legal' && (
                     <div>
-                        <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Legal Content</h2>
+                        <div className="admin-section-header">
+                            <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Legal Content</h2>
+                            <button
+                                onClick={() => {
+                                    if (window.confirm("Are you sure you want to reset Legal Content (Privacy/Terms) to defaults?")) {
+                                        resetLegal(userInfo.token);
+                                        setLegalForm({ privacy: '', terms: '' }); // Update local form state too
+                                        showAlert("Reset", "Legal content reset to defaults.", "success");
+                                    }
+                                }}
+                                style={{ padding: '0.5rem 1rem', backgroundColor: '#666', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+                            >
+                                Reset to Defaults
+                            </button>
+                        </div>
                         <div style={{ display: 'grid', gap: '2rem' }}>
                             {/* Privacy Policy */}
                             <div style={{ border: '1px solid #eee', padding: '1.5rem', borderRadius: '8px' }}>
@@ -1534,19 +1773,10 @@ const Admin = () => {
                                     <h3 style={{ margin: 0 }}>Privacy Policy</h3>
                                     <button
                                         onClick={async () => {
-                                            console.log("Admin: Saving Privacy...", legalForm.privacy);
-                                            if (!legalForm.privacy) {
-                                                if (!window.confirm("Warning: Privacy Policy is empty. Save anyway?")) return;
-                                            }
-                                            try {
-                                                const result = await updateLegalContent('privacy', legalForm.privacy);
-                                                console.log("Admin: Save Result", result);
-                                                if (result) showAlert("Saved", "Privacy Policy updated!", "success");
-                                                else showAlert("Error", "Failed to save. Check console.", "error");
-                                            } catch (err) {
-                                                console.error("Admin: Save Exception", err);
-                                                showAlert("Error", "Exception during save: " + err.message, "error");
-                                            }
+                                            if (!legalForm.privacy && !window.confirm("Warning: Privacy Policy is empty. Save anyway?")) return;
+                                            const result = await updateLegalContent('privacy', legalForm.privacy);
+                                            if (result) showAlert("Saved", "Privacy Policy updated!", "success");
+                                            else showAlert("Error", "Failed to save. Check console.", "error");
                                         }}
                                         className="btn-primary"
                                         style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
@@ -1578,16 +1808,9 @@ const Admin = () => {
                                     <h3 style={{ margin: 0 }}>Terms of Service</h3>
                                     <button
                                         onClick={async () => {
-                                            console.log("Admin: Saving Terms...", legalForm.terms);
-                                            try {
-                                                const result = await updateLegalContent('terms', legalForm.terms);
-                                                console.log("Admin: Save Result", result);
-                                                if (result) showAlert("Saved", "Terms updated!", "success");
-                                                else showAlert("Error", "Failed to save. Check console.", "error");
-                                            } catch (err) {
-                                                console.error("Admin: Save Exception", err);
-                                                showAlert("Error", "Exception: " + err.message, "error");
-                                            }
+                                            const result = await updateLegalContent('terms', legalForm.terms);
+                                            if (result) showAlert("Saved", "Terms updated!", "success");
+                                            else showAlert("Error", "Failed to save. Check console.", "error");
                                         }}
                                         className="btn-primary"
                                         style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}

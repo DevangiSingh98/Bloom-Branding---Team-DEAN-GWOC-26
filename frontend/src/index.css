@@ -43,6 +43,33 @@
   text-transform: uppercase;
   letter-spacing: -0.02em;
   /* Tight spacing as requested */
+@font-face {
+  font-family: 'Oswald';
+  /* Kept for legacy reference but we are switching main usage */
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/oswald/v57/TK3_WkUHHAIjg75cFRf3bXL8LICs1xZogUE.ttf) format('truetype');
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Lekton:ital,wght@0,400;0,700;1,400&display=swap');
+
+.font-lekton {
+  font-family: 'Lekton', monospace;
+}
+
+/* Remap Oswald usage to Lekton for immediate switch */
+.font-oswald {
+  font-family: 'Lekton', monospace !important;
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: 'Antonio';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/antonio/v7/sIOsB4u_2XqV-M4jF08.ttf) format('truetype');
 }
 
 :root {
@@ -417,9 +444,228 @@ button {
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 800px) {
   .work-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Grid Item Styles */
+.work-grid-item {
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.work-grid-item-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  /* Square & Sharp */
+  border-radius: 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.work-grid-item-title {
+  font-family: var(--font-brand);
+  font-size: 1.5rem;
+  /* Small but readable */
+  color: var(--color-dark-choc);
+  text-transform: uppercase;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+/* --- Project Panel (Horizontal Section) Styles --- */
+.project-panel {
+  min-width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  background-color: var(--color-earl-gray);
+  /* Desktop Grid */
+  grid-template-columns: 20vw 1fr 1fr 20vw;
+  grid-template-rows: 1fr 1fr;
+  gap: 2vw;
+  padding: 4vw;
+  box-sizing: border-box;
+}
+
+.project-panel-info {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  z-index: 20;
+}
+
+.project-panel-title-container {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.project-panel-title {
+  font-family: var(--font-brand);
+  /* Slightly smaller but still bold */
+  font-size: clamp(4rem, 15vw, 10rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 0.8;
+  mix-blend-mode: multiply;
+  opacity: 0.9;
+}
+
+/* Image Placements (Desktop) */
+.project-panel-img-1 {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+  width: 100%;
+  height: 80%;
+  align-self: end;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.project-panel-img-2 {
+  grid-column: 3 / 5;
+  grid-row: 1 / 2;
+  width: 85%;
+  height: 90%;
+  justify-self: end;
+  align-self: start;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.project-panel-img-3 {
+  grid-column: 2 / 4;
+  grid-row: 2 / 3;
+  width: 70%;
+  height: 70%;
+  justify-self: center;
+  align-self: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.project-panel-img-4 {
+  grid-column: 4 / 5;
+  grid-row: 1 / 3;
+  width: 80%;
+  height: 60%;
+  justify-self: end;
+  align-self: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Mobile / Responsive Adjustments */
+@media (max-width: 768px) {
+  .project-panel {
+    display: grid;
+    /* Mobile Grid - Strict Left Title */
+    grid-template-columns: 12vw 1fr 1fr 10vw;
+    grid-template-rows: 1fr 1fr;
+    padding: 1rem 1rem 1rem 0;
+    /* Remove left padding */
+    overflow: hidden;
+  }
+
+  .project-panel-title-container {
+    display: flex;
+    /* Vertical Title - STRICT LEFT EDGE */
+    grid-column: 1 / 2;
+    grid-row: 1 / -1;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    pointer-events: none;
+    order: -1;
+    background-color: transparent;
+    /* Ensure transparency */
+  }
+
+  .project-panel-title {
+    font-size: clamp(3rem, 10vh, 5rem);
+    line-height: 0.8;
+  }
+
+  .project-panel-info {
+    grid-column: 2 / 5;
+    /* Spans the rest of the width but centered content-wise */
+    grid-row: 1 / -1;
+    /* Full height to allow vertical centering */
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Center vertical */
+    z-index: 30;
+    /* Above images */
+    pointer-events: none;
+    /* Let clicks pass through to images if needed */
+  }
+
+  /* Images - Scattered Grid Mapping for Mobile */
+  .project-panel-img-1 {
+    grid-column: 3 / 5 !important;
+    grid-row: 2 / 3 !important;
+    width: 100% !important;
+    height: 90% !important;
+    align-self: end !important;
+    justify-self: end !important;
+    margin: 0 !important;
+    max-height: none !important;
+  }
+
+  .project-panel-img-2 {
+    grid-column: 2 / 4 !important;
+    grid-row: 1 / 2 !important;
+    width: 90% !important;
+    height: 70% !important;
+    justify-self: start !important;
+    align-self: start !important;
+    margin: 0 !important;
+    max-height: none !important;
+    opacity: 0.8;
+  }
+
+  .project-panel-img-3 {
+    grid-column: 2 / 4 !important;
+    grid-row: 2 / 3 !important;
+    width: 90% !important;
+    height: 60% !important;
+    justify-self: center !important;
+    align-self: center !important;
+    margin: 0 !important;
+    max-height: none !important;
+    z-index: 5 !important;
+  }
+
+  .project-panel-img-4 {
+    display: none !important;
+    /* Hide img 4 as it conflicts with title on strict left */
   }
 }
 
@@ -951,6 +1197,396 @@ img {
 
 .admin-header-title {
   font-size: 3rem;
+.service-card-content.row {
+  flex-direction: row;
+}
+
+.service-card-content.row-reverse {
+  flex-direction: row-reverse;
+}
+
+.service-text-side {
+  flex: 1 1 450px;
+}
+
+.service-image-side {
+  flex: 1 1 450px;
+}
+
+.difference-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* Mobile & Tablet Styles (< 1024px) */
+@media (max-width: 1024px) {
+  .service-card-content {
+    gap: 40px;
+  }
+
+  .service-text-side,
+  .service-image-side {
+    flex: 1 1 100%;
+    /* Force full width easier */
+  }
+}
+
+/* Mobile Styles (< 768px) */
+@media (max-width: 768px) {
+
+  /* 1. Hero Section */
+  .services-hero {
+    flex-direction: column;
+    /* Image Top (or Text Bottom) - let's do Text Bottom for impact */
+    height: auto !important;
+    /* Allow auto height */
+    min-height: 100vh;
+  }
+
+  .services-hero-text {
+    padding: 140px 20px 60px 20px !important;
+    /* increased top padding to clear logo */
+    text-align: center;
+    align-items: center;
+  }
+
+  .services-hero-image {
+    min-height: 40vh;
+    /* Ensure image takes up space */
+  }
+
+  /* 2. Service Cards */
+  /* 2. Service Cards - Mobile Layout Refinement */
+  .service-card-content.row,
+  .service-card-content.row-reverse {
+    flex-direction: column !important;
+    /* Stack: Image Top, Text Bottom */
+    gap: 0;
+    padding: 0;
+    height: 100vh;
+    /* Restore 100vh for sticky scrolling */
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .service-image-side {
+    width: 85% !important;
+    margin: 0 auto -20px auto !important;
+    /* Slight overlap to save space */
+    z-index: 10 !important;
+    flex: 0 0 auto !important;
+    order: 1;
+    /* Image Top */
+  }
+
+  .service-text-side {
+    width: 90% !important;
+    margin-top: 0;
+    z-index: 20 !important;
+    flex: 0 0 auto !important;
+    order: 2;
+    /* Text Bottom */
+  }
+
+  /* Ensure text card is compact and fits */
+  .service-text-side>div {
+    background-color: #EADDCD;
+    padding: 20px 15px !important;
+    /* Reduced padding */
+    border-radius: 20px !important;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Compact Polaroid size */
+  .service-image-side>div {
+    transform: rotate(2deg) !important;
+    padding: 10px 10px 30px 10px !important;
+    /* Minimal frame */
+    width: 100% !important;
+    background-color: #fff;
+  }
+
+  /* FIX TAPE ON MOBILE - Horizontal and non-obstructive */
+  .service-tape {
+    transform: translateX(-50%) rotate(0deg) !important;
+    top: -10px !important;
+    width: 60px !important;
+    height: 20px !important;
+    opacity: 0.8;
+  }
+
+  /* Image height - constrained but bigger */
+  .service-image-side img {
+    max-height: 35vh;
+    /* Increased from 25vh to 35vh */
+    object-fit: cover;
+    width: 100%;
+    display: block;
+  }
+
+  /* Target the Image Container Div specifically to override height:400px */
+  /* Tape is first child, Image Container is second */
+  .service-image-side>div>div:nth-of-type(2) {
+    height: auto !important;
+    min-height: 0 !important;
+    background-color: transparent !important;
+  }
+
+  /* Adjust Text Card Typography for compact fit */
+  .service-text-side h2 {
+    font-size: 2rem !important;
+    /* Increased from 1.8rem */
+    margin-bottom: 5px !important;
+    line-height: 1 !important;
+  }
+
+  /* Reposition the 'bloom branding' signature for tight layout */
+  /* Reposition the 'bloom branding' signature for tight layout */
+  .service-image-side>div>div:last-child {
+    bottom: 10px !important;
+    right: auto !important;
+    left: 0 !important;
+    width: 100% !important;
+    text-align: center !important;
+    font-size: 0.8rem !important;
+  }
+
+  .service-text-side p {
+    font-size: 0.95rem !important;
+    /* Slightly bigger */
+    margin-bottom: 10px !important;
+    line-height: 1.4 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    /* Allow even more text */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Ensure text card is padded/bigger */
+  /* Ensure text card is padded/bigger */
+  .service-text-side>div {
+    background-color: #EADDCD;
+    padding: 40px 25px !important;
+    /* increased padding */
+    border-radius: 20px !important;
+    min-height: 350px;
+    /* Force even larger minimum vertical size */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .service-text-side ul li {
+    margin-bottom: 4px !important;
+    font-size: 0.9rem !important;
+    padding-bottom: 2px !important;
+  }
+
+  /* Make the card container sticky again */
+  .service-card-item {
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden;
+    /* Prevent overflow */
+  }
+
+  /* 3. The Difference Section */
+  .difference-grid {
+    gap: 40px;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  /* GLOBAL OVERRIDE FOR SIGNATURE CENTER ALIGNMENT (ANY SCREEN) */
+  .service-image-side>div>div:last-child {
+    right: auto !important;
+    left: 0 !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .difference-grid>div {
+    width: 100% !important;
+    max-width: 400px !important;
+    /* Ensure they don't get too wide if centered */
+  }
+}
+
+/* --- WORK PAGE MODAL RESPONSIVENESS --- */
+
+.project-slide-inner {
+  display: flex;
+  gap: 6rem;
+  align-items: center;
+  width: 100%;
+  max-width: 1400px;
+  justify-content: center;
+  flex-direction: row;
+}
+
+/* Wrapper essentially replaces old .project-slide-text on desktop */
+.project-info-wrapper {
+  width: 450px;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+.project-slide-header h3 {
+  /* Category */
+  font-size: 1.2rem;
+  color: #4A3426;
+  /* Brown */
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.8;
+}
+
+.project-slide-header h2 {
+  /* Title */
+  margin-bottom: 1.5rem;
+  line-height: 0.9;
+  color: #4A3426;
+  /* Brown */
+}
+
+.project-slide-desc p {
+  /* Description */
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+  color: #4A3426;
+  /* Brown */
+}
+
+.project-slide-media {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.project-slide-media-element {
+  max-height: 80vh;
+  max-width: 50vw;
+  width: auto;
+  border-radius: 5px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .project-slide-inner {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-top: 60px;
+    /* Space for close button */
+    justify-content: center;
+  }
+
+  /* UNWRAP the container so children become flex items of .project-slide-inner */
+  .project-info-wrapper {
+    display: contents;
+  }
+
+  /* REORDERING MAGIC */
+  .project-slide-header {
+    order: 1;
+    /* Title First */
+    width: 100%;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .project-slide-media {
+    order: 2;
+    /* Image Second */
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .project-slide-desc {
+    order: 3;
+    /* Description Third */
+    width: 100%;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .project-slide-media-element {
+    max-width: 90vw !important;
+    max-height: 50vh !important;
+    /* Limit height so text fits */
+  }
+
+  .project-slide-header h2 {
+    font-size: 2.5rem !important;
+  }
+}
+
+
+
+/* =========================================
+   RESTORED HOME PAGE STYLES
+   ========================================= */
+
+/* Blooming the Brand (Home Page) Layout (Desktop) */
+@media (min-width: 769px) {
+  .blooming-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      "title image"
+      "text image";
+    gap: 0 4rem;
+    align-items: center;
+  }
+
+  .blooming-title {
+    grid-area: title;
+  }
+
+  .blooming-image {
+    grid-area: image;
+  }
+
+  .blooming-text {
+    grid-area: text;
+    align-self: start;
+  }
+}
+
+/* Blooming the Brand (Home Page) Layout (Mobile) */
+@media (max-width: 768px) {
+  .blooming-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .blooming-title,
+  .blooming-image,
+  .blooming-text {
+    width: 100%;
+  }
+}
+
+/* Specific text adjustment for Mobile Blooming Section */
+@media (max-width: 600px) {
+  .blooming-text p {
+    font-size: 1.2rem !important;
+    text-align: justify !important;
+  }
+}
+
+/* Brands Section */
+.brands-title {
   color: var(--color-dark-choc);
 }
 

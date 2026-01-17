@@ -60,6 +60,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
@@ -1433,5 +1434,27 @@ img {
     max-width: none;
     /* Fill the grid cell */
     width: 100%;
+  }
+}
+
+/* Brands Grid Layout */
+.brands-grid-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3rem;
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .brands-grid-container {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.5rem !important;
+    /* Significantly reduced to fit 3 items */
+    padding: 0 0.5rem;
+    /* Reduced side padding */
+    width: 100%;
+    margin: 0 auto;
   }
 }

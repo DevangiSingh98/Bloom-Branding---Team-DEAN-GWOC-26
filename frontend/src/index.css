@@ -597,7 +597,17 @@ button {
     writing-mode: vertical-rl;
     transform: rotate(180deg);
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
+    /* Push to "left" (which is bottom after rotation?) or start?  
+                                  Rotate 180 flips it. Original top-left becomes bottom-right? 
+                                  Wait. vertical-rl starts top-right default. 
+                                  Let's stick to flex-end or flex-start to see movement. 
+                                  The user said "left corner". grid-column 1 is left. 
+                                  Vertical alignment (along the column) is justify-content in vertical writing mode? 
+                                  No, align-items matches column width (horizontal in vertical mode). 
+                                  Justify-content matches column height (vertical axis). 
+                                  Let's try flex-end to push it down/left visually. 
+                               */
     z-index: 50;
     pointer-events: none;
     order: -1;
@@ -606,8 +616,11 @@ button {
   }
 
   .project-panel-title {
-    font-size: clamp(3rem, 10vh, 5rem);
-    line-height: 0.8;
+    font-size: 11vh !important;
+    line-height: 0.8 !important;
+    white-space: nowrap !important;
+    /* Removed fixed width to let it flow naturally */
+    text-align: center !important;
   }
 
   .project-panel-info {

@@ -42,7 +42,10 @@
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: -0.02em;
+
   /* Tight spacing as requested */
+}
+
 @font-face {
   font-family: 'Oswald';
   /* Kept for legacy reference but we are switching main usage */
@@ -1197,6 +1200,8 @@ img {
 
 .admin-header-title {
   font-size: 3rem;
+}
+
 .service-card-content.row {
   flex-direction: row;
 }

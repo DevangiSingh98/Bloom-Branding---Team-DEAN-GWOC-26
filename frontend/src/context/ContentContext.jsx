@@ -14,54 +14,99 @@ const defaultContent = {
     },
     allProjects: [
         {
+            id: 1,
             title: "Vardhaman Diam",
             category: "Jewellery Brand",
             image: "/images/project1.png",
+            images: [
+                "/images/project1.png",
+                "https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1618220048045-10a6dbdf83e0?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2400&auto=format&fit=crop"
+            ],
             description: "A luxurious brand identity reflecting the brilliance and precision of fine diamonds."
         },
         {
+            id: 2,
             title: "Binal Patel",
             category: "Fashion Brand",
             image: "/images/project2.png",
+            images: [
+                "/images/project2.png",
+                "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1616486338812-3dadae4b4f9d?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1616137466211-f939a420be63?q=80&w=2400&auto=format&fit=crop"
+            ],
             description: "An elegant, heritage-inspired visual system tailored for a contemporary fashion label."
         },
         {
+            id: 3,
             title: "Life's A Beach",
             category: "Other Lifestyle Brand",
             image: "/images/project3.png",
+            images: [
+                "/images/project3.png",
+                "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1515405295579-ba7b45403062?q=80&w=2400&auto=format&fit=crop"
+            ],
             description: "Vibrant storytelling and strategic positioning for a spirited lifestyle brand."
         },
         {
+            id: 4,
             title: "Thyme & Whisk",
             category: "Cafes & Restaurants",
             image: "/images/project4.png",
+            images: [
+                "/images/project4.png",
+                "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1504384308090-c54be3855833?q=80&w=2400&auto=format&fit=crop"
+            ],
             description: "A flavorful brand experience designed to capture the culinary soul of the restaurant."
         },
         {
+            id: 5,
             title: "AMBC Gems",
             category: "Jewellery Brand",
             image: "/images/project5.png",
+            images: [
+                "/images/project5.png",
+                "https://images.unsplash.com/photo-1449824913929-49aa262918a5?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1518005020951-ecc8e1213ac4?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=2400&auto=format&fit=crop"
+            ],
             description: "Exquisite craftsmanship meets timeless elegance in this jewellery brand identity."
         },
         {
+            id: 6,
             title: "Moire Rugs",
             category: "Home Furnishing Brand",
             image: "/images/project6.png",
+            images: [
+                "/images/project6.png",
+                "https://images.unsplash.com/photo-1516939884455-1445c8652f83?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?q=80&w=2400&auto=format&fit=crop",
+                "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2400&auto=format&fit=crop"
+            ],
             description: "Weaving tradition with modernity to create a distinct home furnishing identity."
         },
         {
+            id: 7,
             title: "The Right Cut",
             category: "Fashion Brand",
             image: "/images/project7.png",
             description: "Sharp, stylish, and sophisticated branding for a contemporary fashion house."
         },
         {
+            id: 8,
             title: "ShoP",
             category: "Luxury Sourcing Brand",
             image: "/images/project8.png",
             description: "Connecting discernment with luxury through a refined and exclusive brand persona."
         },
         {
+            id: 9,
             title: "Kaffyn",
             category: "Cafes & Restaurants",
             image: "/images/project9.png",
@@ -243,7 +288,7 @@ const defaultContent = {
 export const ContentProvider = ({ children }) => {
     // Initialize state from localStorage if available, else default (Forcing Refresh)
     const [content, setContent] = useState(() => {
-        const savedContent = localStorage.getItem('bloomContent_v25');
+        const savedContent = localStorage.getItem('bloomContent_v26'); // Bumped version for IDs
         console.log("Loading content...", savedContent ? "Found cached" : "Using default");
         const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
         return { ...defaultContent, ...parsed };

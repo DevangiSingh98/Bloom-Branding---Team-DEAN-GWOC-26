@@ -147,7 +147,7 @@ export default function Navbar() {
 
     const getColor = () => {
         if (isOpen) return 'var(--color-butter-yellow)';
-        if (isWork) return 'var(--color-butter-yellow)';
+        if (isWork) return '#4A3426'; // Brown for Work Page using Ingrao theme
 
         // 1. SAFETY OVERRIDE: Enforce "Top of Page" colors
         // If we are basically at the top (< 10px), FORCE the correct color

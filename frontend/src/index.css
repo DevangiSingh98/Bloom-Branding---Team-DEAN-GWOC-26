@@ -1,3 +1,12 @@
+/* Simulate Druk Wide using Archivo (Variable Font) */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap');
+/* Google Fonts Import for Lekton (Bold 700) */
+@import url('https://fonts.googleapis.com/css2?family=Lekton:ital,wght@0,400;0,700;1,400&display=swap');
+
+html {
+  scroll-snap-type: y mandatory;
+}
+
 @font-face {
   font-family: 'Bigilla';
   src: url('/fonts/bigilla/Bigilla.otf') format('opentype');
@@ -33,17 +42,19 @@
   font-style: normal;
 }
 
-/* Simulate Druk Wide using Archivo (Variable Font) */
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap');
 
+
+/* REPLACED Druk/Archivo with Bold Lekton per User Request */
 .font-druk {
-  font-family: 'Archivo', sans-serif;
-  font-variation-settings: 'wdth' 125, 'wght' 900;
-  font-weight: 900;
+  font-family: 'Lekton', monospace;
+  /* The "letter" font */
+  font-weight: bold;
+  /* Very bold */
   text-transform: uppercase;
-  letter-spacing: -0.02em;
-
-  /* Tight spacing as requested */
+  letter-spacing: -0.05em;
+  /* Reduced spacing */
+  line-height: 0.85;
+  /* Reduced line spacing */
 }
 
 @font-face {
@@ -129,7 +140,8 @@ h4,
 h5,
 h6 {
   font-family: var(--font-brand);
-  font-weight: 700;
+  font-weight: 900;
+  /* Very Bold */
   line-height: 1.1;
   text-transform: uppercase;
 }

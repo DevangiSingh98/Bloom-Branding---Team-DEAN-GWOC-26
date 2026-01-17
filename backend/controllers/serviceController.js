@@ -51,4 +51,25 @@ const deleteService = async (req, res) => {
     }
 };
 
-export { getServices, createService, deleteService };
+// @desc    Replace all services (Bulk Update)
+// @route   PUT /api/services
+// @access  Private/Admin
+const replaceServices = async (req, res) => {
+    try {
+        const services = req.body; // Expecting an array
+        if (!Array.isArray(services)) {
+            return res.status(400).json({ message: 'Request body must be an array of services' });
+        }
+
+        // Optional: clear existing
+        await Service.deleteMany({});
+
+        // Insert new
+        const createdServices = await Service.insertMany(services);
+        res.json(createdServices);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export { getServices, createService, deleteService, replaceServices };

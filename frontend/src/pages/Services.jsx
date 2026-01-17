@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import { useContent } from '../context/ContentContext';
 import Footer from '../components/Footer';
-
 
 // --- Configuration ---
 const BASE_SERVICES = [
@@ -13,8 +13,8 @@ const BASE_SERVICES = [
         image: '/images/dummypost4.png',
         accent: 'var(--color-electric-blue)',
         textColor: '#FFFFFF', // White on Blue
-        longText: 'Building a brand is about crafting a narrative that resonates deeply. We ensure your identity is not just seen but felt, creating a lasting dominance in your market. Our approach merges psychological depth with aesthetic precision.',
-        mobileText: 'Building a brand is about crafting a narrative that resonates deeply. We ensure your identity is not just seen but felt, creating a lasting dominance.'
+        longText: 'Crafting narratives that resonate. Your identity, felt not just seen.',
+        mobileText: 'Crafting identities that build dominance and resonate deeply.'
     },
     {
         id: 'social',
@@ -23,9 +23,9 @@ const BASE_SERVICES = [
         description: 'Quality strategies for your goals.',
         image: '/images/s_social.jpg',
         accent: 'var(--color-butter-yellow)',
-        textColor: 'var(--color-dark-choc)', // Brown on Yellow
-        longText: 'In the digital age, attention is currency. We strategize to maximize engagement, ensuring your content reaches the right audience with precision and impact. From viral moments to sustained growth, we engineer interactions that convert.',
-        mobileText: 'In the digital age, attention is currency. We strategize to maximize engagement, ensuring your content reaches the right audience with precision and impact.'
+        textColor: 'var(--color-electric-blue)', // Blue on Yellow
+        longText: 'Maximizing engagement with precision. Viral moments to sustained growth.',
+        mobileText: 'Strategize to maximize engagement and reach the right audience.'
     },
     {
         id: 'production',
@@ -35,8 +35,8 @@ const BASE_SERVICES = [
         image: '/images/s_production.jpg',
         accent: 'var(--color-electric-blue)',
         textColor: '#FFFFFF', // White on Blue
-        longText: 'Every frame matters. Our production team blends cinematic excellence with your brand voice to create visual stories that captivate. We handle everything from concept to final cut, delivering high-fidelity visuals that leave a lasting imprint.',
-        mobileText: 'Every frame matters. Our production team blends cinematic excellence with your brand voice to create visual stories that captivate and convert.'
+        longText: 'Cinematic excellence blending with your brand voice. Visual stories that captivate.',
+        mobileText: 'Cinematic excellence aligned with your brand voice to captivate.'
     },
     {
         id: 'influencer',
@@ -45,9 +45,9 @@ const BASE_SERVICES = [
         description: 'Authentic partnerships maximizing your value.',
         image: '/images/s_influencer.jpg',
         accent: 'var(--color-butter-yellow)',
-        textColor: 'var(--color-dark-choc)', // Brown on Yellow
-        longText: 'True influence is built on authenticity. We connect you with voices that amplify your message, creating partnerships that drive real value. By leveraging data-driven matchmaking, we ensure your brand aligns with creators who embody your values.',
-        mobileText: 'True influence is built on authenticity. We connect you with voices that amplify your message, creating partnerships that drive real value.'
+        textColor: 'var(--color-electric-blue)', // Blue on Yellow
+        longText: 'Connecting you with voices that amplify your message. Authentic partnerships.',
+        mobileText: 'Authentic partnerships that amplify your message and drive value.'
     },
     {
         id: 'creative',
@@ -57,29 +57,25 @@ const BASE_SERVICES = [
         image: '/images/s_creative.jpg',
         accent: 'var(--color-electric-blue)',
         textColor: '#FFFFFF', // White on Blue
-        longText: 'Design is intelligence made visible. We push creative boundaries to deliver experiences that leave a mark, merging aesthetics with strategy. Our designs are crafted to not only look stunning but to function seamlessly across your brand ecosystem.',
-        mobileText: 'Design is intelligence made visible. We push creative boundaries to deliver experiences that leave a mark, merging aesthetics with strategy.'
+        longText: 'Pushing boundaries to deliver experiences that leave a mark. Aesthetics met with strategy.',
+        mobileText: 'Design intelligence creating experiences that leave a lasting mark.'
     }
 ];
 
-// Create a looped version (20x repeat = 100 items, lighter on performance)
-const SERVICES = Array(20).fill(BASE_SERVICES).flat().map((service, index) => ({
-    ...service,
-    id: `${service.id}-${index}`, // Ensure unique ID for React keys
-    originalId: service.id
-}));
+// --- SUB-COMPONENT: LEFT SERVICE ITEM ---
+const ServiceLeftItem = ({ service, index, currentIndex }) => {
 
-// --- 3. SUB-COMPONENT: LEFT SERVICE ITEM (Fixes Hook Rules) ---
-const ServiceLeftItem = ({ service, index, total, smoothScroll }) => {
-    // Hooks called at top level of sub-component: SUCCESS
     const x = useTransform(
-        smoothScroll,
-        [(index - 1) / total, index / total, (index + 1) / total],
+        currentIndex,
+        [index - 1, index, index + 1],
         ["100%", "0%", "-100%"]
     );
 
+    // Initial state fix for first item: Sync exactly with Item 1's entry
+    // If Item 1 goes 100% -> 0% (as index goes 0->1)
+    // Item 0 must go 0% -> -100% (as index goes 0->1)
     const xStyle = index === 0
-        ? useTransform(smoothScroll, [0, 1 / total], ["0%", "-120%"])
+        ? useTransform(currentIndex, [0, 1], ["0%", "-100%"])
         : x;
 
     return (
@@ -229,27 +225,53 @@ const ServiceLeftItem = ({ service, index, total, smoothScroll }) => {
 // --- MAIN COMPONENT ---
 const Services = () => {
 
+    const { content } = useContent();
+    const dbServices = content?.services || [];
+
+    // Merge DB or Base
+    const RAW_SERVICES = dbServices.length > 0 ? dbServices.map(s => ({
+        ...s,
+        accent: s.accent || 'var(--color-electric-blue)',
+        textColor: s.textColor || '#FFFFFF'
+    })) : BASE_SERVICES;
+
+    // Force Order
+    const ORDER = ['branding', 'social', 'production', 'influencer', 'creative'];
+    const SERVICES = [...RAW_SERVICES].sort((a, b) => {
+        const idA = (a.id || '').toLowerCase();
+        const idB = (b.id || '').toLowerCase();
+        return ORDER.indexOf(idA) - ORDER.indexOf(idB);
+    }).map((service, index) => ({
+        ...service,
+        id: `${service.id}-${index}`, // Ensure unique ID
+        originalId: service.id
+    }));
+
     const containerRef = useRef(null);
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start start", "end end"]
+    const { scrollYProgress } = useScroll({ target: containerRef });
+
+    const smoothProgress = useSpring(scrollYProgress, {
+        stiffness: 50,
+        damping: 20,
+        mass: 1.4
     });
 
-    const smoothScroll = useSpring(scrollYProgress, { stiffness: 50, damping: 20, mass: 1.4 });
+    const totalItems = SERVICES.length;
+    const currentIndex = useTransform(smoothProgress, [0, 1], [0, totalItems - 1]);
+    const [activeIndex, setActiveIndex] = useState(0);
 
-    const currentIndex = useTransform(smoothScroll, [0, 1], [0, SERVICES.length - 1]);
-    const [activeSection, setActiveSection] = useState(0);
-
+    // Sync active index for UI
     useEffect(() => {
         const unsubscribe = currentIndex.on("change", (latest) => {
-            setActiveSection(Math.round(latest));
+            setActiveIndex(Math.round(latest));
         });
         return () => unsubscribe();
     }, [currentIndex]);
 
-    const getAccentColor = (idx) => SERVICES[idx % SERVICES.length].accent;
+    // Alias for code compatibility
+    const activeSection = activeIndex;
+    const getAccentColor = (idx) => SERVICES[idx % SERVICES.length]?.accent || 'var(--color-electric-blue)';
 
-    // --- RESIZE LOGIC ---
     const [isMobile, setIsMobile] = useState(false);
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth <= 768);
@@ -258,11 +280,15 @@ const Services = () => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
+    // Safety check
+    if (!SERVICES.length) return null;
+    const currentService = SERVICES[activeSection] || SERVICES[0];
+
     return (
         <>
             <div ref={containerRef} style={{ height: `${SERVICES.length * 100}vh`, backgroundColor: 'var(--color-earl-gray)' }}>
                 <div style={{
-                    position: 'sticky', // CHANGED FROM FIXED
+                    position: 'sticky',
                     top: 0,
                     left: 0,
                     width: '100%',
@@ -281,14 +307,14 @@ const Services = () => {
                         left: isMobile ? '0' : '5vw',
                         right: isMobile ? '0' : '5vw',
                         display: 'flex',
-                        flexDirection: isMobile ? 'column' : 'row', // STACKED ON MOBILE
+                        flexDirection: isMobile ? 'column' : 'row',
                         backgroundColor: 'transparent',
                         overflow: 'hidden'
                     }}>
 
                         {/* --- LEFT RECTANGLE --- */}
                         <div style={{
-                            display: isMobile ? 'none' : 'block', // HIDDEN ON MOBILE
+                            display: isMobile ? 'none' : 'block',
                             width: '50%',
                             height: '100%',
                             position: 'relative',
@@ -300,8 +326,7 @@ const Services = () => {
                                     key={service.id}
                                     service={service}
                                     index={index}
-                                    total={SERVICES.length}
-                                    smoothScroll={smoothScroll}
+                                    currentIndex={currentIndex}
                                 />
                             ))}
                         </div>
@@ -309,7 +334,7 @@ const Services = () => {
                         {/* --- RIGHT RECTANGLE --- */}
                         <div style={{
                             width: isMobile ? '100%' : '50%',
-                            height: '100%', // Full height on mobile
+                            height: '100%',
                             position: 'relative',
                             overflow: 'hidden',
                             backgroundColor: 'var(--color-earl-gray)',
@@ -320,7 +345,7 @@ const Services = () => {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1, backgroundColor: getAccentColor(activeSection) }}
                                     exit={{ opacity: 0 }}
-                                    transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1] }} // Soft Ease
+                                    transition={{ duration: 1.2, ease: [0.19, 1, 0.22, 1] }}
                                     style={{
                                         position: 'absolute',
                                         top: 0,
@@ -332,22 +357,22 @@ const Services = () => {
                                 />
                             </AnimatePresence>
 
-                            {/* MOBILE ADJUSTMENTS FOR INTERNAL ELEMENTS */}
+                            {/* MOBILE ADJUSTMENTS */}
                             <div style={{
                                 position: 'absolute',
-                                top: isMobile ? '5%' : '0', // Slight top padding on mobile
-                                left: isMobile ? '5%' : '0', // Centered on mobile
-                                width: isMobile ? '90%' : '75%', // Wider on mobile but with margins
-                                height: isMobile ? '60%' : '80%', // Mobile Image Height
+                                top: isMobile ? '5%' : '0',
+                                left: isMobile ? '5%' : '0',
+                                width: isMobile ? '90%' : '75%',
+                                height: isMobile ? '60%' : '80%',
                                 overflow: 'hidden',
                                 zIndex: 10,
-                                borderRadius: isMobile ? '10px' : '0' // rounded corners on mobile
+                                borderRadius: isMobile ? '10px' : '0'
                             }}>
                                 <AnimatePresence mode="popLayout">
                                     <motion.img
-                                        key={`img-${SERVICES[activeSection].id}`}
-                                        src={SERVICES[activeSection].image}
-                                        alt={SERVICES[activeSection].title}
+                                        key={`img-${currentService.id}`}
+                                        src={currentService.image}
+                                        alt={currentService.title}
                                         initial={{ y: '100%' }}
                                         animate={{ y: '0%' }}
                                         exit={{ y: '-100%' }}
@@ -364,7 +389,7 @@ const Services = () => {
                                     />
                                     {isMobile && (
                                         <motion.div
-                                            key={`title-${SERVICES[activeSection].id}`}
+                                            key={`title-${currentService.id}`}
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: -20 }}
@@ -376,19 +401,19 @@ const Services = () => {
                                                 width: '100%',
                                                 textAlign: 'center',
                                                 zIndex: 20,
-                                                mixBlendMode: ['social', 'influencer'].includes(SERVICES[activeSection].originalId || SERVICES[activeSection].id) ? 'normal' : 'difference' // White for Social/Influencer
+                                                mixBlendMode: ['social', 'influencer'].includes(currentService.originalId) ? 'normal' : 'difference'
                                             }}
                                         >
                                             <h1 style={{
                                                 fontFamily: 'var(--font-brand)',
-                                                fontSize: '15vw', // BIGGER (was 12vw)
+                                                fontSize: '15vw',
                                                 fontWeight: '900',
                                                 color: 'white',
                                                 margin: 0,
                                                 lineHeight: 0.85,
                                                 textTransform: 'uppercase'
                                             }}>
-                                                {SERVICES[activeSection].title}
+                                                {currentService.title}
                                             </h1>
                                         </motion.div>
                                     )}
@@ -397,33 +422,39 @@ const Services = () => {
 
                             <div style={{
                                 position: 'absolute',
-                                top: isMobile ? '68%' : '72%', // Below the 60% image
-                                left: isMobile ? '5%' : '3rem',
-                                right: isMobile ? '5%' : 'auto',
-                                width: isMobile ? '90%' : '50%',
-                                zIndex: 20
+                                top: isMobile ? '68%' : '72%',
+                                left: isMobile ? '0' : '8%',
+                                right: isMobile ? '0' : 'auto',
+                                margin: isMobile ? '0 auto' : '0',
+                                width: isMobile ? '90%' : '70%',
+                                textAlign: isMobile ? 'center' : 'left', // Left align on desktop
+                                zIndex: 20,
+                                display: 'flex',
+                                justifyContent: isMobile ? 'center' : 'flex-start'
                             }}>
                                 <AnimatePresence mode="wait">
                                     <motion.div
-                                        key={`txt-${SERVICES[activeSection].id}`}
-                                        initial={{ opacity: 0, y: 10 }}
+                                        key={`txt-${currentService.id}`}
+                                        initial={{ opacity: 0, y: 15 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
+                                        exit={{ opacity: 0, y: -15 }}
                                         transition={{ duration: 0.8, ease: "easeOut" }}
+                                        style={{ width: '100%' }}
                                     >
                                         <p style={{
-                                            margin: 0,
-                                            fontSize: isMobile ? '0.9rem' : '0.8rem',
-                                            lineHeight: '1.5',
-                                            fontWeight: '900', // Extra Bold
-                                            fontFamily: isMobile ? "'Arial Nova', sans-serif" : 'sans-serif', // Keep standard font
-                                            textTransform: 'uppercase', // Always uppercase
-                                            letterSpacing: isMobile ? '0' : '0.05em',
-                                            color: SERVICES[activeSection].textColor, // Dynamic Color (White or Brown)
-                                            width: isMobile ? '100%' : '140%',
-                                            textShadow: 'none'
+                                            margin: '0',
+                                            fontSize: isMobile ? '0.9rem' : '1.3rem',
+                                            lineHeight: '1.2',
+                                            fontWeight: '900',
+                                            fontFamily: isMobile ? "'Arial Nova', sans-serif" : 'sans-serif',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.02em',
+                                            color: currentService.textColor || 'white',
+                                            // Removed mixBlendMode to allow specific color control
+                                            width: '100%',
+                                            maxWidth: '500px'
                                         }}>
-                                            {isMobile ? SERVICES[activeSection].mobileText : SERVICES[activeSection].longText}
+                                            {isMobile ? currentService.mobileText : currentService.longText}
                                         </p>
                                     </motion.div>
                                 </AnimatePresence>
@@ -432,8 +463,23 @@ const Services = () => {
 
                     </div>
                 </div>
+
+                {/* --- SNAP POINTS --- */}
+                {SERVICES.map((_, i) => (
+                    <div
+                        key={i}
+                        style={{
+                            height: '100vh',
+                            scrollSnapAlign: 'center',
+                            scrollSnapStop: 'always',
+                            position: 'relative',
+                            border: '1px solid transparent',
+                            pointerEvents: 'none'
+                        }}
+                    />
+                ))}
             </div>
-            <Footer />
+            {/* Footer removed to rely on global ConditionalFooter */}
         </>
     );
 };

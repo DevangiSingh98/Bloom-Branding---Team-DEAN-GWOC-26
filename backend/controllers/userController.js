@@ -12,11 +12,17 @@ const generateToken = (id) => {
 // @desc    Auth user & get token
 // @route   POST /api/users/login
 // @access  Public
+// @desc    Auth user & get token
+// @route   POST /api/users/login
+// @access  Public
 const authUser = async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        const user = await User.findOne({ username });
+        // Allow login with either username or email
+        const user = await User.findOne({
+            $or: [{ username }, { email: username }]
+        });
 
         if (user && (await user.matchPassword(password))) {
             res.json({
@@ -34,7 +40,40 @@ const authUser = async (req, res) => {
     }
 };
 
-// @desc    Register a new user
+// @desc    Register a new CLIENT user (Public)
+// @route   POST /api/users/register
+// @access  Public
+const registerClient = async (req, res) => {
+    const { username, email, password } = req.body;
+
+    const userExists = await User.findOne({ $or: [{ username }, { email }] });
+    if (userExists) {
+        return res.status(400).json({ message: 'User already exists' });
+    }
+
+    const user = await User.create({
+        username,
+        email,
+        password,
+        isAdmin: false,
+        role: 'client'
+    });
+
+    if (user) {
+        res.status(201).json({
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            role: user.role,
+            token: generateToken(user._id),
+        });
+    } else {
+        res.status(400).json({ message: 'Invalid user data' });
+    }
+};
+
+// @desc    Register a new user (Admin only)
 // @route   POST /api/users
 // @access  Protected (Admin)
 const registerUser = async (req, res) => {
@@ -93,7 +132,8 @@ const forgotPassword = async (req, res) => {
         await user.save();
 
         // Create Reset URL
-        const resetUrl = `http://localhost:5173/admin?resetToken=${resetToken}`;
+        // Create Reset URL
+        const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
 
         const message = `You are receiving this email because you (or someone else) has requested the reset of a password. \n\n
 Please click on the following link to reset your password:\n\n
@@ -124,12 +164,13 @@ If you did not request this, please ignore this email.`;
 // @route   PUT /api/users/resetpassword/:resettoken
 // @access  Public
 const resetPassword = async (req, res) => {
-    const { resetToken, newPassword } = req.body;
+    const { password } = req.body;
+    const { resettoken } = req.params;
 
     // Get hashed token
     const resetPasswordToken = crypto
         .createHash('sha256')
-        .update(resetToken)
+        .update(resettoken)
         .digest('hex');
 
     try {
@@ -142,7 +183,7 @@ const resetPassword = async (req, res) => {
             return res.status(400).json({ message: 'Invalid token' });
         }
 
-        user.password = newPassword;
+        user.password = password;
         user.resetPasswordToken = undefined;
         user.resetPasswordExpire = undefined;
 
@@ -158,4 +199,34 @@ const resetPassword = async (req, res) => {
     }
 };
 
-export { authUser, registerUser, forgotPassword, resetPassword };
+// @desc    Get all users
+// @route   GET /api/users
+// @access  Private/Admin
+const getUsers = async (req, res) => {
+    try {
+        const users = await User.find({});
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// @desc    Delete user
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
+const deleteUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (user) {
+            await user.deleteOne();
+            res.json({ message: 'User removed' });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export { authUser, registerUser, registerClient, forgotPassword, resetPassword, getUsers, deleteUser };

@@ -14,38 +14,46 @@ export default function Contact() {
         service: '',
         budget: '',
         timeline: '',
-        message: ''
+        message: '',
+        vibes: [],
+        vibeDescription: '' // NEW FIELD
     });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        if (name === 'message') {
+        if (name === 'message' || name === 'vibeDescription') {
             const words = value.trim().split(/\s+/);
-            if (words.length > 200) {
-                if (words.length > 200) return;
-            }
+            if (words.length > 300) return; // Limit word count
         }
         setFormData({ ...formData, [name]: value });
     };
 
-    // Calculate current word count for display
-    const currentWordCount = formData.message.trim().split(/\s+/).filter(Boolean).length;
+    const toggleVibe = (vibe) => {
+        const currentVibes = formData.vibes || [];
+        const newVibes = currentVibes.includes(vibe)
+            ? currentVibes.filter(v => v !== vibe)
+            : [...currentVibes, vibe];
+        setFormData({ ...formData, vibes: newVibes });
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
         const newEnquiry = {
             id: Date.now(),
             date: new Date().toLocaleDateString(),
             time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
             ...formData
         };
-
         addEnquiry(newEnquiry);
         alert("Thank you for your enquiry! We will bloom together soon.");
-        setFormData({ name: '', email: '', company: '', service: '', budget: '', timeline: '', message: '' });
+        setFormData({
+            name: '', email: '', company: '', service: '', budget: '', timeline: '', message: '',
+            vibes: [], vibeDescription: ''
+        });
     };
+
+    // Vibe Keywords
+    const VIBES = ['Minimalist', 'Bold & Loud', 'Luxury', 'Playful', 'Geometric', 'Organic', 'Tech', 'Vintage', 'Editorial', 'Abstract'];
 
     return (
         <>
@@ -53,193 +61,227 @@ export default function Contact() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                style={{ paddingTop: '8rem', paddingBottom: '4rem' }}
+                style={{ backgroundColor: '#fff', minHeight: '100vh', paddingBottom: '0' }}
             >
-                <div className="container">
-                    <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-                        <h1 style={{ fontSize: 'clamp(3rem, 7vw, 7rem)', color: 'var(--color-electric-blue)', fontFamily: 'var(--font-brand)', lineHeight: 1 }}>Start a Project</h1>
-                        <p className="font-subtitle" style={{ fontSize: '1.5rem', marginTop: '1rem', color: '#666' }}>
-                            Ready to make your brand bloom? Fill out the form below to get started.
-                        </p>
-                    </div>
-
-                    {/* PROJECT FORM */}
-                    <div className="contact-form-wrapper" style={{ maxWidth: '900px', margin: '0 auto', backgroundColor: 'var(--color-white)', borderRadius: '20px', boxShadow: '0 20px 60px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-                        <div className="contact-form-inner" style={{ padding: '4rem' }}>
-                            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
-
-                                {/* Section 1: contact Info */}
-                                <div>
-                                    <h3 className="font-subtitle" style={{ fontSize: '2rem', marginBottom: '1.5rem', color: 'var(--color-dark-choc)', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>01. You & Your Brand</h3>
-                                    <div className="contact-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                            <label className="font-subtitle" htmlFor="name" style={{ fontSize: '1.2rem', color: '#888' }}>Name *</label>
-                                            <input type="text" name="name" required value={formData.name} onChange={handleChange} style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#FCFCFC', fontSize: '1.2rem' }} placeholder="Name" />
-                                        </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                            <label className="font-subtitle" htmlFor="email" style={{ fontSize: '1.2rem', color: '#888' }}>Email *</label>
-                                            <input type="email" name="email" required value={formData.email} onChange={handleChange} style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#FCFCFC', fontSize: '1.2rem' }} placeholder="your@email.com" />
-                                        </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: '1 / -1' }}>
-                                            <label className="font-subtitle" htmlFor="company" style={{ fontSize: '1.2rem', color: '#888' }}>Company / Brand Name *</label>
-                                            <input type="text" name="company" required value={formData.company} onChange={handleChange} style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#FCFCFC', fontSize: '1.2rem' }} placeholder="Your Company/brand" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Section 2: Project Details */}
-                                <div>
-                                    <h3 className="font-subtitle" style={{ fontSize: '2rem', marginBottom: '1.5rem', color: 'var(--color-dark-choc)', borderBottom: '1px solid #eee', paddingBottom: '1rem' }}>
-                                        02. Project Details
-                                    </h3>
-                                    <div className="contact-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                            <label className="font-subtitle" htmlFor="service" style={{ fontSize: '1.2rem', color: '#888' }}>Service of Interest *</label>
-                                            <select name="service" required value={formData.service} onChange={handleChange} style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#FCFCFC', fontSize: '1.2rem' }}>
-                                                <option value="">Select a service...</option>
-                                                <option value="Branding">Branding Identity</option>
-                                                <option value="Social Media">Social Media Management</option>
-                                                <option value="Production">Content Production</option>
-                                                <option value="Web Design">Web Design & Dev</option>
-                                                <option value="Strategy">Brand Strategy</option>
-                                            </select>
-                                        </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                            <label className="font-subtitle" htmlFor="budget" style={{ fontSize: '1.2rem', color: '#888' }}>Estimated Budget *</label>
-                                            <input
-                                                list="budget-options"
-                                                name="budget"
-                                                required
-                                                value={formData.budget}
-                                                onChange={handleChange}
-                                                style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#FCFCFC', fontSize: '1.2rem' }}
-                                                placeholder="Select or type amount..."
-                                            />
-                                            <datalist id="budget-options">
-                                                <option value="₹50k - ₹1L" />
-                                                <option value="₹1L - ₹3L" />
-                                                <option value="₹3L - ₹5L" />
-                                                <option value="₹5L+" />
-                                            </datalist>
-                                        </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: '1 / -1' }}>
-                                            <label className="font-subtitle" htmlFor="timeline" style={{ fontSize: '1.2rem', color: '#888' }}>Desired Timeline *</label>
-                                            <select name="timeline" required value={formData.timeline} onChange={handleChange} style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#FCFCFC', fontSize: '1.2rem' }}>
-                                                <option value="">When do you need this launched?</option>
-                                                <option value="ASAP">As soon as possible</option>
-                                                <option value="1 month">Within 1 month</option>
-                                                <option value="1-3 months">1-3 months</option>
-                                                <option value="3+ months">3+ months</option>
-                                            </select>
-                                        </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: '1 / -1' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <label className="font-subtitle" htmlFor="message" style={{ fontSize: '1.2rem', color: '#888' }}>Tell us about your vision</label>
-                                                <span style={{ fontSize: '1rem', color: currentWordCount >= 200 ? 'red' : '#aaa' }}>
-                                                    {currentWordCount} / 200 words
-                                                </span>
-                                            </div>
-                                            <textarea
-                                                name="message"
-                                                rows="5"
-                                                value={formData.message}
-                                                onChange={handleChange}
-                                                style={{ padding: '1rem', border: '1px solid #eee', borderRadius: '8px', backgroundColor: '#FCFCFC', fontSize: '1.2rem' }}
-                                                placeholder="Any specifics we should know? (Max 200 words)"
-                                            ></textarea>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <AnimatedButton type="submit" className="btn-primary" style={{ alignSelf: 'start', marginTop: '1rem', width: '100%', textAlign: 'center' }}>
-                                    Submit Project Enquiry
-                                </AnimatedButton>
-
-                            </form>
-                        </div>
-                    </div>
-
-                    {/* COLLABORATIONS CTA */}
-                    <div className="collab-section" style={{
-                        marginTop: '6rem',
-                        textAlign: 'center',
-                        padding: '4rem 2rem',
-                        backgroundColor: '#EADDCD',
-                        borderRadius: '20px',
-                        position: 'relative',
-                        overflow: 'hidden'
+                {/* HERO HEADER */}
+                <div style={{ paddingTop: '15vh', paddingBottom: '5vh', paddingLeft: '5vw', paddingRight: '5vw' }}>
+                    <h1 style={{
+                        fontSize: 'clamp(3.5rem, 15vw, 12rem)', // HUGE TYPOGRAPHY
+                        fontFamily: 'var(--font-brand)',
+                        fontWeight: '900',
+                        lineHeight: 0.85,
+                        textTransform: 'uppercase',
+                        color: 'var(--color-electric-blue)',
+                        margin: 0
                     }}>
-                        <div style={{ position: 'relative', zIndex: 1 }}>
-                            <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '4.5rem', marginBottom: '1rem', color: '#333' }}>Looking to Collaborate?</h2>
-                            <p className="font-subtitle" style={{ fontSize: '1.5rem', color: '#555', marginBottom: '2rem', maxWidth: '600px', margin: '0 auto 2rem' }}>
-                                For partnerships, press, podcast features, or just casual coffee chats, we'd love to hear from you directly.
+                        Let's Talk
+                    </h1>
+                    <h1 style={{
+                        fontSize: 'clamp(3.5rem, 15vw, 12rem)',
+                        fontFamily: 'var(--font-brand)',
+                        fontWeight: '900',
+                        lineHeight: 0.85,
+                        textTransform: 'uppercase',
+                        color: 'var(--color-dark-choc)', // Dark Chocolate
+                        margin: 0,
+                        textAlign: 'right' // Editorial stagger
+                    }}>
+                        Business
+                    </h1>
+                </div>
+
+                <div className="container" style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 5vw' }}>
+
+                    <form onSubmit={handleSubmit} style={{ marginTop: '5rem' }}>
+
+                        {/* 01. THE VIBE */}
+                        <section style={{ marginBottom: '8rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '2rem', marginBottom: '3rem', borderBottom: '2px solid var(--color-dark-choc)', paddingBottom: '1rem' }}>
+                                <span style={{ fontFamily: 'var(--font-brand)', fontSize: '3rem', color: 'var(--color-electric-blue)' }}>01</span>
+                                <h2 style={{ fontFamily: 'var(--font-subtitle)', fontSize: '2rem', textTransform: 'uppercase', margin: 0 }}>The Vibe Check</h2>
+                            </div>
+
+                            <p style={{ fontSize: '1.2rem', marginBottom: '2rem', fontFamily: 'var(--font-subtitle)' }}>Select keywords that define your vision:</p>
+
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                                {VIBES.map(vibe => (
+                                    <motion.button
+                                        key={vibe}
+                                        type="button"
+                                        onClick={() => toggleVibe(vibe)}
+                                        whileHover={{ scale: 1.05, backgroundColor: 'var(--color-dark-choc)', color: '#fff' }}
+                                        whileTap={{ scale: 0.95 }}
+                                        style={{
+                                            padding: '0.8rem 2rem',
+                                            fontSize: '1.1rem',
+                                            textTransform: 'uppercase',
+                                            border: '1px solid var(--color-dark-choc)',
+                                            backgroundColor: formData.vibes.includes(vibe) ? 'var(--color-electric-blue)' : 'transparent',
+                                            color: formData.vibes.includes(vibe) ? '#fff' : 'var(--color-dark-choc)',
+                                            borderColor: formData.vibes.includes(vibe) ? 'var(--color-electric-blue)' : 'var(--color-dark-choc)',
+                                            borderRadius: '50px',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                    >
+                                        {vibe}
+                                    </motion.button>
+                                ))}
+                            </div>
+
+                            <div style={{ marginTop: '3rem' }}>
+                                <label style={{ display: 'block', fontSize: '1.5rem', fontFamily: 'var(--font-subtitle)', marginBottom: '1rem', fontWeight: 'bold' }}>
+                                    Tell us more about your vibe...
+                                </label>
+                                <textarea
+                                    name="vibeDescription"
+                                    value={formData.vibeDescription}
+                                    onChange={handleChange}
+                                    placeholder="Describe the mood, feeling, or aesthetic you're aiming for..."
+                                    rows="3"
+                                    style={{
+                                        width: '100%',
+                                        border: 'none',
+                                        borderBottom: '2px solid #ccc',
+                                        fontSize: '1.5rem',
+                                        padding: '1rem 0',
+                                        fontFamily: 'var(--font-subtitle)',
+                                        resize: 'none',
+                                        outline: 'none',
+                                        backgroundColor: 'transparent'
+                                    }}
+                                />
+                            </div>
+                        </section>
+
+                        {/* 02. THE BASICS */}
+                        <section style={{ marginBottom: '8rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '2rem', marginBottom: '3rem', borderBottom: '2px solid var(--color-dark-choc)', paddingBottom: '1rem' }}>
+                                <span style={{ fontFamily: 'var(--font-brand)', fontSize: '3rem', color: 'var(--color-electric-blue)' }}>02</span>
+                                <h2 style={{ fontFamily: 'var(--font-subtitle)', fontSize: '2rem', textTransform: 'uppercase', margin: 0 }}>The Basics</h2>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem 2rem' }}>
+                                <InputGroup label="Name" name="name" value={formData.name} onChange={handleChange} />
+                                <InputGroup label="Email" name="email" type="email" value={formData.email} onChange={handleChange} />
+                                <InputGroup label="Company / Brand" name="company" value={formData.company} onChange={handleChange} />
+                            </div>
+                        </section>
+
+                        {/* 03. THE DETAILS */}
+                        <section style={{ marginBottom: '8rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '2rem', marginBottom: '3rem', borderBottom: '2px solid var(--color-dark-choc)', paddingBottom: '1rem' }}>
+                                <span style={{ fontFamily: 'var(--font-brand)', fontSize: '3rem', color: 'var(--color-electric-blue)' }}>03</span>
+                                <h2 style={{ fontFamily: 'var(--font-subtitle)', fontSize: '2rem', textTransform: 'uppercase', margin: 0 }}>The Details</h2>
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem 2rem' }}>
+                                <SelectGroup label="Service" name="service" value={formData.service} onChange={handleChange}
+                                    options={['Branding', 'Social Media', 'Production', 'Web Design', 'Strategy', 'Other']} />
+
+                                <SelectGroup label="Budget" name="budget" value={formData.budget} onChange={handleChange}
+                                    options={['₹50k - ₹1L', '₹1L - ₹3L', '₹3L - ₹5L', '₹5L+']} />
+
+                                <SelectGroup label="Timeline" name="timeline" value={formData.timeline} onChange={handleChange}
+                                    options={['ASAP', '1 Month', '1-3 Months', '3+ Months']} />
+                            </div>
+
+                            <div style={{ marginTop: '4rem' }}>
+                                <label style={{ display: 'block', fontSize: '1.2rem', fontFamily: 'var(--font-subtitle)', marginBottom: '1rem', color: '#666' }}>
+                                    Anything else?
+                                </label>
+                                <textarea
+                                    name="message"
+                                    value={formData.message}
+                                    onChange={handleChange}
+                                    placeholder="Tell us about your project goals..."
+                                    rows="2"
+                                    style={{
+                                        width: '100%',
+                                        border: 'none',
+                                        borderBottom: '2px solid #ccc',
+                                        fontSize: '1.5rem',
+                                        padding: '1rem 0',
+                                        fontFamily: 'var(--font-subtitle)',
+                                        resize: 'none',
+                                        outline: 'none',
+                                        backgroundColor: 'transparent'
+                                    }}
+                                />
+                            </div>
+                        </section>
+
+                        <div style={{ textAlign: 'right', marginBottom: '10rem' }}>
+                            <AnimatedButton
+                                type="submit"
+                                style={{
+                                    fontSize: '1.5rem',
+                                    padding: '1.5rem 4rem',
+                                    backgroundColor: 'var(--color-dark-choc)',
+                                    color: '#fff',
+                                    borderRadius: '50px' // Rounded corners
+                                }}
+                            >
+                                SUBMIT ENQUIRY
+                            </AnimatedButton>
+                        </div>
+
+                    </form>
+
+                    {/* COLLAB / MAP SECTION - SIMPLIFIED EDITORIAL */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', paddingBottom: '4rem' }}>
+
+                        {/* ADDRESS & MAP */}
+                        <div style={{ flex: 1, minWidth: '300px' }}>
+                            <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--color-electric-blue)' }}>VISIT US</h3>
+                            <p style={{ fontSize: '1.2rem', lineHeight: 1.6, fontFamily: 'var(--font-subtitle)', marginBottom: '1.5rem' }}>
+                                Solarium Business Centre,<br />
+                                515, Beside Times Corner<br />
+                                Surat, Gujarat 395007
+                            </p>
+                            <div style={{ width: '100%', height: '300px', borderRadius: '15px', overflow: 'hidden', border: '1px solid #ddd' }}>
+                                <iframe
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3720.627254589255!2d72.78426021424785!3d21.16723238837373!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be053f3199b5003%3A0xe9c8642279140af!2sSolarium%20Business%20Center!5e0!3m2!1sen!2sin!4v1689596821464!5m2!1sen!2sin"
+                                    width="100%"
+                                    height="100%"
+                                    style={{ border: 0 }}
+                                    allowFullScreen=""
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer-when-downgrade"
+                                ></iframe>
+                            </div>
+                        </div>
+
+                        {/* COLLAB */}
+                        <div style={{ flex: 1, minWidth: '300px' }}>
+                            <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--color-electric-blue)' }}>COLLABORATE</h3>
+                            <p style={{ fontSize: '1.2rem', lineHeight: 1.6, fontFamily: 'var(--font-subtitle)' }}>
+                                Partnerships, press, or just a coffee chat?
                             </p>
                             <button
                                 onClick={() => setEmailModalOpen(true)}
                                 style={{
-                                    display: 'inline-block',
-                                    padding: '1rem 2.5rem',
-                                    backgroundColor: '#333',
-                                    color: '#fff',
+                                    marginTop: '1rem',
+                                    background: 'none',
                                     border: 'none',
-                                    boxSizing: 'border-box',
-                                    cursor: 'pointer',
-                                    textDecoration: 'none',
-                                    borderRadius: '50px',
-                                    fontFamily: 'var(--font-subtitle)',
+                                    borderBottom: '2px solid var(--color-dark-choc)',
+                                    fontSize: '1.2rem',
                                     fontWeight: 'bold',
-                                    transition: 'transform 0.2s',
-                                    boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+                                    cursor: 'pointer',
+                                    paddingBottom: '5px',
+                                    fontFamily: 'var(--font-subtitle)'
                                 }}
-                                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                             >
-                                Email Us Directly
+                                EMAIL US DIRECTLY
                             </button>
                         </div>
-                        {/* Decor */}
-                        <div className="collab-decor-1" style={{ position: 'absolute', top: -50, left: -50, width: 200, height: 200, backgroundColor: '#fff', borderRadius: '50%', opacity: 0.3 }}></div>
-                        <div className="collab-decor-2" style={{ position: 'absolute', bottom: -50, right: -50, width: 150, height: 150, backgroundColor: '#fff', borderRadius: '50%', opacity: 0.3 }}></div>
-                    </div>
 
-                    {/* GOOGLE MAP & ADDRESS */}
-                    <div className="map-section" style={{ marginTop: '6rem' }}>
-                        <div style={{ marginBottom: '2rem', textAlign: 'center', fontFamily: 'var(--font-subtitle)' }}>
-                            <h4 style={{ fontSize: '3rem', color: 'var(--color-dark-choc)', fontWeight: 'bold', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '2px' }}>
-                                Visit Our Office
-                            </h4>
-                            <p style={{ color: '#666', fontSize: '1.3rem', lineHeight: '1.6' }}>
-                                Solarium Business Centre, 515, beside Times Corner<br />
-                                Surat, Gujarat 395007
-                                <br />
-                                <a
-                                    href="https://www.google.com/maps/search/?api=1&query=Bloom+Branding,+Solarium+Business+Centre,+515,+Surat"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={{ color: 'var(--color-electric-blue)', textDecoration: 'underline', fontSize: '1.2rem', marginTop: '10px', display: 'inline-block' }}
-                                >
-                                    View on Google Maps
-                                </a>
-                            </p>
-                        </div>
-
-                        <div style={{ width: '100%', height: '300px', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', position: 'relative' }}>
-                            <iframe
-                                title="Office Location"
-                                width="100%"
-                                height="100%"
-                                style={{ border: 0 }}
-                                loading="lazy"
-                                allowFullScreen
-                                src="https://maps.google.com/maps?q=Bloom+Branding,+Solarium+Business+Centre,+515,+Surat&z=15&output=embed"
-                            ></iframe>
-                            {/* Overlay to ensure map style matches branding slightly or just clean look */}
-                            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', boxShadow: 'inset 0 0 20px rgba(0,0,0,0.1)' }}></div>
-                        </div>
                     </div>
 
                 </div>
             </motion.div>
+
+
 
             <EmailServiceSelector
                 isOpen={emailModalOpen}
@@ -249,3 +291,53 @@ export default function Contact() {
         </>
     );
 }
+
+// Micro-Components for cleaner code
+const InputGroup = ({ label, name, value, onChange, type = "text" }) => (
+    <div>
+        <label style={{ display: 'block', fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem', color: '#999' }}>{label}</label>
+        <input
+            type={type}
+            name={name}
+            value={value}
+            onChange={onChange}
+            required
+            style={{
+                width: '100%',
+                border: 'none',
+                borderBottom: '2px solid var(--color-dark-choc)',
+                fontSize: '1.5rem',
+                padding: '0.5rem 0',
+                fontFamily: 'var(--font-subtitle)',
+                outline: 'none',
+                backgroundColor: 'transparent'
+            }}
+        />
+    </div>
+);
+
+const SelectGroup = ({ label, name, value, onChange, options }) => (
+    <div>
+        <label style={{ display: 'block', fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem', color: '#999' }}>{label}</label>
+        <select
+            name={name}
+            value={value}
+            onChange={onChange}
+            required
+            style={{
+                width: '100%',
+                border: 'none',
+                borderBottom: '2px solid var(--color-dark-choc)',
+                fontSize: '1.5rem',
+                padding: '0.5rem 0',
+                fontFamily: 'var(--font-subtitle)',
+                outline: 'none',
+                backgroundColor: 'transparent',
+                cursor: 'pointer'
+            }}
+        >
+            <option value="">Select...</option>
+            {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+        </select>
+    </div>
+);

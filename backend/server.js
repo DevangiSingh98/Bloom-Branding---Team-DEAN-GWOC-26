@@ -3,6 +3,9 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
+import session from 'express-session';
+import passport from 'passport';
+import './config/passport.js';
 
 import projectRoutes from './routes/projectRoutes.js';
 import userRoutes from './routes/userRoutes.js';
@@ -18,39 +21,30 @@ import chatRoutes from './routes/chatRoutes.js';
 import heroRoutes from './routes/heroRoutes.js';
 import siteImageRoutes from './routes/siteImageRoutes.js';
 import legalRoutes from './routes/legalRoutes.js';
-
-// Load env vars from root directory
-dotenv.config({ path: '../.env' });
-
-// Initialize App
-const app = express();
-
-// Middleware
-app.use(cors());
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
-
-// Custom Logger Middleware
-app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} | ${req.method} ${req.originalUrl}`);
-    next();
-});
-
-// Database Connection
-// Check if URI is loaded
-if (!process.env.MONGODB_URI) {
-    console.error('FATAL ERROR: MONGODB_URI is not defined in ../.env');
-    console.warn('Attempting to look for .env in current directory...');
-    dotenv.config(); // Try current directory as fallback
-}
-// Security Check
-if (!process.env.JWT_SECRET) {
-    console.warn('⚠️ WARNING: JWT_SECRET is not defined! Using fallback "secret". THIS IS INSECURE FOR PRODUCTION.');
-}
+import aiRoutes from './routes/aiRoutes.js';
+import assetRoutes from './routes/assetRoutes.js';
+dotenv.config();
 
 connectDB();
 
-// Routes
+const app = express();
+
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
+app.use(express.json());
+
+// Session and Passport Middleware
+app.use(session({
+    secret: process.env.JWT_SECRET || 'secret', // Use JWT_SECRET for session secret
+    resave: false,
+    saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/api/projects', projectRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/services', serviceRoutes);
@@ -61,10 +55,53 @@ app.use('/api/founders', founderRoutes);
 app.use('/api/values', valueRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/selected-work', selectedWorkRoutes);
+app.use('/api/chat', chatRoutes);
 app.use('/api/hero', heroRoutes);
 app.use('/api/site-images', siteImageRoutes);
 app.use('/api/legal', legalRoutes);
-app.use('/api/chat', chatRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api/assets', assetRoutes);
+
+// --- GOOGLE AUTH ROUTES ---
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: 'http://localhost:5173/vault/login?error=true' }),
+    (req, res) => {
+        // Successful authentication
+        // In a real production app, generate a JWT token here and pass it via URL (or cookie)
+        // For now, we redirect to frontend with a flag, and frontend will fetch user data
+        res.redirect('http://localhost:5173/vault?login=success');
+    }
+);
+
+app.get('/auth/current_user', (req, res) => {
+    if (req.user) {
+        // Generate Token for the user so they can use Bearer Auth for other routes
+        // We need to import generateToken logic or duplicate it.
+        // It's cleaner to import. But for now, let's quick fix import or verify.
+        // `userController` has `generateToken` but it's not exported.
+        // We really should export `generateToken` or use `jsonwebtoken` directly here.
+
+        import('jsonwebtoken').then(({ default: jwt }) => {
+            const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET || 'secret', {
+                expiresIn: '30d',
+            });
+
+            // Return user AND token
+            const userData = req.user.toObject();
+            res.json({ ...userData, token });
+        });
+    } else {
+        res.status(401).send(null);
+    }
+});
+app.get('/auth/logout', (req, res) => {
+    req.logout((err) => {
+        if (err) { return next(err); }
+        res.redirect('http://localhost:5173/');
+    });
+});
 
 app.get('/', (req, res) => {
     res.send('API is running...');

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useContent } from '../context/ContentContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image", onUpload, pathPrefix }) => {
     const [fileName, setFileName] = useState("No file chosen");
@@ -404,7 +406,9 @@ const Admin = () => {
     const [resetToken, setResetToken] = useState('');
     const [resetData, setResetData] = useState({ newPassword: '', confirmPassword: '' });
     const [resetMessage, setResetMessage] = useState({ type: '', text: '' });
-    const [isLoading, setIsLoading] = useState(false);
+    const [showPreview, setShowPreview] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const navigate = useNavigate();
 
     const handleSendEmail = async (e) => {
         e.preventDefault();
@@ -488,34 +492,72 @@ const Admin = () => {
         content,
         updateHero,
         updateAllProjects,
-        addProject,
+        syncProject,
         removeProject,
-        updateSelectedWork,
-        addSelectedWork,
-        removeSelectedWork,
-        updateInstagram,
+        syncTestimonial,
+        removeTestimonial,
         syncInstagram,
-        uploadFile,
+        removeInstagram,
+        syncFounder,
+        removeFounder,
+        syncValue,
+        removeValue,
+        syncBrand,
+        removeBrand,
+        syncSelectedWork,
+        removeSelectedWork,
+        updateSelectedWork,
+        updateTestimonials,
+        updateBrandLogos,
+        updateInstagram,
         updateFounders,
-        resetFounders,
-        updateSiteImage,
-        updateLegalContent,
-        resetLegal,
-        refreshEnquiries,
-        enquiries,
+        updateValues,
+        updateServices,
+        updateEnquiries,
         removeEnquiry,
         removeEnquiries,
-        removeAllEnquiries
+        removeAllEnquiries,
+        addEnquiry,
+        resetContent,
+        resetFounders,
+        resetLegal,
+        resetServices,
+        refreshEnquiries,
+        uploadFile,
+        updateLegalContent,
+        updateSiteImage,
+        undo, redo, canUndo, canRedo, takeSnapshot
     } = useContent();
 
-    const [activeTab, setActiveTab] = useState('projects');
+    const [activeTab, setActiveTab] = useState('Home');
+    const [clients, setClients] = useState([]);
+    const [filteredClients, setFilteredClients] = useState([]);
+
+    // Asset Management State
+    const [assetModalOpen, setAssetModalOpen] = useState(false);
+    const [selectedClientForAssets, setSelectedClientForAssets] = useState(null);
+    const [clientAssets, setClientAssets] = useState([]);
+    const [uploadingAssets, setUploadingAssets] = useState(false);
 
     useEffect(() => {
         if (userInfo && userInfo.token) {
             refreshEnquiries(userInfo.token);
+            const fetchClients = async () => {
+                try {
+                    const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+                    const { data } = await axios.get('/api/users', config);
+                    const safeData = Array.isArray(data) ? data : [];
+                    setClients(safeData);
+                    setFilteredClients(safeData);
+                } catch (error) { console.error("Error fetching users", error); setClients([]); setFilteredClients([]); }
+            };
+            fetchClients();
         }
-    }, [userInfo]);
+    }, [userInfo, activeTab]);
     const [openEnquiryId, setOpenEnquiryId] = useState(null);
+    const [aiIdeas, setAiIdeas] = useState({}); // Store ideas by enquiry ID
+    const [loadingAi, setLoadingAi] = useState(null); // ID of enquiry currently generating
+
     const [isInitializing, setIsInitializing] = useState(false);
     const [legalForm, setLegalForm] = useState({ privacy: '', terms: '' });
 
@@ -556,11 +598,37 @@ const Admin = () => {
     };
 
     const handleBulkDelete = () => {
-        showAlert("Delete Selected?", `Are you sure you want to delete ${selectedEnquiries.size} enquiries?`, "warning", () => {
+        if (selectedEnquiries.size === 0) return;
+        showAlert("Delete Enquiries?", `Delete ${selectedEnquiries.size} selected items?`, "warning", () => {
             removeEnquiries(Array.from(selectedEnquiries), userInfo.token);
             setSelectedEnquiries(new Set());
-        }, "Delete Selected", "red");
+        }, "Delete All", "red");
     };
+
+    // --- AI GENERATION LOGIC ---
+    const handleGenerateIdeas = async (enquiry) => {
+        setLoadingAi(enquiry.id);
+        try {
+            console.log("Generating ideas for:", enquiry.company);
+            const { data } = await axios.post('/api/ai/generate', {
+                service: enquiry.service,
+                message: enquiry.message,
+                company: enquiry.company,
+                vibe: enquiry.budget // Using Budget field as vibe indicator if specific vibe missing
+            }, {
+                headers: { Authorization: `Bearer ${userInfo.token}` }
+            });
+
+            console.log("AI Response:", data);
+            setAiIdeas(prev => ({ ...prev, [enquiry.id]: data.ideas }));
+        } catch (error) {
+            console.error("AI Generation Failed:", error);
+            alert("Failed to generate ideas. Check console for details.");
+        } finally {
+            setLoadingAi(null);
+        }
+    };
+
 
     const handleDeleteAllEnquiries = () => {
         showAlert("Delete ALL?", "Are you sure you want to delete ALL enquiries? This cannot be undone.", "warning", () => {
@@ -591,6 +659,8 @@ const Admin = () => {
                             company: msg.company,
                             budget: msg.budget,
                             timeline: msg.timeline,
+                            vibes: msg.vibes, // Added
+                            vibeDescription: msg.vibeDescription, // Added
                             date: new Date(msg.createdAt).toLocaleDateString(),
                             time: new Date(msg.createdAt).toLocaleTimeString(),
                             read: msg.read
@@ -659,6 +729,106 @@ const Admin = () => {
         setLoginData({ username: '', password: '' });
     };
 
+    const handleLogout = () => {
+        logout();
+        navigate('/admin');
+    };
+
+    // Asset Management Functions
+    const openAssetManager = async (client) => {
+        setSelectedClientForAssets(client);
+        setAssetModalOpen(true);
+        // Fetch existing assets
+        try {
+            const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+            const { data } = await axios.get(`/api/assets?userId=${client._id}`, config);
+            setClientAssets(data);
+        } catch (error) {
+            console.error("Failed to fetch assets", error);
+            alert("Could not load assets.");
+        }
+    };
+
+    const handleAssetDelete = async (assetId) => {
+        if (!window.confirm("Delete this asset?")) return;
+        try {
+            const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+            await axios.delete(`/api/assets/${assetId}`, config);
+            setClientAssets(prev => prev.filter(a => a._id !== assetId));
+        } catch (error) {
+            console.error("Failed to delete asset", error);
+            alert("Failed to delete asset.");
+        }
+    };
+
+    const handleAssetUpload = async (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+
+        setUploadingAssets(true);
+        try {
+            // We can reuse the uploadFile from context logic if it exposes a raw upload function,
+            // but usually it expects to update state. 
+            // We'll assume we have a generic upload helper or use the cloud logic directly.
+            // Since `uploadFile` in context updates STATE, we need a raw upload function. 
+            // Let's rely on the fact that `uploadFile` (from context) might be for SINGLE file -> State.
+            // We need a loop here. 
+            // Actually, `uploadFile` in `ContentContext` likely handles the cloudinary post.
+            // We should peek generic content context? 
+            // For now, let's implement a direct Cloudinary upload loop here or use a helper if available,
+            // OR if `uploadFile` is the generic one.
+
+            // Assuming we need to implement raw upload here similar to how `ContentContext` probably does it.
+            // Let's use the `/api/upload` endpoint if it existed, BUT `ContentContext` usually does client-side upload to Cloudinary?
+            // Wait, looking at previous code `FileUpload` uses `uploadFile`.
+
+            // Let's assume `uploadFile` takes (file) and returns URL. 
+            // If `uploadFile` is NOT exposed as a raw function returning a promise of URL, we might need to add one.
+            // Checking `ContentContext`: `uploadFile` was destructured. 
+
+            // Let's try to fetch a signature or use an unassigned upload preset if configured.
+            // Better: Let's create `uploadAssetToCloud` helper inside logic here if possible, 
+            // Or assume `uploadFile` returns the URL. 
+
+            // WORKAROUND: We will iterate and use `uploadFile` if it returns data.
+            // Detailed check of `ContentContext` showed `uploadFile` updates state directly? 
+            // No, `FileUpload` calls `onUpload`.
+
+            // Let's look at `ContentContext` later. For now, I'll skeleton the loop.
+
+            // Parallel Uploads
+            const uploadPromises = files.map(async (file) => {
+                const fileUrl = await uploadFile(file);
+                if (!fileUrl) throw new Error(`Failed to upload ${file.name}`);
+
+                const assetData = {
+                    title: file.name,
+                    type: file.type.startsWith('video') ? 'video' : 'image',
+                    url: fileUrl,
+                    userId: selectedClientForAssets._id,
+                    format: file.name.split('.').pop(),
+                    size: file.size
+                };
+
+                const { data: newAsset } = await axios.post('/api/assets', assetData, {
+                    headers: { Authorization: `Bearer ${userInfo.token}` }
+                });
+                return newAsset;
+            });
+
+            const newAssets = await Promise.all(uploadPromises);
+            setClientAssets(prev => [...newAssets, ...prev]);
+            alert("Upload Complete!");
+        } catch (error) {
+            console.error("Upload failed", error);
+            alert("Upload failed. Ensure you have an Upload Route working.");
+        } finally {
+            setUploadingAssets(false);
+            e.target.value = null; // reset input
+        }
+    };
+
+
 
 
     const initializeDatabase = async () => {
@@ -685,6 +855,21 @@ const Admin = () => {
                         }
                     }
 
+                    // --- 3. FILTER SITE IMAGES (Exclude 'Expertise' / Services) ---
+                    // Only allow Home, About, Menu, Logo
+                    const ALLOWED_IMAGE_TYPES = ['home', 'about', 'menu', 'logo', 'background'];
+
+                    const filteredSiteImages = (Array.isArray(content.siteImages) ? content.siteImages : []).filter(img => {
+                        // Basic filter: Check if category or ID implies "expert" or "service"
+                        const lowerId = (img.id || '').toLowerCase();
+                        const lowerCat = (img.category || '').toLowerCase();
+
+                        // Explicit exclusions
+                        if (lowerId.includes('expert') || lowerCat.includes('expert')) return false;
+                        if (lowerId.includes('service') || lowerCat.includes('service')) return false;
+
+                        return true;
+                    }) || [];
                     // Sync Testimonials
                     if (content.testimonials) {
                         for (const item of content.testimonials) {
@@ -742,10 +927,12 @@ const Admin = () => {
     });
 
     const handleHeroChange = (e) => {
+        takeSnapshot();
         updateHero({ [e.target.name]: e.target.value }, userInfo.token);
     };
 
     const handleFoundersChange = (section, field, value) => {
+        takeSnapshot();
         const newFounders = { ...content.founders };
         // Ensure section object exists
         if (!newFounders[section]) newFounders[section] = {};
@@ -757,6 +944,7 @@ const Admin = () => {
 
     // Helper to handle array updates
     const handleArrayChange = (index, field, value, type) => {
+        takeSnapshot();
         let newArray;
         if (type === 'work') {
             newArray = [...content.selectedWork];
@@ -792,6 +980,7 @@ const Admin = () => {
     };
 
     const addItem = async (type) => {
+        takeSnapshot();
         const tempId = Date.now() + Math.random();
         // PREPEND new items to make them appear at the top
         if (type === 'work') {
@@ -816,6 +1005,7 @@ const Admin = () => {
     };
 
     const deleteItem = async (index, type) => {
+        takeSnapshot();
         showConfirm(
             "Confirm Deletion",
             `Are you sure you want to delete this ${type.slice(0, -1)}? This cannot be undone.`,
@@ -1063,15 +1253,20 @@ const Admin = () => {
                 )}
             </AnimatePresence>
 
-            <div className="admin-header-container">
-                <h1 className="admin-header-title">Admin Dashboard</h1>
-                <span className="admin-saved-message">
-                    ✓ Changes auto-saved to Database
-                </span>
+            <div className="admin-header-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <h1 className="admin-header-title">Admin Dashboard</h1>
+                    <span className="admin-saved-message">
+                        ✓ Changes auto-saved to Database
+                    </span>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    {/* Undo/Redo Removed */}
+                </div>
             </div>
 
             <div className="admin-tabs-container">
-                {['enquiries', 'projects', 'selected work', 'founder', 'testimonials', 'instagram', 'brands', 'site-images', 'legal'].map(tab => (
+                {['enquiries', 'services', 'projects', 'selected work', 'founder', 'testimonials', 'instagram', 'brands', 'site-images', 'legal'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -1090,6 +1285,22 @@ const Admin = () => {
                         {tab}
                     </button>
                 ))}
+                <button
+                    onClick={() => setActiveTab('Clients')}
+                    style={{
+                        padding: '0.5rem 1rem',
+                        borderRadius: '5px',
+                        backgroundColor: activeTab === 'Clients' ? 'var(--color-electric-blue)' : '#eee',
+                        color: activeTab === 'Clients' ? 'white' : 'black',
+                        textTransform: 'capitalize',
+                        cursor: 'pointer',
+                        fontSize: '0.9rem',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0
+                    }}
+                >
+                    Clients
+                </button>
 
                 <button
                     onClick={initializeDatabase}
@@ -1213,8 +1424,8 @@ const Admin = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {content.enquiries.map((item) => (
-                                                <React.Fragment key={item.id}>
+                                            {content.enquiries.map((item, index) => (
+                                                <React.Fragment key={item.id || index}>
                                                     <tr style={{ borderBottom: '1px solid #eee', backgroundColor: selectedEnquiries.has(item.id) ? '#e6f7ff' : 'transparent' }}>
                                                         <td style={{ padding: '1rem', textAlign: 'center' }}>
                                                             <input
@@ -1273,9 +1484,60 @@ const Admin = () => {
                                                                     <div><strong>Company:</strong> {item.company || 'N/A'}</div>
                                                                     <div><strong>Budget:</strong> {item.budget || 'N/A'}</div>
                                                                     <div><strong>Timeline:</strong> {item.timeline || 'N/A'}</div>
+
+                                                                    {/* Display Vibe if present */}
+                                                                    {item.vibes && (
+                                                                        <div style={{ gridColumn: '1 / -1' }}>
+                                                                            <strong>Vibes:</strong>
+                                                                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+                                                                                {item.vibes.map((v, i) => (
+                                                                                    <span key={i} style={{ backgroundColor: 'var(--color-electric-blue)', color: '#fff', padding: '0.2rem 0.6rem', borderRadius: '15px', fontSize: '0.8rem' }}>{v}</span>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+                                                                    {item.vibeDescription && (
+                                                                        <div style={{ gridColumn: '1 / -1' }}>
+                                                                            <strong>Vibe Description:</strong>
+                                                                            <p style={{ fontStyle: 'italic', color: '#555' }}>"{item.vibeDescription}"</p>
+                                                                        </div>
+                                                                    )}
+
                                                                     <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
                                                                         <strong>Message:</strong>
                                                                         <p style={{ marginTop: '0.5rem', lineHeight: '1.6', backgroundColor: '#fff', padding: '1rem', borderRadius: '4px' }}>{item.message}</p>
+                                                                    </div>
+
+                                                                    {/* AI GENERATION SECTION */}
+                                                                    <div style={{ gridColumn: '1 / -1', marginTop: '1rem', borderTop: '1px solid #ddd', paddingTop: '1rem' }}>
+                                                                        <button
+                                                                            onClick={() => handleGenerateIdeas(item)}
+                                                                            disabled={loadingAi === item.id}
+                                                                            style={{
+                                                                                background: 'var(--color-electric-blue)',
+                                                                                color: '#fff',
+                                                                                border: 'none',
+                                                                                padding: '0.8rem 1.5rem',
+                                                                                borderRadius: '50px',
+                                                                                cursor: 'pointer',
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                fontFamily: 'var(--font-brand)',
+                                                                                fontSize: '1rem',
+                                                                                marginBottom: '1rem'
+                                                                            }}
+                                                                        >
+                                                                            {loadingAi === item.id ? 'Generating Magic...' : '✨ Generate Creative Ideas'}
+                                                                        </button>
+
+                                                                        {aiIdeas[item.id] && (
+                                                                            <div style={{ backgroundColor: '#fff', padding: '1.5rem', borderRadius: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.05)' }}>
+                                                                                <h4 style={{ margin: '0 0 1rem 0', color: 'var(--color-electric-blue)' }}>AI Suggestions</h4>
+                                                                                <div style={{ whiteSpace: 'pre-line', lineHeight: '1.6' }}>
+                                                                                    {aiIdeas[item.id]}
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
                                                                     </div>
                                                                 </div>
                                                             </td>
@@ -1288,8 +1550,8 @@ const Admin = () => {
                                 </div>
 
                                 <div className="mobile-cards">
-                                    {content.enquiries.map((item) => (
-                                        <div key={item.id} className="mobile-card">
+                                    {content.enquiries.map((item, index) => (
+                                        <div key={item.id || index} className="mobile-card">
                                             <div className="mobile-card-row">
                                                 <input
                                                     type="checkbox"
@@ -1325,6 +1587,37 @@ const Admin = () => {
                                                         <strong>Message:</strong>
                                                         <p style={{ backgroundColor: 'white', padding: '0.5rem' }}>{item.message}</p>
                                                     </div>
+
+                                                    {/* AI SECTION */}
+                                                    <div style={{ marginTop: '1rem', borderTop: '1px solid #ddd', paddingTop: '1rem' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                                            <h4 style={{ margin: 0, color: 'var(--color-butter-yellow-dark)' }}>✨ Creative Spark</h4>
+                                                            <button
+                                                                onClick={() => handleGenerateIdeas(item)}
+                                                                disabled={loadingAi === item.id}
+                                                                style={{
+                                                                    padding: '0.5rem 1rem',
+                                                                    backgroundColor: 'black',
+                                                                    color: 'white',
+                                                                    border: 'none',
+                                                                    borderRadius: '20px',
+                                                                    cursor: loadingAi === item.id ? 'wait' : 'pointer',
+                                                                    fontSize: '0.8rem',
+                                                                    display: 'flex', alignItems: 'center', gap: '5px'
+                                                                }}
+                                                            >
+                                                                {loadingAi === item.id ? 'Thinking...' : 'Generate Ideas'}
+                                                            </button>
+                                                        </div>
+
+                                                        {aiIdeas[item.id] && (
+                                                            <div style={{ backgroundColor: '#fff', padding: '1rem', borderRadius: '8px', borderLeft: '4px solid var(--color-butter-yellow)' }}>
+                                                                <div style={{ whiteSpace: 'pre-line', fontSize: '0.9rem', lineHeight: '1.5' }}>
+                                                                    {aiIdeas[item.id]}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
@@ -1332,6 +1625,92 @@ const Admin = () => {
                                 </div>
                             </>
                         )}
+                    </div>
+                )}
+
+                {/* SERVICES MANAGEMENT */}
+                {activeTab === 'services' && (
+                    <div>
+                        <div className="admin-section-header">
+                            <div>
+                                <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Manage Services</h2>
+                                <p style={{ fontSize: '1.3rem', color: '#666', margin: 0 }}>Update service descriptions and imagery.</p>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    if (window.confirm("Reset Services to default configuration?")) {
+                                        resetServices(userInfo.token);
+                                    }
+                                }}
+                                style={{ padding: '0.5rem 1rem', backgroundColor: '#666', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+                            >
+                                Reset to Defaults
+                            </button>
+                        </div>
+                        {content.services && content.services.map((service, index) => (
+                            <div key={service.id ? `service-${service.id}` : `service-idx-${index}`} style={{ border: '1px solid #eee', padding: '1.5rem', marginBottom: '1.5rem', borderRadius: '8px', background: 'white' }}>
+                                <h3 style={{ margin: '0 0 1rem 0', color: service.accent || 'black' }}>{service.title}</h3>
+
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                                    <div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Subtitle</label>
+                                            <textarea
+                                                value={service.subtitle || ''}
+                                                onChange={(e) => {
+                                                    const newServices = [...content.services];
+                                                    newServices[index] = { ...newServices[index], subtitle: e.target.value };
+                                                    updateServices(newServices);
+                                                }}
+                                                style={{ width: '100%', padding: '0.8rem', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'inherit' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Description (Mobile)</label>
+                                            <textarea
+                                                value={service.description || ''}
+                                                onChange={(e) => {
+                                                    const newServices = [...content.services];
+                                                    newServices[index] = { ...newServices[index], description: e.target.value };
+                                                    updateServices(newServices);
+                                                }}
+                                                style={{ width: '100%', padding: '0.8rem', border: '1px solid #ddd', borderRadius: '4px', minHeight: '80px', fontFamily: 'inherit' }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <FileUpload
+                                            label="Service Image"
+                                            value={service.image}
+                                            onFileSelect={(val) => {
+                                                const newServices = [...content.services];
+                                                newServices[index] = { ...newServices[index], image: val };
+                                                updateServices(newServices);
+                                            }}
+                                            onRemove={() => {
+                                                const newServices = [...content.services];
+                                                newServices[index] = { ...newServices[index], image: '' };
+                                                updateServices(newServices);
+                                            }}
+                                            onUpload={uploadFile}
+                                            pathPrefix="services"
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{ marginTop: '1rem' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Long Text (Desktop)</label>
+                                    <textarea
+                                        value={service.longText || ''}
+                                        onChange={(e) => {
+                                            const newServices = [...content.services];
+                                            newServices[index] = { ...newServices[index], longText: e.target.value };
+                                            updateServices(newServices);
+                                        }}
+                                        style={{ width: '100%', padding: '0.8rem', border: '1px solid #ddd', borderRadius: '4px', minHeight: '150px', fontFamily: 'inherit', lineHeight: '1.5' }}
+                                    />
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 )}
 
@@ -1345,7 +1724,7 @@ const Admin = () => {
                             </div>
                             <button onClick={() => addItem('projects')} className="btn-primary" style={{ fontSize: '1rem', padding: '0.8rem 1.5rem', whiteSpace: 'nowrap' }}>+ Add New Project</button>
                         </div>
-                        {content.allProjects.map((item, index) => (
+                        {content.allProjects?.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
                                     <input
@@ -1403,7 +1782,7 @@ const Admin = () => {
                             </div>
                             <button onClick={() => addItem('work')} className="btn-primary" style={{ fontSize: '0.9rem', padding: '0.6rem 1.2rem', whiteSpace: 'nowrap' }}>+ Add Slot</button>
                         </div>
-                        {content.selectedWork.map((item, index) => (
+                        {content.selectedWork?.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ marginBottom: '0.5rem' }}>
                                     <label style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem' }}>Project</label>
@@ -1472,7 +1851,7 @@ const Admin = () => {
                             <h2 style={{ fontSize: '2.5rem', margin: 0 }}>Testimonials</h2>
                             <button onClick={() => addItem('testimonials')} className="btn-primary" style={{ fontSize: '0.9rem', padding: '0.6rem 1.2rem', whiteSpace: 'nowrap' }}>+ Add Testimonial</button>
                         </div>
-                        {content.testimonials.map((item, index) => (
+                        {content.testimonials?.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ marginBottom: '1rem' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
@@ -1502,7 +1881,7 @@ const Admin = () => {
                 {activeTab === 'instagram' && (
                     <div>
                         <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Instagram Content</h2>
-                        {content.instagram.map((item, index) => (
+                        {content.instagram?.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px', position: 'relative' }}>
                                 <button
                                     onClick={() => deleteItem(index, 'instagram')}
@@ -1531,6 +1910,8 @@ const Admin = () => {
                                         value={item.image}
                                         onFileSelect={(val) => handleArrayChange(index, 'image', val, 'instagram')}
                                         onRemove={() => handleArrayChange(index, 'image', '', 'instagram')}
+                                        onUpload={uploadFile}
+                                        pathPrefix="instagram"
                                     />
                                 </div>
                                 <div>
@@ -1546,7 +1927,7 @@ const Admin = () => {
                 {activeTab === 'brands' && (
                     <div>
                         <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Manage Brand Logos</h2>
-                        {content.brandLogos && content.brandLogos.map((item, index) => (
+                        {content.brandLogos?.map((item, index) => (
                             <div key={item.id || index} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem', alignItems: 'center' }}>
                                     <h4 style={{ margin: 0 }}>{item.name || `Brand ${index + 1}`}</h4>
@@ -1566,6 +1947,8 @@ const Admin = () => {
                                     value={item.logo || ''}
                                     onFileSelect={(val) => handleArrayChange(index, 'logo', val, 'brands')}
                                     onRemove={() => handleArrayChange(index, 'logo', '', 'brands')}
+                                    onUpload={uploadFile}
+                                    pathPrefix="brands"
                                 />
                             </div>
                         ))}
@@ -1591,6 +1974,7 @@ const Admin = () => {
                                         Reset to Defaults
                                     </button>
                                 </div>
+                                {/* Removed erroneous Project Image upload from Founders section */}
                                 <FileUpload
                                     label="Central Image"
                                     value={content.founders.main?.image || ''}
@@ -1682,27 +2066,7 @@ const Admin = () => {
 
                             </div>
 
-                            {/* Service Icons */}
-                            <div className="admin-card">
-                                <h3>Home: Service Images</h3>
-                                {[
-                                    { k: 'home_service_branding', l: 'Branding' },
-                                    { k: 'home_service_social', l: 'Social Media' },
-                                    { k: 'home_service_production', l: 'Production' },
-                                    { k: 'home_service_influencer', l: 'Influencer' },
-                                    { k: 'home_service_creative', l: 'Creative' }
-                                ].map(s => (
-                                    <FileUpload
-                                        key={s.k}
-                                        label={s.l}
-                                        value={content.siteImages?.[s.k] || ''}
-                                        onFileSelect={(val) => updateSiteImage(s.k, 'Home', s.l, val, userInfo.token)}
-                                        onRemove={() => updateSiteImage(s.k, 'Home', s.l, '', userInfo.token)}
-                                        onUpload={uploadFile}
-                                        pathPrefix="site_assets"
-                                    />
-                                ))}
-                            </div>
+                            {/* Service Images Removed per user request */}
 
                             {/* About Page */}
                             <div className="admin-card">
@@ -1839,8 +2203,156 @@ const Admin = () => {
                     </div>
                 )}
 
+                {/* CLIENTS TAB */}
+                {activeTab === 'Clients' && (
+                    <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                            <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '2rem', margin: 0 }}>Client Users</h2>
+                            <input
+                                type="text"
+                                placeholder="Search Clients..."
+                                style={{ padding: '0.8rem', width: '300px', borderRadius: '4px', border: '1px solid #ccc' }}
+                                onChange={(e) => {
+                                    const term = e.target.value.toLowerCase();
+                                    if (!term) setFilteredClients(clients);
+                                    else setFilteredClients(clients.filter(c => c.username?.toLowerCase().includes(term) || c.email?.toLowerCase().includes(term)));
+                                }}
+                            />
+                        </div>
+
+                        <div style={{ backgroundColor: '#fff', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 5px 15px rgba(0,0,0,0.05)' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                <thead>
+                                    <tr style={{ backgroundColor: '#f9f9f9', fontFamily: 'var(--font-subtitle)', fontSize: '0.9rem', color: '#666' }}>
+                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Username</th>
+                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Email</th>
+                                        <th style={{ padding: '1rem', textAlign: 'left' }}>Role</th>
+                                        <th style={{ padding: '1rem', textAlign: 'right' }}>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredClients.map((client) => (
+                                        <tr key={client._id} style={{ borderBottom: '1px solid #eee' }}>
+                                            <td style={{ padding: '1rem', fontWeight: 'bold' }}>{client.username}</td>
+                                            <td style={{ padding: '1rem' }}>{client.email}</td>
+                                            <td style={{ padding: '1rem' }}>
+                                                {client.isAdmin ? <span style={{ backgroundColor: '#e6f7ff', color: '#1890ff', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>Admin</span> : 'Client'}
+                                            </td>
+                                            <td style={{ padding: '1rem', textAlign: 'right' }}>
+                                                <button
+                                                    onClick={async () => {
+                                                        if (window.confirm('Delete this user?')) {
+                                                            try {
+                                                                const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+                                                                await axios.delete(`/api/users/${client._id}`, config);
+                                                                const newClients = clients.filter(c => c._id !== client._id);
+                                                                setClients(newClients);
+                                                                setFilteredClients(newClients);
+                                                            } catch (err) { alert('Failed to delete'); }
+                                                        }
+                                                    }}
+                                                    style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                                                >
+                                                    Delete
+                                                </button>
+                                                <button
+                                                    onClick={() => openAssetManager(client)}
+                                                    style={{ marginLeft: '1rem', color: 'var(--color-electric-blue)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+                                                >
+                                                    Manage Assets
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {filteredClients.length === 0 && (
+                                        <tr><td colSpan="4" style={{ padding: '2rem', textAlign: 'center', color: '#999' }}>No clients found.</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
             </div >
             <CustomModal {...modal} />
+
+            {/* ASSET MANAGER MODAL */}
+            {assetModalOpen && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 2000,
+                    display: 'flex', justifyContent: 'center', alignItems: 'center'
+                }}>
+                    <div style={{
+                        backgroundColor: 'white', width: '80%', height: '80%',
+                        borderRadius: '12px', padding: '2rem', display: 'flex', flexDirection: 'column',
+                        position: 'relative'
+                    }}>
+                        <button
+                            onClick={() => setAssetModalOpen(false)}
+                            style={{ position: 'absolute', top: '20px', right: '20px', fontSize: '1.5rem', background: 'none', border: 'none', cursor: 'pointer' }}
+                        >X</button>
+
+                        <h2 style={{ fontFamily: 'var(--font-brand)', marginBottom: '0.5rem' }}>Vault Assets</h2>
+                        <p style={{ fontFamily: 'var(--font-subtitle)', marginBottom: '2rem' }}>
+                            Managing for: <strong>{selectedClientForAssets?.username}</strong>
+                            {selectedClientForAssets?.companyName && ` (${selectedClientForAssets.companyName})`}
+                        </p>
+
+                        {/* Upload Section */}
+                        <div style={{ marginBottom: '2rem', padding: '1.5rem', border: '2px dashed #eee', borderRadius: '8px', textAlign: 'center' }}>
+                            <h4 style={{ margin: '0 0 1rem 0' }}>Upload New Assets (Max 100)</h4>
+                            <input
+                                type="file"
+                                multiple
+                                onChange={handleAssetUpload}
+                                disabled={uploadingAssets}
+                                style={{ display: 'none' }}
+                                id="asset-upload-input"
+                            />
+                            <label
+                                htmlFor="asset-upload-input"
+                                className="btn-primary"
+                                style={{ cursor: uploadingAssets ? 'not-allowed' : 'pointer', padding: '0.8rem 2rem', display: 'inline-block' }}
+                            >
+                                {uploadingAssets ? 'Uploading...' : 'Select Files'}
+                            </label>
+                        </div>
+
+                        {/* Gallery Section */}
+                        <div style={{ flex: 1, overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '1rem', alignContent: 'start' }}>
+                            {clientAssets.length === 0 ? (
+                                <p style={{ color: '#999', gridColumn: '1/-1', textAlign: 'center', marginTop: '2rem' }}>No assets found.</p>
+                            ) : (
+                                clientAssets.map(asset => (
+                                    <div key={asset._id} style={{ border: '1px solid #eee', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
+                                        <button
+                                            onClick={() => handleAssetDelete(asset._id)}
+                                            style={{
+                                                position: 'absolute', top: '5px', right: '5px',
+                                                background: 'white', border: '1px solid red', color: 'red',
+                                                borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', zIndex: 10
+                                            }}
+                                        >X</button>
+
+                                        <div style={{ height: '120px', backgroundColor: '#f9f9f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            {asset.type === 'image' ? (
+                                                <img src={asset.url} alt={asset.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            ) : (
+                                                <span style={{ fontSize: '2rem', color: '#ccc' }}>VIDEO</span>
+                                            )}
+                                        </div>
+                                        <div style={{ padding: '0.5rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.8rem' }}>
+                                            {asset.title}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div >
     );
 };

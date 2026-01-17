@@ -61,6 +61,9 @@ export default function Footer() {
                         <div style={{ display: 'flex', gap: '2rem' }}>
                             <span onClick={() => openLegal('privacy')} style={{ cursor: 'pointer', transition: 'color 0.3s' }} onMouseEnter={e => e.target.style.color = 'var(--color-butter-yellow)'} onMouseLeave={e => e.target.style.color = 'inherit'}>Privacy Policy</span>
                             <span onClick={() => openLegal('terms')} style={{ cursor: 'pointer', transition: 'color 0.3s' }} onMouseEnter={e => e.target.style.color = 'var(--color-butter-yellow)'} onMouseLeave={e => e.target.style.color = 'inherit'}>Terms</span>
+                            <div style={{ marginLeft: '1rem', borderLeft: '1px solid rgba(255,255,255,0.3)', paddingLeft: '1rem' }}>
+                                <a href="/client-login" style={{ textDecoration: 'none', color: 'var(--color-butter-yellow)', fontWeight: 'bold', textTransform: 'uppercase' }}>Client Access</a>
+                            </div>
                         </div>
                     </div>
                 </div>

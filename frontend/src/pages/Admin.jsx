@@ -1318,12 +1318,12 @@ const Admin = () => {
                     </button>
                 ))}
                 <button
-                    onClick={() => setActiveTab('Clients')}
+                    onClick={() => setActiveTab('clients')}
                     style={{
                         padding: '0.5rem 1rem',
                         borderRadius: '5px',
-                        backgroundColor: activeTab === 'Clients' ? 'var(--color-electric-blue)' : '#eee',
-                        color: activeTab === 'Clients' ? 'white' : 'black',
+                        backgroundColor: activeTab === 'clients' ? 'var(--color-electric-blue)' : '#eee',
+                        color: activeTab === 'clients' ? 'white' : 'black',
                         textTransform: 'capitalize',
                         cursor: 'pointer',
                         fontSize: '0.9rem',

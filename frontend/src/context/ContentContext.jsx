@@ -1316,17 +1316,7 @@ export const ContentProvider = ({ children }) => {
         }
     };
 
-    const resetLegal = async (token) => {
-        const defaults = {
-            privacy: '<h2>Privacy Policy</h2><p>Default privacy policy content...</p>',
-            terms: '<h2>Terms of Service</h2><p>Default terms content...</p>'
-        };
-        setContent(prev => ({ ...prev, legal: defaults }));
-        if (token) {
-            await updateLegalContent('privacy', defaults.privacy);
-            await updateLegalContent('terms', defaults.terms);
-        }
-    };
+
 
     return (
         <ContentContext.Provider value={{
@@ -1362,6 +1352,7 @@ export const ContentProvider = ({ children }) => {
             resetContent,
             resetFounders,
             resetLegal,
+
             refreshEnquiries,
             uploadFile, // Export this
             updateLegalContent,

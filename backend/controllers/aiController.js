@@ -19,8 +19,8 @@ export const generateIdeas = async (req, res) => {
 
         // Construct Prompt
         const prompt = `
-            You are a creative director for a high-end branding agency called Bloom Branding.
-            Generate 3 creative, actionable ideas for a new client enquiry.
+            You are a senior marketing strategist for a high-end branding agency called Bloom Branding.
+            Develop a concise, high-impact marketing strategy for a new client enquiry.
             
             Client Details:
             - Company/Brand: ${company || 'Unknown Brand'}
@@ -30,12 +30,13 @@ export const generateIdeas = async (req, res) => {
             - Client's Vision: "${message || 'No specific vision provided'}"
 
             Output Format:
-            Return the response in strictly formatted Markdown.
-            - Idea 1: [Title] - [Brief Description]
-            - Idea 2: [Title] - [Brief Description]
-            - Idea 3: [Title] - [Brief Description]
-            
-            Keep it professional, visionary, and concise (under 50 words per idea).
+            Output Format:
+            Provide a mini-strategy with exactly 3 sections (headings):
+            1. **Brand Positioning**: One sentence defining their potential market position.
+            2. **Target Audience**: A brief profile of who they should target.
+            3. **Key Marketing Angles**: 3 bullet points of actionable marketing hooks.
+
+            Keep the tone professional, strategic, and concise. Do not use markdown bolding in the output if possible, or keep it minimal.
         `;
 
         // Initialize Gemini

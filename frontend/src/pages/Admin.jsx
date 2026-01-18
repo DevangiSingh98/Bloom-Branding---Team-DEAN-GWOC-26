@@ -1559,12 +1559,12 @@ const Admin = () => {
                                                                                 marginBottom: '1rem'
                                                                             }}
                                                                         >
-                                                                            {loadingAi === item.id ? 'Generating Magic...' : '✨ Generate Creative Ideas'}
+                                                                            {loadingAi === item.id ? 'Developing Strategy...' : '📈 Generate Marketing Strategy'}
                                                                         </button>
 
                                                                         {aiIdeas[item.id] && (
                                                                             <div style={{ backgroundColor: '#fff', padding: '1.5rem', borderRadius: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.05)' }}>
-                                                                                <h4 style={{ margin: '0 0 1rem 0', color: 'var(--color-electric-blue)' }}>AI Suggestions</h4>
+                                                                                <h4 style={{ margin: '0 0 1rem 0', color: 'var(--color-electric-blue)' }}>Strategic Insight</h4>
                                                                                 <div style={{ whiteSpace: 'pre-line', lineHeight: '1.6' }}>
                                                                                     {aiIdeas[item.id]}
                                                                                 </div>
@@ -1644,7 +1644,7 @@ const Admin = () => {
                                                     {/* AI SECTION */}
                                                     <div style={{ marginTop: '1rem', borderTop: '1px solid #ddd', paddingTop: '1rem' }}>
                                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                                                            <h4 style={{ margin: 0, color: 'var(--color-butter-yellow-dark)' }}>✨ Creative Spark</h4>
+                                                            <h4 style={{ margin: 0, color: 'var(--color-butter-yellow-dark)' }}>📈 Marketing Strategy</h4>
                                                             <button
                                                                 onClick={() => handleGenerateIdeas(item)}
                                                                 disabled={loadingAi === item.id}
@@ -1659,7 +1659,7 @@ const Admin = () => {
                                                                     display: 'flex', alignItems: 'center', gap: '5px'
                                                                 }}
                                                             >
-                                                                {loadingAi === item.id ? 'Thinking...' : 'Generate Ideas'}
+                                                                {loadingAi === item.id ? 'Thinking...' : 'Generate Strategy'}
                                                             </button>
                                                         </div>
 

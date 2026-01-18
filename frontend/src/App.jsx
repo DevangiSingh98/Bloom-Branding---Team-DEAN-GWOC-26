@@ -134,6 +134,7 @@ function App() {
                             <AnimatedRoutes />
                         </main>
                         <ConditionalFooter />
+                        <Chatbot />
                     </div>
                 )}
             </Router>

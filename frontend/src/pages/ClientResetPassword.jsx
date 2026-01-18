@@ -4,6 +4,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 
 const ClientResetPassword = () => {
+    const API_URL = import.meta.env.VITE_API_URL || '';
     const { token } = useParams();
     const navigate = useNavigate();
     const [password, setPassword] = useState('');
@@ -29,7 +30,7 @@ const ClientResetPassword = () => {
             };
 
             // Assuming backend route is /api/users/resetpassword/:resetToken
-            await axios.put(`/api/users/resetpassword/${token}`, { password }, config);
+            await axios.put(`${API_URL}/api/users/resetpassword/${token}`, { password }, config);
             setMessage('Password Reset Successful! Redirecting to login...');
 
             setTimeout(() => {

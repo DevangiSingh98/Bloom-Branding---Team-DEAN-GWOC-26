@@ -124,8 +124,9 @@ export const generateIdeas = async (req, res) => {
         if (error.message.includes("API_KEY")) userMessage = "Server missing API Key.";
         if (error.message.includes("Library Load Failed")) userMessage = "Internal Server Error: AI Library Missing.";
         if (error.message.includes("candidate")) userMessage = "AI Safety Filter blocked response. Try different wording.";
-        if (error.message.includes("429") || (error.status === 429)) {
+        if (error.message?.includes("429") || error.status === 429 || JSON.stringify(error).includes("429")) {
             userMessage = "Rate limit exceeded. Please wait a minute.";
+            console.error("AI Rate Limit Final Failure (after retries):", error.message);
             return res.status(429).json({ message: userMessage, error: error.message });
         }
 

@@ -17,6 +17,7 @@ const generateToken = (id) => {
 // @access  Public
 const authUser = async (req, res) => {
     const { username, password } = req.body;
+    console.log(`[AUTH] Manual login attempt for: ${username}`);
 
     try {
         // Allow login with either username or email
@@ -25,17 +26,21 @@ const authUser = async (req, res) => {
         });
 
         if (user && (await user.matchPassword(password))) {
+            console.log(`[AUTH] Successful manual login: ${user.email}`);
             res.json({
                 _id: user._id,
                 username: user.username,
                 email: user.email,
                 isAdmin: user.isAdmin,
+                companyName: user.companyName,
                 token: generateToken(user._id),
             });
         } else {
+            console.warn(`[AUTH] Failed manual login for: ${username} - ${!user ? 'User Not Found' : 'Incorrect Password'}`);
             res.status(401).json({ message: 'Invalid username or password' });
         }
     } catch (error) {
+        console.error(`[AUTH] Fatal login error: ${error.message}`);
         res.status(500).json({ message: error.message });
     }
 };
@@ -110,11 +115,13 @@ const registerUser = async (req, res) => {
 const forgotPassword = async (req, res) => {
     let { email } = req.body;
     if (email) email = email.toLowerCase().trim();
+    console.log(`[FORGOT] Password reset requested for: ${email}`);
 
     try {
         const user = await User.findOne({ email });
 
         if (!user) {
+            console.warn(`[FORGOT] User not found: ${email}`);
             return res.status(404).json({ message: 'User with this email does not exist' });
         }
 
@@ -148,7 +155,7 @@ Please click on the following link to reset your password:\n\n
 ${resetUrl}\n\n
 If you did not request this, please ignore this email.`;
 
-        console.log('RESET URL:', resetUrl); // Debug: Log the URL explicitly
+        console.log(`[FORGOT] Generated reset token for ${email}. Sending email...`);
 
         try {
             await sendEmail({
@@ -156,17 +163,17 @@ If you did not request this, please ignore this email.`;
                 subject: 'Password Reset Token',
                 message,
             });
-
+            console.log(`[FORGOT] Reset email sent successfully to ${email}`);
             res.status(200).json({ success: true, data: 'Email sent' });
         } catch (err) {
-            console.error('SEND EMAIL ERROR:', err);
+            console.error(`[FORGOT] Email sending FAILED for ${email}:`, err);
             user.resetPasswordToken = undefined;
             user.resetPasswordExpire = undefined;
             await user.save();
-            return res.status(500).json({ message: 'Email could not be sent: ' + err.message });
+            return res.status(500).json({ message: 'Email could not be sent: ' + err.message, stack: err.stack });
         }
     } catch (error) {
-        console.error('FORGOT PASSWORD ERROR:', error);
+        console.error(`[FORGOT] Fatal error in forgotPassword: ${error.message}`);
         res.status(500).json({ message: error.message });
     }
 };

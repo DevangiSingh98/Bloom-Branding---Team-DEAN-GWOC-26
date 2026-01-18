@@ -120,10 +120,21 @@ app.get('/auth/google-callback',
     }
 );
 
+app.get('/api/diag/env-status', (req, res) => {
+    res.json({
+        node_env: process.env.NODE_ENV,
+        render: !!process.env.RENDER,
+        smtp_configured: !!process.env.SMTP_EMAIL,
+        frontend_url: FRONTEND_URL,
+        session_secret_set: !!process.env.JWT_SECRET,
+        database_connected: mongoose.connection.readyState === 1
+    });
+});
+
 app.get('/auth/current_user', (req, res) => {
-    console.log('CHECKING CURRENT USER. Session ID:', req.sessionID);
+    console.log(`[AUTH] Checking current user. SessionID: ${req.sessionID}, Authenticated: ${req.isAuthenticated()}`);
     if (req.user) {
-        console.log('Found user in session:', req.user.email);
+        console.log(`[AUTH] User found in session: ${req.user.email}`);
         import('jsonwebtoken').then(({ default: jwt }) => {
             const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET || 'secret', {
                 expiresIn: '30d',
@@ -132,8 +143,8 @@ app.get('/auth/current_user', (req, res) => {
             res.json({ ...userData, token });
         });
     } else {
-        console.log('No user found in session for ID:', req.sessionID);
-        res.status(401).send(null);
+        console.log(`[AUTH] No user found in session: ${req.sessionID}`);
+        res.status(401).json({ message: 'Not authenticated', sessionID: req.sessionID });
     }
 });
 app.get('/auth/logout', (req, res) => {

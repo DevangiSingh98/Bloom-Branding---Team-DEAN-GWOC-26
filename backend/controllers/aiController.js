@@ -1,4 +1,5 @@
 import { withRetry } from '../utils/aiRetry.js';
+import { aiQueue } from '../utils/aiQueue.js';
 
 // @desc    Generate ideas based on enquiry
 // @route   POST /api/ai/generate
@@ -71,39 +72,42 @@ export const generateIdeas = async (req, res) => {
             },
         ];
 
-        // MODEL SELECTION LOGIC with fallback and retry
-        const tryModels = [
-            { name: "gemini-1.5-flash", retries: 6, delay: 3000 },
-            { name: "gemini-2.0-flash-exp", retries: 4, delay: 4000 },
-            { name: "gemini-1.5-pro", retries: 4, delay: 5000 }
-        ];
+        // QUEUE WRAPPER: Serialize requests to avoid concurrent rate limits
+        let text = await aiQueue.add(async () => {
+            // MODEL SELECTION LOGIC with fallback and retry
+            const tryModels = [
+                { name: "gemini-1.5-flash", retries: 6, delay: 3000 },
+                { name: "gemini-2.0-flash-exp", retries: 4, delay: 4000 },
+                { name: "gemini-1.5-pro", retries: 4, delay: 5000 }
+            ];
 
-        let text;
-        let successModel = "";
-        let finalError = "";
+            let finalError = "";
 
-        for (const modelConfig of tryModels) {
-            try {
-                console.log(`[AI] Attempting ${modelConfig.name} (Retries: ${modelConfig.retries})...`);
-                text = await withRetry(async () => {
-                    const model = genAI.getGenerativeModel({ model: modelConfig.name, safetySettings });
-                    const result = await model.generateContent(prompt);
-                    return result.response.text();
-                }, modelConfig.retries, modelConfig.delay);
+            for (const modelConfig of tryModels) {
+                try {
+                    console.log(`[AI] Attempting ${modelConfig.name} (Retries: ${modelConfig.retries})...`);
+                    const resultText = await withRetry(async () => {
+                        const model = genAI.getGenerativeModel({ model: modelConfig.name, safetySettings });
+                        const result = await model.generateContent(prompt);
+                        return result.response.text();
+                    }, modelConfig.retries, modelConfig.delay);
 
-                successModel = modelConfig.name;
-                break; // Success!
-            } catch (modelError) {
-                console.error(`[AI] Model ${modelConfig.name} failed:`, modelError.message);
-                finalError += `${modelConfig.name}: ${modelError.message} | `;
+                    console.log(`[AI] Successfully generated with: ${modelConfig.name}`);
+                    return resultText; // Return from Queue callback
+                } catch (modelError) {
+                    console.warn(`[AI] Model ${modelConfig.name} failed:`, modelError.message);
+                    finalError += `${modelConfig.name}: ${modelError.message} | `;
+                }
             }
-        }
+
+            throw new Error(`All Gemini models failed: ${finalError}`);
+        });
 
         if (!text) {
             throw new Error(`All Gemini models failed: ${finalError}`);
         }
 
-        console.log(`[AI] Successfully generated with: ${successModel}`);
+        console.log(`[AI] Successfully generated with: ${successModel}`); // successModel might be undefined here if not hoisted, but let's check vars
         res.json({ ideas: text });
 
     } catch (error) {

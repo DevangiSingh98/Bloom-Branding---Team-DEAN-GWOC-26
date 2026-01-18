@@ -197,7 +197,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/version', (req, res) => {
-    res.json({ version: '1.6.4', timestamp: new Date().toISOString(), note: 'AI Resilience Update (Extended Retries)' });
+    res.json({ version: '1.7.0', timestamp: new Date().toISOString(), note: 'AI Rate Limit Fix (No Fallback)' });
 });
 
 // Error Handling Middleware (Must be last)
@@ -206,4 +206,7 @@ app.use(errorHandler);
 
 // Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`DEPLOYED VERSION 1.7.0 - FIX ACTIVE`);
+});

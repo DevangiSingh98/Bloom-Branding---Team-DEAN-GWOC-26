@@ -60,12 +60,17 @@ app.use(express.json());
 
 // Session and Passport Middleware
 app.use(session({
-    secret: process.env.JWT_SECRET || 'secret', // Use JWT_SECRET for session secret
+    secret: process.env.JWT_SECRET || 'secret',
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
         mongoUrl: process.env.MONGODB_URI,
-    })
+    }),
+    cookie: {
+        secure: (process.env.NODE_ENV === 'production' || process.env.RENDER) ? true : false,
+        sameSite: (process.env.NODE_ENV === 'production' || process.env.RENDER) ? 'none' : 'lax',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
 }));
 
 app.use(passport.initialize());

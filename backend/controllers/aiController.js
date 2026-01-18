@@ -5,13 +5,20 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 // @desc    Generate ideas based on enquiry
 // @route   POST /api/ai/generate
 // @access  Private (Admin only - verified by middleware in route)
+// @desc    Generate ideas based on enquiry
+// @route   POST /api/ai/generate
+// @access  Private (Admin only - verified by middleware in route)
 export const generateIdeas = async (req, res) => {
     try {
         const { service, vibe, message, company } = req.body;
 
         console.log("----- GEMINI AI REQUEST -----");
         console.log("Company:", company);
-        console.log("API Key Status:", process.env.GEMINI_API_KEY ? "Loaded" : "MISSING");
+
+        if (!process.env.GEMINI_API_KEY) {
+            console.error("GEMINI_API_KEY is missing");
+            throw new Error("GEMINI_API_KEY is missing configuration.");
+        }
 
         // Construct Prompt
         const prompt = `
@@ -25,41 +32,47 @@ export const generateIdeas = async (req, res) => {
             - Client's Vision: "${message || 'No specific vision provided'}"
 
             Output Format:
-            Provide exactly 3 distinct ideas (bullet points). 
-            For each idea, provide a catchy title and a 1-sentence description.
-            Keep the tone professional yet creative and visionary.
-            Do not include any intro or outro text, just the 3 ideas.
+            Return the response in strictly formatted Markdown.
+            - Idea 1: [Title] - [Brief Description]
+            - Idea 2: [Title] - [Brief Description]
+            - Idea 3: [Title] - [Brief Description]
+            
+            Keep it professional, visionary, and concise (under 50 words per idea).
         `;
-
-        if (!process.env.GEMINI_API_KEY) {
-            throw new Error("GEMINI_API_KEY is missing in backend environment variables.");
-        }
-
-        console.log("Using API Key:", process.env.GEMINI_API_KEY.substring(0, 5) + "...");
 
         // Initialize Gemini
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        // Use gemini-1.5-flash for better performance/stability
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        console.log(`Sending request to Gemini (Model: gemini-1.5-flash)...`);
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
+        let model;
+        let text;
+
+        try {
+            // Try Flash first
+            model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const result = await model.generateContent(prompt);
+            text = result.response.text();
+        } catch (flashError) {
+            console.warn("Gemini 1.5 Flash failed, trying gemini-pro...", flashError.message);
+            // Fallback
+            model = genAI.getGenerativeModel({ model: "gemini-pro" });
+            const result = await model.generateContent(prompt);
+            text = result.response.text();
+        }
 
         console.log("Gemini Response Success");
-
         res.json({ ideas: text });
 
     } catch (error) {
         console.error("AI Generation Error Details:", error);
-        // Extract useful Google API error message if available
-        const errorMsg = error.response ? JSON.stringify(error.response) : error.message;
+
+        // Improve error message for frontend
+        let userMessage = "Failed to generate ideas.";
+        if (error.message.includes("API_KEY")) userMessage = "Server missing API Key.";
+        if (error.message.includes("candidate")) userMessage = "AI Safety Filter blocked response. Try different wording.";
 
         res.status(500).json({
-            message: "Failed to generate ideas.",
-            error: errorMsg,
-            stack: error.stack
+            message: userMessage,
+            error: error.message
         });
     }
 };

@@ -122,66 +122,27 @@ const ViscousWrapper = ({ children, className, style, intensity = 100 }) => {
 
 const ServiceList = ({ screenSize }) => {
     const containerRef = useRef(null);
-    // Use "start start" to "end end" to track the full scroll of the 300vh container
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start start", "end end"]
     });
-
     const smoothProgress = useSpring(scrollYProgress, {
-        stiffness: 800, // Very high stiffness for "immediate" feel
-        damping: 60,    // Critical damping to stay "smooth" (no bounce)
+        stiffness: 800,
+        damping: 60,
         mass: 1,
         restDelta: 0.001
     });
 
-    const { content } = useContent();
-
-    // Fallback icons map to handle existing/cached data that might miss the new 'icon' field
-    const FALLBACK_ICONS = {
-        branding: '/images/branding.png',
-        social: '/images/socialmedia.png',
-        production: '/images/production.png',
-        influencer: '/images/influencer.png',
-        creative: '/images/creativedesign.png',
-        // Numeric ID fallbacks for legacy DB data
-        '1': '/images/branding.png',
-        '2': '/images/socialmedia.png',
-        '3': '/images/production.png',
-        '4': '/images/influencer.png',
-        '5': '/images/creativedesign.png',
-        // Number type fallback just in case
-        1: '/images/branding.png',
-        2: '/images/socialmedia.png',
-        3: '/images/production.png',
-        4: '/images/influencer.png',
-        5: '/images/creativedesign.png'
-    };
-
-    // Use DB services or fall back to empty array
-    const services = content.services && content.services.length > 0 ? content.services : [];
-
-    const displayServices = services.map(s => {
-        // Determine the icon source: DB Icon -> Fallback Map -> DB Image -> None
-        const iconSrc = s.icon || FALLBACK_ICONS[s.id?.toLowerCase()] || FALLBACK_ICONS[s.id] || s.image || FALLBACK_ICONS[Object.keys(FALLBACK_ICONS)[0]]; // Ensure some fallback
-        const hasMask = !!iconSrc;
-
-        return {
-            ...s,
-            link: `/services#${s.id}`,
-            maskVal: hasMask ? `url(${iconSrc})` : 'none',
-            bgColor: hasMask ? 'var(--color-butter-yellow)' : 'transparent',
-            // Default image size usually works well, but can override if needed
-            imgSize: s.imgSize || "60%",
-            iconSrc // Pass original src for direct rendering
-        };
-    });
+    const services = [
+        { title: "Branding", link: "/services#branding", img: "branding.png", imgSize: "60%" },
+        { title: "Social Media", link: "/services#social-media", img: "socialmedia.png", imgSize: "60%" },
+        { title: "Production", link: "/services#production", img: "production.png", imgSize: "60%" },
+        { title: "Influencer", link: "/services#influencer-marketing", img: "influencer.png" },
+        { title: "Creative Design", link: "/services#creative-design", img: "creativedesign.png" }
+    ];
 
     return (
-        <div ref={containerRef} style={{
-            height: '500vh', // Increased height for more resistance
-            position: 'relative'
-        }}>
+        <div ref={containerRef} style={{ height: '500vh', position: 'relative' }}>
             <div style={{
                 position: 'sticky',
                 top: 0,
@@ -189,12 +150,12 @@ const ServiceList = ({ screenSize }) => {
                 backgroundColor: 'var(--color-electric-blue)',
                 display: 'flex',
                 flexDirection: 'column',
-                padding: screenSize === 'mobile' ? '15vh 5vw 2vh 5vw' : '2vh 5vw', // Added top padding on mobile
+                padding: screenSize === 'mobile' ? '15vh 5vw 2vh 5vw' : '2vh 5vw',
                 overflow: 'hidden'
             }}>
                 <h2 style={{
                     color: 'var(--color-butter-yellow)',
-                    fontSize: screenSize === 'mobile' ? '3.5rem' : 'clamp(5rem, 10vw, 10rem)', // Smaller font on mobile
+                    fontSize: screenSize === 'mobile' ? '3.5rem' : 'clamp(5rem, 10vw, 10rem)',
                     fontFamily: 'var(--font-brand)',
                     marginBottom: '1rem',
                     flexShrink: 0,
@@ -204,28 +165,24 @@ const ServiceList = ({ screenSize }) => {
                 }}>
                     Our Expertise
                 </h2>
-
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}>
-                    {/* Left Side: Services List */}
                     <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column' }}>
-                        {displayServices.map((service, i) => (
-                            <div key={`home-${i}`} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginTop: i === 0 ? 0 : '-8vh' }}>
+                        {services.map((service, i) => (
+                            <div key={i} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginTop: i === 0 ? 0 : '-8vh' }}>
                                 <ServiceItem
                                     service={service}
                                     i={i}
-                                    total={displayServices.length}
+                                    total={services.length}
                                     scrollYProgress={smoothProgress}
                                 />
                             </div>
                         ))}
                     </div>
-
-                    {/* Right Side: Images (Moving Band) */}
                     <div style={{
                         flex: 1,
                         position: 'relative',
                         overflow: 'hidden',
-                        display: screenSize === 'mobile' ? 'none' : 'flex', // Hidden on mobile
+                        display: screenSize === 'mobile' ? 'none' : 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                     }}>
@@ -234,10 +191,10 @@ const ServiceList = ({ screenSize }) => {
                             flexDirection: 'column-reverse',
                             height: '100%',
                             width: '100%',
-                            y: useTransform(smoothProgress, [0, 1], ['0%', '400%']) // Adjusted range
+                            y: useTransform(smoothProgress, [0, 1], ['0%', '400%'])
                         }}>
-                            {displayServices.map((service, i) => (
-                                <div key={`home-img-${i}`} style={{
+                            {services.map((service, i) => (
+                                <div key={i} style={{
                                     height: '100%',
                                     width: '100%',
                                     flexShrink: 0,
@@ -245,13 +202,12 @@ const ServiceList = ({ screenSize }) => {
                                     alignItems: 'center',
                                     justifyContent: 'center'
                                 }}>
-                                    {/* Butter Yellow Masked Image */}
                                     <div style={{
                                         width: service.imgSize || '80%',
                                         height: '60%',
                                         backgroundColor: 'var(--color-butter-yellow)',
-                                        maskImage: `url(${service.iconSrc || service.maskVal.replace(/url\(['"]?(.+?)['"]?\)/, '$1')})`,
-                                        WebkitMaskImage: `url(${service.iconSrc || service.maskVal.replace(/url\(['"]?(.+?)['"]?\)/, '$1')})`,
+                                        maskImage: `url(/images/${service.img})`,
+                                        WebkitMaskImage: `url(/images/${service.img})`,
                                         maskSize: 'contain',
                                         WebkitMaskSize: 'contain',
                                         maskRepeat: 'no-repeat',
@@ -265,8 +221,6 @@ const ServiceList = ({ screenSize }) => {
                     </div>
                 </div>
             </div>
-
-            {/* Scroll Snap Points */}
             <div style={{
                 position: 'absolute',
                 top: 0,
@@ -275,10 +229,10 @@ const ServiceList = ({ screenSize }) => {
                 height: '100%',
                 pointerEvents: 'none',
             }}>
-                {displayServices.map((_, i) => (
-                    <div key={`snap-${i}`} style={{
+                {services.map((_, i) => (
+                    <div key={i} style={{
                         position: 'absolute',
-                        top: `${i * 100}vh`, // 100vh intervals
+                        top: `${i * 100}vh`,
                         height: '100vh',
                         width: '100%',
                         scrollSnapAlign: 'start',
@@ -286,28 +240,18 @@ const ServiceList = ({ screenSize }) => {
                     }} />
                 ))}
             </div>
-        </div >
+        </div>
     );
 };
 
 const ServiceItem = ({ service, i, total, scrollYProgress }) => {
-    // 5 items mapped to 0, 0.25, 0.5, 0.75, 1.0
-    // Dynamic mapping based on total items if needed, but keeping fixed steps for 5 items as per design
     const steps = [0, 0.25, 0.5, 0.75, 1];
-
-    // Flex Grow: Active = 30, Inactive = 1
     const flexValues = steps.map((_, idx) => idx === i ? 30 : 1);
     const flexGrow = useTransform(scrollYProgress, steps, flexValues);
-
-    // Opacity: Active = 1, Inactive = 0.3
     const opacityValues = steps.map((_, idx) => idx === i ? 1 : 0.3);
     const opacity = useTransform(scrollYProgress, steps, opacityValues);
-
-    // Scale Y (Stretch): Active = 1.5, Inactive = 0.5
     const scaleYValues = steps.map((_, idx) => idx === i ? 1.5 : 0.5);
     const textScaleY = useTransform(scrollYProgress, steps, scaleYValues);
-
-    // Scale (Zoom): Active = 1.2, Inactive = 0.8
     const scaleValues = steps.map((_, idx) => idx === i ? 1.2 : 0.8);
     const textScale = useTransform(scrollYProgress, steps, scaleValues);
 
@@ -315,7 +259,7 @@ const ServiceItem = ({ service, i, total, scrollYProgress }) => {
         <motion.div style={{
             flexGrow,
             display: 'flex',
-            alignItems: 'center', // Vertically center the text in the expanded/squished box
+            alignItems: 'center',
             overflow: 'hidden',
             position: 'relative',
             originX: 0
@@ -323,7 +267,7 @@ const ServiceItem = ({ service, i, total, scrollYProgress }) => {
             <Link to={service.link} style={{ display: 'block', width: '100%' }}>
                 <motion.h3 style={{
                     margin: 0,
-                    fontFamily: 'var(--font-subtitle)', // Lekton
+                    fontFamily: 'var(--font-subtitle)',
                     fontWeight: 'bold',
                     color: 'var(--color-butter-yellow)',
                     opacity,

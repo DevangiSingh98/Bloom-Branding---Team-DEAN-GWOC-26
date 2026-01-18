@@ -48,10 +48,10 @@ app.use(cors({
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
         if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes(origin)) {
-            callback(null, true);
+            callback(null, origin); // Return the origin string for credentials
         } else {
             console.warn(`Blocked by CORS: ${origin}`);
-            callback(null, true); // TEMPORARILY ALLOW ALL TO DEBUG PRODUCTION
+            callback(null, origin); // Temporarily allow for debugging
         }
     },
     credentials: true
@@ -61,20 +61,28 @@ app.use(express.json());
 // Session and Passport Middleware
 app.use(session({
     secret: process.env.JWT_SECRET || 'secret',
-    resave: false,
-    saveUninitialized: false,
+    resave: true, // More reliable for some environments
+    saveUninitialized: true, // More reliable for debugging
     store: MongoStore.create({
         mongoUrl: process.env.MONGODB_URI,
     }),
+    proxy: true, // Tell session to trust the proxy
     cookie: {
-        secure: (process.env.NODE_ENV === 'production' || process.env.RENDER) ? true : false,
-        sameSite: (process.env.NODE_ENV === 'production' || process.env.RENDER) ? 'none' : 'lax',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        secure: true, // Force secure since we are on HTTPS
+        sameSite: 'none', // Required for cross-site
+        maxAge: 24 * 60 * 60 * 1000
     }
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url} - Session ID: ${req.sessionID}`);
+    if (req.user) console.log(`User found in session: ${req.user.email}`);
+    else console.log('No user in session');
+    next();
+});
 
 app.use('/api/projects', projectRoutes);
 app.use('/api/users', userRoutes);
@@ -113,23 +121,18 @@ app.get('/auth/google-callback',
 );
 
 app.get('/auth/current_user', (req, res) => {
+    console.log('CHECKING CURRENT USER. Session ID:', req.sessionID);
     if (req.user) {
-        // Generate Token for the user so they can use Bearer Auth for other routes
-        // We need to import generateToken logic or duplicate it.
-        // It's cleaner to import. But for now, let's quick fix import or verify.
-        // `userController` has `generateToken` but it's not exported.
-        // We really should export `generateToken` or use `jsonwebtoken` directly here.
-
+        console.log('Found user in session:', req.user.email);
         import('jsonwebtoken').then(({ default: jwt }) => {
             const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET || 'secret', {
                 expiresIn: '30d',
             });
-
-            // Return user AND token
             const userData = req.user.toObject();
             res.json({ ...userData, token });
         });
     } else {
+        console.log('No user found in session for ID:', req.sessionID);
         res.status(401).send(null);
     }
 });

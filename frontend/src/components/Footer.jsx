@@ -24,7 +24,7 @@ export default function Footer() {
                 title={modal.title}
                 content={modal.content}
             />
-            <footer style={{ backgroundColor: 'var(--color-electric-blue)', color: 'var(--color-earl-gray)', padding: '6rem 5% 2rem' }}>
+            <footer style={{ backgroundColor: 'var(--color-electric-blue)', color: 'var(--color-earl-gray)', padding: '6rem 5% 2rem', position: 'relative', zIndex: 10, scrollSnapAlign: 'start', scrollSnapStop: 'always' }}>
                 <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '3rem' }}>
                         <div style={{ flex: 2, minWidth: '300px' }}>

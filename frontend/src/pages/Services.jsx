@@ -450,7 +450,7 @@ const Services = () => {
                                             textTransform: 'uppercase',
                                             letterSpacing: '0.02em',
                                             color: currentService.textColor || 'white',
-                                            // Removed mixBlendMode to allow specific color control
+                                            mixBlendMode: 'difference', // Negative effect for overlap
                                             width: '100%',
                                             maxWidth: '500px'
                                         }}>

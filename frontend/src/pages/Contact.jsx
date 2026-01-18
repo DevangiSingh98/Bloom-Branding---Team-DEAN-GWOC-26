@@ -231,7 +231,7 @@ export default function Contact() {
                     {/* COLLAB / MAP SECTION - SIMPLIFIED EDITORIAL */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '4rem', paddingBottom: '4rem' }}>
 
-                        {/* ADDRESS & MAP */}
+                        {/* ADDRESS */}
                         <div style={{ flex: 1, minWidth: '300px' }}>
                             <h3 style={{ fontFamily: 'var(--font-brand)', fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--color-electric-blue)' }}>VISIT US</h3>
                             <p style={{ fontSize: '1.2rem', lineHeight: 1.6, fontFamily: 'var(--font-subtitle)', marginBottom: '1.5rem' }}>
@@ -239,18 +239,8 @@ export default function Contact() {
                                 515, Beside Times Corner<br />
                                 Surat, Gujarat 395007
                             </p>
-                            <div style={{ width: '100%', height: '300px', borderRadius: '15px', overflow: 'hidden', border: '1px solid #ddd' }}>
-                                <iframe
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3720.627254589255!2d72.78426021424785!3d21.16723238837373!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be053f3199b5003%3A0xe9c8642279140af!2sSolarium%20Business%20Center!5e0!3m2!1sen!2sin!4v1689596821464!5m2!1sen!2sin"
-                                    width="100%"
-                                    height="100%"
-                                    style={{ border: 0 }}
-                                    allowFullScreen=""
-                                    loading="lazy"
-                                    referrerPolicy="no-referrer-when-downgrade"
-                                ></iframe>
-                            </div>
                         </div>
+
 
                         {/* COLLAB */}
                         <div style={{ flex: 1, minWidth: '300px' }}>
@@ -278,8 +268,21 @@ export default function Contact() {
 
                     </div>
 
+                    {/* FULL WIDTH MAP */}
+                    <div style={{ width: '100%', height: '500px', borderRadius: '15px', overflow: 'hidden', border: '1px solid #ddd', marginBottom: '4rem' }}>
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3720.627254589255!2d72.78426021424785!3d21.16723238837373!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be053f3199b5003%3A0xe9c8642279140af!2sSolarium%20Business%20Center!5e0!3m2!1sen!2sin!4v1689596821464!5m2!1sen!2sin"
+                            width="100%"
+                            height="100%"
+                            style={{ border: 0 }}
+                            allowFullScreen=""
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                    </div>
+
                 </div>
-            </motion.div>
+            </motion.div >
 
 
 

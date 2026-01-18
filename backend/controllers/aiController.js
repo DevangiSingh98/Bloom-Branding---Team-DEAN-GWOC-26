@@ -35,12 +35,14 @@ export const generateIdeas = async (req, res) => {
             throw new Error("GEMINI_API_KEY is missing in backend environment variables.");
         }
 
+        console.log("Using API Key:", process.env.GEMINI_API_KEY.substring(0, 5) + "...");
+
         // Initialize Gemini
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        // Use gemini-pro as standard fallback
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        // Use gemini-1.5-flash for better performance/stability
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-        console.log(`Sending request to Gemini (Model: gemini-pro)...`);
+        console.log(`Sending request to Gemini (Model: gemini-1.5-flash)...`);
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
@@ -51,9 +53,12 @@ export const generateIdeas = async (req, res) => {
 
     } catch (error) {
         console.error("AI Generation Error Details:", error);
+        // Extract useful Google API error message if available
+        const errorMsg = error.response ? JSON.stringify(error.response) : error.message;
+
         res.status(500).json({
             message: "Failed to generate ideas.",
-            error: error.message,
+            error: errorMsg,
             stack: error.stack
         });
     }

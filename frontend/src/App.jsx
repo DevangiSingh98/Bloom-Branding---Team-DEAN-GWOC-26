@@ -14,6 +14,10 @@ import Brands from './pages/Brands';
 import { ContentProvider } from './context/ContentContext';
 import { AnimatePresence } from 'framer-motion';
 import Chatbot from './components/Chatbot';
+import ClientLogin from './pages/ClientLogin'; // Import
+import ClientDashboard from './pages/ClientDashboard'; // Import
+import VaultLogin from './pages/VaultLogin'; // Import
+import ClientResetPassword from './pages/ClientResetPassword'; // Import
 
 // Scroll to top on route change
 // Scroll to top on route change and refresh
@@ -72,6 +76,10 @@ function AnimatedRoutes() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/brands" element={<Brands />} />
+                <Route path="/client-login" element={<VaultLogin />} /> {/* Updated to use VaultLogin */}
+                <Route path="/vault" element={<ClientDashboard />} />
+                <Route path="/vault/login" element={<VaultLogin />} /> {/* New Route */}
+                <Route path="/reset-password/:token" element={<ClientResetPassword />} />
             </Routes>
         </AnimatePresence>
     );
@@ -91,7 +99,7 @@ function ConditionalFooter() {
     // However, usually detailed pages also might want this or not. 
     // Let's stick to strict equality for now or strict equality to /work.
     // The user said "remove the footer from THIS page".
-    if (location.pathname === '/about' || location.pathname === '/services') {
+    if (location.pathname === '/about') {
         return null;
     }
     return <Footer />;
@@ -113,7 +121,6 @@ function App() {
                     <>
                         <Navbar />
                         <AnimatedRoutes />
-                        <Chatbot />
                         <ConditionalFooter />
                     </>
                 )}

@@ -140,6 +140,8 @@ Please click on the following link to reset your password:\n\n
 ${resetUrl}\n\n
 If you did not request this, please ignore this email.`;
 
+        console.log('RESET URL:', resetUrl); // Debug: Log the URL explicitly
+
         try {
             await sendEmail({
                 email: user.email,

@@ -1,0 +1,1237 @@
+/* Simulate Druk Wide using Archivo (Variable Font) */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap');
+/* Google Fonts Import for Lekton (Bold 700) */
+@import url('https://fonts.googleapis.com/css2?family=Lekton:ital,wght@0,400;0,700;1,400&display=swap');
+
+html {
+  scroll-snap-type: y mandatory;
+}
+
+@font-face {
+  font-family: 'Bigilla';
+  src: url('/fonts/bigilla/Bigilla.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Bigilla';
+  src: url('/fonts/bigilla/Bigilla-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Lekton';
+  src: url('/fonts/lekton/lekton005_l.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Arial Nova';
+  src: url('/fonts/Arial Nova Font/ArialNova.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Arial Nova';
+  src: url('/fonts/Arial Nova Font/ArialNova-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+
+
+/* REPLACED Druk/Archivo with Bold Lekton per User Request */
+.font-druk {
+  font-family: 'Lekton', monospace;
+  /* The "letter" font */
+  font-weight: bold;
+  /* Very bold */
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  /* Reduced spacing */
+  line-height: 0.85;
+  /* Reduced line spacing */
+}
+
+:root {
+  --color-earl-gray: #e8e6d8;
+  --color-electric-blue: #004AAD;
+  --color-butter-yellow: #F6F1B5;
+  --color-dark-choc: #4B2E26;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --font-brand: 'Bigilla', serif;
+  --font-subtitle: 'Lekton', monospace;
+  --font-body: 'Arial Nova', sans-serif;
+
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 2rem;
+  --spacing-lg: 4rem;
+  --spacing-xl: 8rem;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-earl-gray);
+  color: var(--color-dark-choc);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-brand);
+  font-weight: 900;
+  /* Very Bold */
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+p {
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+}
+
+button {
+  font-family: var(--font-subtitle);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* Utilities */
+.font-subtitle {
+  font-family: var(--font-subtitle);
+}
+
+.text-electric-blue {
+  color: var(--color-electric-blue);
+}
+
+.bg-butter-yellow {
+  background-color: var(--color-butter-yellow);
+}
+
+.section-padding {
+  padding: var(--spacing-lg) 5%;
+}
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding: var(--spacing-xl) 5%;
+  }
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-primary {
+  background-color: var(--color-electric-blue);
+  color: var(--color-white);
+  padding: 1rem 2rem;
+  font-family: var(--font-subtitle);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: 50px;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-dark-choc);
+  transform: translateY(-2px);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-earl-gray);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-electric-blue);
+  border-radius: 4px;
+}
+
+/* Image Placeholder Box */
+.img-placeholder {
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-family: var(--font-subtitle);
+}
+
+/* Hide Scrollbar Utility */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Force disable smooth scroll for infinite loops */
+.no-smooth-scroll {
+  scroll-behavior: auto !important;
+}
+
+/* --- Magazine / Scrapbook Effects --- */
+
+/* Tape Effect */
+.tape {
+  background-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
+  transform: rotate(-2deg);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.tape-top-center {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%) rotate(1deg);
+  width: 120px;
+  height: 35px;
+  z-index: 10;
+}
+
+.tape-corner {
+  position: absolute;
+  top: -10px;
+  right: -25px;
+  width: 100px;
+  height: 30px;
+  transform: rotate(45deg);
+  z-index: 10;
+}
+
+/* Paper / Card Texture */
+.paper-card {
+  background-color: #fdfbf7;
+  /* Off-white paper */
+  box-shadow: 2px 4px 15px rgba(0, 0, 0, 0.1);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.paper-card:hover {
+  transform: translateY(-5px) rotate(1deg);
+  z-index: 5;
+}
+
+/* Polaroid Style */
+.polaroid {
+  background-color: #fff;
+  padding: 1rem;
+  padding-bottom: 3.5rem;
+  /* Classic polaroid bottom */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transform: rotate(2deg);
+}
+
+/* Handwritten / Scribble Accents */
+.scribble-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.scribble-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: url("data:image/svg+xml,%3Csvg width='200' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5 10 Q 50 20 90 10 T 190 10' stroke='%23004AAD' stroke-width='3' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
+}
+
+/* Torn Edge Effect (CSS Mask) */
+.torn-paper {
+  mask-image: url("data:image/svg+xml,%3Csvg width='200' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10 L 10 0 L 20 10 L 30 0 L 40 10 L 50 0 L 60 10 L 70 0 L 80 10 L 90 0 L 100 10 L 110 0 L 120 10 L 130 0 L 140 10 L 150 0 L 160 10 L 170 0 L 180 10 L 190 0 L 200 10' fill='black'/%3E%3C/svg%3E");
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg width='200' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10 L 10 0 L 20 10 L 30 0 L 40 10 L 50 0 L 60 10 L 70 0 L 80 10 L 90 0 L 100 10 L 110 0 L 120 10 L 130 0 L 140 10 L 150 0 L 160 10 L 170 0 L 180 10 L 190 0 L 200 10' fill='black'/%3E%3C/svg%3E");
+  mask-size: 20px 10px;
+  mask-repeat: repeat-x;
+  mask-position: bottom;
+}
+
+/* Services Grid (Our Expertise) */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* Service Card Components */
+.service-card {
+  height: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 20px 0;
+}
+
+.service-title {
+  font-size: 2.5rem;
+  margin: 0;
+  font-family: var(--font-brand);
+  color: var(--color-butter-yellow);
+  text-align: center;
+  font-weight: bold;
+}
+
+.service-img-container {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--color-butter-yellow);
+  box-shadow: 0 0 0 4px rgba(246, 241, 181, 0.1);
+}
+
+.service-btn {
+  padding: 10px 30px;
+  border-radius: 50px;
+  border: 1px solid var(--color-butter-yellow);
+  color: var(--color-butter-yellow);
+  font-family: var(--font-subtitle);
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background-color: transparent;
+}
+
+@media (max-width: 640px) {
+  .services-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 0;
+    /* Removed gap completely per request */
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: -5%;
+    /* Negative margin to pull to edges */
+    margin-right: -5%;
+    /* Negative margin to pull to edges */
+    width: 110%;
+    /* Compensate for page padding */
+    align-items: flex-start;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .services-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Make items take up significant width to force scrolling */
+  .services-grid>a {
+    width: 45vw;
+    /* Slightly narrower to fit comfortably */
+    min-width: auto;
+    flex-shrink: 0;
+  }
+
+  /* Mobile resizing for card elements */
+  .service-card {
+    height: 280px;
+    padding: 10px 5px;
+    /* Added slight horizontal padding inside card instead of gap */
+  }
+
+  .service-title {
+    font-size: 1.5rem;
+    width: 100%;
+    /* Ensure text doesn't cut off */
+    overflow: visible;
+  }
+
+  .service-img-container {
+    width: 130px;
+    /* Slightly larger again */
+    height: 130px;
+  }
+
+  .service-btn {
+    padding: 6px 16px;
+    font-size: 0.7rem;
+  }
+}
+
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 2rem;
+  padding: 1rem;
+}
+
+@media (min-width: 600px) {
+  .work-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .work-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.work-grid-tight {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 0.5rem;
+  /* Very little gap */
+  padding: 0.5rem;
+}
+
+@media (min-width: 600px) {
+  .work-grid-tight {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .work-grid-tight {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+
+/* Navbar Menu Styles */
+.nav-menu-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background-color: var(--color-electric-blue);
+  color: var(--color-earl-gray);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  /* Default desktop */
+}
+
+.nav-menu-list {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2vw;
+  flex-wrap: nowrap;
+  width: 100%;
+  padding: 0 2rem;
+}
+
+.nav-menu-item {
+  margin: 0;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-menu-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: inherit;
+  padding: 10px;
+}
+
+.nav-menu-img {
+  width: auto;
+  object-fit: contain;
+  max-height: 300px;
+  z-index: 2;
+}
+
+.nav-menu-text {
+  font-family: var(--font-brand);
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-butter-yellow);
+  margin-top: 1rem;
+  margin-left: -20px;
+}
+
+/* Mobile Tweaks for Menu */
+@media (max-width: 768px) {
+  .nav-menu-wrapper {
+    overflow-y: auto;
+    justify-content: flex-start;
+    padding-top: 8rem;
+    padding-bottom: 2rem;
+  }
+
+  .nav-menu-list {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 1rem;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .nav-menu-item {
+    width: 45%;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .nav-menu-img {
+    max-width: 100%;
+    height: auto !important;
+    max-height: 150px !important;
+    /* Increased size per user request */
+  }
+
+  .nav-menu-text {
+    font-size: 1rem;
+    margin-left: 0;
+    margin-top: 0.5rem;
+    text-align: center;
+  }
+}
+
+img {
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Story Page Scrolling Text */
+.story-scrolling-text {
+  font-size: 4rem;
+}
+
+@media (max-width: 480px) {
+  .story-scrolling-text {
+    font-size: 4rem;
+    /* Increased to 4rem per request */
+  }
+}
+
+/* About Page Split Layout */
+.about-split-layout {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+}
+
+.about-image-half {
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 20;
+}
+
+.about-text-half {
+  width: 50%;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.about-text-item {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem;
+  opacity: 0;
+}
+
+/* Mobile (375px / Phone) */
+@media (max-width: 600px) {
+  .about-image-half {
+    width: 100%;
+    height: 40%;
+    /* Image takes top 40% */
+    left: 0;
+    top: 0;
+  }
+
+  .about-text-half {
+    width: 100%;
+    height: 60%;
+    /* Text takes bottom 60% */
+    left: 0;
+    top: 40%;
+    right: auto;
+  }
+
+  .about-text-item {
+    padding: 2rem;
+    padding-top: 1rem;
+    justify-content: flex-start;
+  }
+
+  /* Shift Rooted text up specifically - REVERTED per user request */
+  /* but we want to close the gap between title and text */
+  .about-text-item h2 {
+    margin-bottom: 0.5rem !important;
+    /* Brought text closer to title */
+  }
+
+  /* Heading adjustments for mobile about-text-items */
+  .about-text-item h2,
+  .about-text-item h3 {
+    font-size: 3rem !important;
+    /* Force smaller size on mobile */
+  }
+
+  /* Unify text size and reduce line spacing for all about items on mobile */
+  .about-text-item p {
+    font-size: 1.5rem !important;
+    line-height: 1.1 !important;
+  }
+}
+
+/* Founders Section Styles */
+.founders-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  align-items: end;
+  position: relative;
+  z-index: 10;
+}
+
+.founder-info {
+  align-self: center;
+  padding-bottom: 4rem;
+  position: relative;
+  z-index: 5;
+}
+
+.founder-info.text-right {
+  text-align: right;
+}
+
+.founder-info.text-left {
+  text-align: left;
+}
+
+.founder-name {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-subtitle);
+  color: var(--color-butter-yellow);
+}
+
+.founder-role {
+  color: var(--color-butter-yellow);
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+}
+
+.founder-bio {
+  line-height: 1.6;
+  color: var(--color-white);
+}
+
+.founder-bio.margin-bottom {
+  margin-bottom: 1rem;
+}
+
+.founder-image-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: -60px;
+  position: relative;
+  z-index: 20;
+}
+
+.founder-main-image {
+  width: 250%;
+  max-width: none;
+  margin-left: 0%;
+  height: auto;
+  border-radius: 10px 10px 0 0;
+  display: block;
+}
+
+/* Mobile Founders Layout */
+@media (max-width: 768px) {
+  .founders-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0rem;
+    padding-bottom: 2rem;
+    padding-top: 4rem;
+    /* Added top space */
+  }
+
+  .founder-info {
+    text-align: justify !important;
+    /* Changed to justify */
+    padding-bottom: 0;
+    width: 100%;
+    padding: 0 1rem;
+    transform: none !important;
+  }
+
+  /* Order: Left Founder (1), Image (2), Right Founder (3) */
+  .founder-info-left {
+    order: 1;
+    margin-top: 6rem;
+    /* Shifted down more */
+    margin-bottom: 1rem;
+  }
+
+  .founder-image-wrapper {
+    order: 2;
+    margin-bottom: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .founder-info-right {
+    order: 3;
+    margin-top: 2rem;
+    /* Shifted down more */
+    padding-top: 0;
+  }
+
+  .founder-main-image {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin-left: 0;
+    border-radius: 10px;
+    position: relative;
+  }
+
+  .founder-name {
+    font-size: 2.5rem;
+  }
+}
+
+/* Mobile adjustments for Selected Work section on Home Page */
+@media (max-width: 600px) {
+
+  /* Header Container: Title and Button */
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:first-child {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+    margin-bottom: 2rem !important;
+  }
+
+  /* View All Projects Button */
+  section.section-padding[style*="var(--color-dark-choc)"] .btn-primary {
+    margin-left: 0 !important;
+    /* Shift slightly left if needed, but in column layout align-self works better */
+    align-self: flex-start;
+    font-size: 0.9rem !important;
+    padding: 0.8rem 1.5rem !important;
+  }
+
+  /* Selected Work Grid - Re-targeting more specifically to override inline grid styles */
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:last-child {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    /* Center align the project cards */
+  }
+
+  /* Individual Project Card Wrapper */
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:last-child>div {
+    width: 90% !important;
+    /* Make projects smaller width-wise */
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Project Image */
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:last-child>div img,
+  section.section-padding[style*="var(--color-dark-choc)"] .container>div:last-child>div .img-placeholder {
+    height: 350px !important;
+    /* Reduce height from 500px */
+  }
+
+  /* --- Contact Page Mobile Adjustments --- */
+  .contact-form-wrapper {
+    width: 90% !important;
+    margin: 0 auto !important;
+    border-radius: 10px !important;
+  }
+
+  .contact-form-inner {
+    padding: 1.5rem !important;
+    /* Reduce padding from 4rem */
+  }
+
+  .contact-form-grid {
+    grid-template-columns: 1fr !important;
+    /* Stack inputs vertically */
+    gap: 1.5rem !important;
+  }
+
+  /* Form Text Scaling */
+  /* Form Text Scaling */
+  .contact-form-inner h3,
+  .contact-form-inner label,
+  .contact-form-inner input,
+  .contact-form-inner select,
+  .contact-form-inner textarea,
+  .collab-section p,
+  .collab-section button,
+  .map-section p,
+  .map-section a,
+  .container>div>p.font-subtitle {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Titles for Collab and Map Sections */
+  .collab-section h2,
+  .map-section h4 {
+    font-size: 2.5rem !important;
+    font-weight: bold !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Adjust padding for the shrunk text */
+  .contact-form-inner label,
+  .contact-form-inner input,
+  .contact-form-inner select,
+  .contact-form-inner textarea {
+    padding: 0.6rem !important;
+  }
+
+  .collab-section h2,
+  .map-section h4,
+  .contact-form-inner h3 {
+    font-weight: bold !important;
+    /* Keep hierarchy via weight since size is same */
+    margin-bottom: 0.5rem !important;
+  }
+
+  .collab-section {
+    margin-top: 3rem !important;
+    padding: 3rem 1rem !important;
+    /* Reduce padding */
+  }
+
+  .collab-decor-1,
+  .collab-decor-2 {
+    width: 100px !important;
+    height: 100px !important;
+  }
+
+  .map-section {
+    margin-top: 3rem !important;
+  }
+
+  .contact-form-inner select,
+  .contact-form-inner textarea {
+    padding: 0.6rem !important;
+  }
+
+  .collab-section h2,
+  .map-section h4,
+  .contact-form-inner h3 {
+    font-weight: bold !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  /* Navbar Menu Mobile Adjustments */
+  .nav-menu-text {
+    font-family: var(--font-brand) !important;
+    font-weight: bold !important;
+    font-size: 1.3rem !important;
+  }
+
+  .nav-menu-img {
+    max-height: 100px !important;
+  }
+
+  .nav-contact-section {
+    margin-top: 1.5rem !important;
+    font-size: 1.2rem !important;
+  }
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Admin Page Styles */
+.admin-login-container {
+  padding: 3rem 2rem;
+  max-width: 400px;
+  width: 90%;
+}
+
+.admin-login-title {
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: var(--color-electric-blue);
+}
+
+.admin-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.admin-header-title {
+  font-size: 3rem;
+  color: var(--color-dark-choc);
+}
+
+.admin-saved-message {
+  color: #27ae60;
+  font-weight: bold;
+  font-family: var(--font-subtitle);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-tabs-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  align-items: center;
+}
+
+/* Hide scrollbar for tabs */
+.admin-tabs-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.admin-tabs-container::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+}
+
+.admin-dual-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .admin-dual-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-header-title {
+    font-size: 2rem;
+  }
+
+  .admin-tabs-container {
+    padding-bottom: 0.5rem;
+  }
+}
+
+/* Utilities */
+.truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: block;
+}
+
+/* --- Admin Responsive Styles --- */
+
+/* Section Headers (Heading + Add Button) */
+.admin-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .admin-section-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 1rem;
+  }
+
+  .admin-section-header button {
+    width: 100%;
+    /* Make add button full width on mobile */
+    justify-content: center;
+    background-color: var(--color-electric-blue) !important;
+    color: white !important;
+  }
+}
+
+/* Desktop Table vs Mobile Cards */
+.mobile-cards {
+  display: block;
+}
+
+.desktop-table {
+  display: none;
+}
+
+@media (min-width: 769px) {
+  .mobile-cards {
+    display: none;
+  }
+
+  .desktop-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+/* Admin Grid Layouts */
+.admin-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* Force 2 columns on mobile per user request */
+  gap: 0.5rem;
+  /* Smaller gap on mobile */
+}
+
+@media (min-width: 769px) {
+  .admin-grid-2 {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+}
+
+/* Force 2 columns for admin-dual-grid (Project uploads) */
+.admin-dual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr !important;
+  /* Force 2 columns even on mobile */
+  gap: 0.5rem;
+}
+
+@media (min-width: 769px) {
+  .admin-dual-grid {
+    gap: 1.5rem;
+  }
+}
+
+/* Admin Flex Row (for Testimonials etc) */
+.admin-flex-row {
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+}
+
+@media (min-width: 769px) {
+  .admin-flex-row {
+    flex-direction: row;
+  }
+}
+
+/* Mobile Card Styling */
+.mobile-card {
+  border: 1px solid #eee;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.mobile-card-label {
+  font-weight: bold;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Admin Specific Mobile Adjustments */
+@media (max-width: 768px) {
+  .section-padding.container {
+    margin-top: 6rem !important;
+    /* give more space for navbar */
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .admin-header-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .admin-header-title {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+
+  .admin-login-container {
+    padding: 2rem 1.5rem;
+    width: 95%;
+  }
+
+  .admin-tabs-container {
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-tabs-container button {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  /* Ensure add buttons and titles don't overlap awkwardly */
+  h2 {
+    font-size: 1.8rem !important;
+  }
+
+  /* Heading/Button Row stacking */
+  .admin-dash-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  /* File Upload on Mobile - MODIFIED PER USER REQUEST */
+  .file-upload-container {
+    /* Allow flex to work normally, don't force wrap if we want compact */
+    gap: 0.3rem !important;
+  }
+
+  /* Shrink image preview to fit side-by-side columns */
+  .file-upload-container>div:first-child {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 4px !important;
+  }
+
+  /* Shrink Buttons */
+  /* Shrink Buttons - INCREASED SIZE PER REQUEST */
+  .file-upload-container .admin-upload-btn {
+    text-align: center;
+    padding: 0.6rem 0.9rem !important;
+    /* Increased padding */
+    font-size: 0.85rem !important;
+    /* Increased font size */
+    width: auto !important;
+    background-color: #eee !important;
+    color: #333 !important;
+    font-weight: normal !important;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+
+  .file-upload-container .admin-remove-btn {
+    width: 24px !important;
+    height: 24px !important;
+    padding: 0 !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* Inputs full width */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+    /* prevent zoom on iOS */
+  }
+}

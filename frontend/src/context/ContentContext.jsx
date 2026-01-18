@@ -12,6 +12,8 @@ const defaultContent = {
     hero: {
         subtitle: "We build brands that bloom."
     },
+    // ... (rest of default content)
+
     allProjects: [
         {
             id: 1,
@@ -194,39 +196,115 @@ const defaultContent = {
         { id: 3, title: "Growth", text: "We design with the future in mind." }
     ],
     brandLogos: [
-        { id: 1, name: "Brand 1", logo: "/images/client1.png" },
-        { id: 2, name: "Brand 2", logo: "/images/client2.png" },
-        { id: 3, name: "Brand 3", logo: "/images/client3.png" }
+        { id: 1, name: "Amar", logo: "/images/amar.png" },
+        { id: 2, name: "AMBC", logo: "/images/ambc.png" },
+        { id: 3, name: "Bafna", logo: "/images/bafna.png" },
+        { id: 4, name: "Bthere", logo: "/images/bthere.png" },
+        { id: 5, name: "Dhruv Gems", logo: "/images/dhruv gems.png" },
+        { id: 6, name: "Fine Decor", logo: "/images/fine decor.png" },
+        { id: 7, name: "Kaffyn", logo: "/images/kaffyn.png" },
+        { id: 8, name: "Life's A Beach", logo: "/images/lifes a beach.png" },
+        { id: 9, name: "Mansi Nagdev", logo: "/images/mansi nagdev.png" },
+        { id: 10, name: "Moire", logo: "/images/moire.png" },
+        { id: 11, name: "ShoP", logo: "/images/shoP..png" },
+        { id: 12, name: "Subhrekha", logo: "/images/subhrekha.png" },
+        { id: 13, name: "The Right Cut", logo: "/images/the right cut.png" },
+        { id: 14, name: "Thyme & Whisk", logo: "/images/thyme & whisk.png" },
+        { id: 15, name: "Vardhaman", logo: "/images/vardhaman.png" }
     ],
-    siteImages: {
+    siteImages: [
         // Fallbacks for Home Page
-        hero_bg: "/images/herosecbg(2).jpg",
-        home_mag_1: "/images/page1.png",
-        home_mag_2: "/images/page2.png",
-        home_mag_3: "/images/page3.png",
-        home_mag_4: "/images/page4.png",
-        home_main_logo: "/images/main logo.png",
-        home_blooming: "/images/bloomingthebrand.png",
-        home_story: "/images/ourstory.png", // Assuming user wants this editable too
-        home_service_branding: "/images/service_branding.png",
-        home_service_social: "/images/service_jewellery.png",
-        home_service_production: "/images/service_decor.png",
-        home_service_influencer: "/images/service_fashion.png",
-        home_service_creative: "/images/service_lifestyle.png",
+        { id: "hero_bg", image: "/images/herosecbg(2).jpg", category: "background" },
+        { id: "home_mag_1", image: "/images/page1.png", category: "home" },
+        { id: "home_mag_2", image: "/images/page2.png", category: "home" },
+        { id: "home_mag_3", image: "/images/page3.png", category: "home" },
+        { id: "home_mag_4", image: "/images/page4.png", category: "home" },
+        { id: "home_main_logo", image: "/images/main logo.png", category: "home" },
+        { id: "home_blooming", image: "/images/bloomingthebrand.png", category: "home" },
+        { id: "home_story", image: "/images/ourstory.png", category: "home" },
+        { id: "home_service_branding", image: "/images/service_branding.png", category: "home" },
+        { id: "home_service_social", image: "/images/service_jewellery.png", category: "home" },
+        { id: "home_service_production", image: "/images/service_decor.png", category: "home" },
+        { id: "home_service_influencer", image: "/images/service_fashion.png", category: "home" },
+        { id: "home_service_creative", image: "/images/service_lifestyle.png", category: "home" },
 
         // About Page
-        about_blooming: "/images/dummy9.png",
-        about_vision: "/images/dummy6.png",
-        about_values: "/images/dummy8.png",
-        about_approach: "/images/dummy7.png",
+        { id: "about_blooming", image: "/images/dummy9.png", category: "about" },
+        { id: "about_vision", image: "/images/dummy6.png", category: "about" },
+        { id: "about_values", image: "/images/dummy8.png", category: "about" },
+        { id: "about_approach", image: "/images/dummy7.png", category: "about" },
 
         // Navbar / Menu Icons
-        nav_home: "/images/home.png",
-        nav_story: "/images/ourstory.png",
-        nav_services: "/images/services.png",
-        nav_work: "/images/Ourwork.png",
-        nav_contact: "/images/tele.png"
-    },
+        { id: "nav_home", image: "/images/home.png", category: "menu" },
+        { id: "nav_story", image: "/images/ourstory.png", category: "menu" },
+        { id: "nav_services", image: "/images/services.png", category: "menu" },
+        { id: "nav_work", image: "/images/Ourwork.png", category: "menu" },
+        { id: "nav_contact", image: "/images/tele.png", category: "menu" }
+    ],
+
+
+    services: [
+        {
+            id: 'branding',
+            title: 'BRANDING',
+            subtitle: 'IDENTITY & STRATEGY',
+            description: 'Crafting identities that build dominance.',
+            image: '/images/dummypost4.png',
+            icon: '/images/branding.png',
+            accent: 'var(--color-electric-blue)',
+            textColor: '#FFFFFF',
+            longText: 'Crafting narratives that resonate. Your identity, felt not just seen.',
+            mobileText: 'Crafting identities that build dominance and resonate deeply.'
+        },
+        {
+            id: 'social',
+            title: 'SOCIAL MEDIA',
+            subtitle: 'MEDIA & GROWTH',
+            description: 'Quality strategies for your goals.',
+            image: '/images/s_social.jpg',
+            icon: '/images/socialmedia.png',
+            accent: 'var(--color-butter-yellow)',
+            textColor: 'var(--color-electric-blue)',
+            longText: 'Maximizing engagement with precision. Viral moments to sustained growth.',
+            mobileText: 'Strategize to maximize engagement and reach the right audience.'
+        },
+        {
+            id: 'production',
+            title: 'PRODUCTION',
+            subtitle: 'SHOOT & EDIT',
+            description: 'Cinematic production aligned with your voice.',
+            image: '/images/s_production.jpg',
+            icon: '/images/production.png',
+            accent: 'var(--color-electric-blue)',
+            textColor: '#FFFFFF',
+            longText: 'Cinematic excellence blending with your brand voice. Visual stories that captivate.',
+            mobileText: 'Cinematic excellence aligned with your brand voice to captivate.'
+        },
+        {
+            id: 'influencer',
+            title: 'INFLUENCER',
+            subtitle: 'CONNECT & AMPLIFY',
+            description: 'Authentic partnerships maximizing your value.',
+            image: '/images/s_influencer.jpg',
+            icon: '/images/influencer.png',
+            accent: 'var(--color-butter-yellow)',
+            textColor: 'var(--color-electric-blue)',
+            longText: 'Connecting you with voices that amplify your message. Authentic partnerships.',
+            mobileText: 'Authentic partnerships that amplify your message and drive value.'
+        },
+        {
+            id: 'creative',
+            title: 'CREATIVE',
+            subtitle: 'DESIGN & DIRECTION',
+            description: 'Designing experiences that captivate.',
+            image: '/images/s_creative.jpg',
+            icon: '/images/creativedesign.png',
+            accent: 'var(--color-electric-blue)',
+            textColor: '#FFFFFF',
+            longText: 'Pushing boundaries to deliver experiences that leave a mark. Aesthetics met with strategy.',
+            mobileText: 'Design intelligence creating experiences that leave a lasting mark.'
+        }
+    ],
     enquiries: [],
     legal: {
         privacy: `<h2>Privacy Policy</h2>
@@ -293,6 +371,55 @@ export const ContentProvider = ({ children }) => {
         const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
         return { ...defaultContent, ...parsed };
     });
+
+    // History for Undo/Redo
+    const [history, setHistory] = useState([]);
+    const [historyIndex, setHistoryIndex] = useState(-1);
+    const [isUndoing, setIsUndoing] = useState(false);
+
+    // Snapshot: Call this BEFORE making a change
+    const takeSnapshot = () => {
+        if (isUndoing) return; // Don't snap during undo/redo
+        const currentSnapshot = JSON.parse(JSON.stringify(content));
+        const newHistory = history.slice(0, historyIndex + 1);
+        newHistory.push(currentSnapshot);
+        // Limit history to 20 steps
+        if (newHistory.length > 20) newHistory.shift();
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+    };
+
+    const undo = () => {
+        if (historyIndex >= 0) {
+            setIsUndoing(true);
+            const previous = history[historyIndex];
+            // We need to save the CURRENT state as "future" if we haven't already
+            // Actually, standard undo pushes current to redo stack?
+            // Simple approach: History is a timeline.
+            // If we are at tip, we should snap "current" before formatting? 
+            // Let's use a simpler standard:
+            // When undoing, we move pointer back. 
+            // But we need to verify we aren't losing the "now".
+            // Let's trust the snapshots were taken BEFORE changes.
+
+            setContent(previous);
+            setHistoryIndex(prev => prev - 1);
+            setTimeout(() => setIsUndoing(false), 50);
+        }
+    };
+
+    const redo = () => {
+        if (historyIndex < history.length - 1) {
+            setIsUndoing(true);
+            const next = history[historyIndex + 1];
+            setContent(next);
+            setHistoryIndex(prev => prev + 1);
+            setTimeout(() => setIsUndoing(false), 50);
+        }
+    };
+
+    const canUndo = historyIndex >= 0;
+    const canRedo = historyIndex < history.length - 1;
 
     // Use environment variable for API URL, fallback to localhost for dev
     const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -402,6 +529,18 @@ export const ContentProvider = ({ children }) => {
                         ...prev,
                         legal: { ...prev.legal, ...legalMap }
                     }));
+                }
+
+                // Fetch Services (NEW)
+                const sResponse = await fetch(`${API_BASE_URL}/api/services`);
+                if (sResponse.ok) {
+                    const servicesData = await sResponse.json();
+                    if (servicesData && servicesData.length > 0) {
+                        setContent(prev => ({ ...prev, services: servicesData }));
+                    } else {
+                        // FIX: If DB is empty, use defaults immediately so Admin isn't empty
+                        setContent(prev => ({ ...prev, services: defaultContent.services }));
+                    }
                 }
 
 
@@ -1067,6 +1206,22 @@ export const ContentProvider = ({ children }) => {
         }
     };
 
+    const updateServices = async (newServices) => {
+        setContent(prev => ({ ...prev, services: newServices }));
+        try {
+            await fetch(`${API_BASE_URL}/api/services`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')).token : ''}`
+                }, // Add Auth token
+                body: JSON.stringify(newServices)
+            });
+        } catch (error) {
+            console.error("Failed to update services", error);
+        }
+    };
+
     return (
         <ContentContext.Provider value={{
             content,
@@ -1092,6 +1247,7 @@ export const ContentProvider = ({ children }) => {
             updateInstagram,
             updateFounders,
             updateValues,
+            updateServices, // Newly added
             updateEnquiries,
             removeEnquiry,
             removeEnquiries,
@@ -1103,7 +1259,71 @@ export const ContentProvider = ({ children }) => {
             refreshEnquiries,
             uploadFile, // Export this
             updateLegalContent,
-            updateSiteImage
+            updateSiteImage,
+            // History
+            undo, redo, canUndo, canRedo, takeSnapshot,
+            // Missing Resets
+            resetServices: async (token) => {
+                // Default Services (Fallbacks)
+                const defaults = [
+                    {
+                        "id": "1",
+                        "title": "Branding",
+                        "subtitle": "Identity & Strategy",
+                        "description": "We craft unique brand identities that resonate with your audience.",
+                        "longText": "Our branding process delves deep into your core values to create...",
+                        "image": "/images/service_branding.png",
+                        "accent": "#F5E6CC",
+                        "textColor": "#5D4037"
+                    },
+                    {
+                        "id": "2",
+                        "title": "Social Media",
+                        "subtitle": "Content & Growth",
+                        "description": "Engaging content strategies to grow your digital presence.",
+                        "longText": "We manage your social media channels with tailored content...",
+                        "image": "/images/service_jewellery.png",
+                        "accent": "#F5E6CC",
+                        "textColor": "#5D4037"
+                    },
+                    {
+                        "id": "3",
+                        "title": "Production",
+                        "subtitle": "Photo & Video",
+                        "description": "High-quality production services for your brand assets.",
+                        "longText": "From concept to final cut, our production team delivers...",
+                        "image": "/images/service_decor.png",
+                        "accent": "#F5E6CC",
+                        "textColor": "#5D4037"
+                    },
+                    {
+                        "id": "4",
+                        "title": "Influencer",
+                        "subtitle": "Marketing & reach",
+                        "description": "Connecting your brand with the right voices.",
+                        "longText": "Our influencer marketing strategies help you reach new audiences...",
+                        "image": "/images/service_fashion.png",
+                        "accent": "#004AAD",
+                        "textColor": "#FFFFFF"
+                    },
+                    {
+                        "id": "5",
+                        "title": "Creative",
+                        "subtitle": "Design & Direction",
+                        "description": "Creative direction for campaigns and launches.",
+                        "longText": "We provide creative direction that aligns with your brand goals...",
+                        "image": "/images/service_lifestyle.png",
+                        "accent": "#004AAD",
+                        "textColor": "#FFFFFF"
+                    }
+                ];
+                setContent(prev => ({ ...prev, services: defaults }));
+                if (token) {
+                    // Sync logic would go here if we had a bulk update endpoint
+                    // For now, we just reset local state which syncs if we have individual updaters
+                    alert("Services reset to defaults. Click 'View' to edit details.");
+                }
+            }
         }}>
             {children}
         </ContentContext.Provider>

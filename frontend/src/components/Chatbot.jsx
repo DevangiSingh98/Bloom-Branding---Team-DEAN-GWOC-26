@@ -277,7 +277,8 @@ export default function Chatbot() {
                                         background: showSidebar ? 'var(--color-electric-blue)' : 'white',
                                         border: '2px solid var(--color-electric-blue)',
                                         borderRadius: '12px',
-                                        width: '40px',
+                                        width: 'auto', // Changed from 40px to auto
+                                        padding: '0 15px', // Added padding
                                         height: '40px',
                                         display: 'flex',
                                         alignItems: 'center',
@@ -310,10 +311,10 @@ export default function Chatbot() {
                 onClick={() => setIsOpen(!isOpen)}
                 style={{
                     width: 'auto',
-                    minWidth: '70px',
-                    height: '70px',
-                    padding: '0 25px',
-                    borderRadius: '50px',
+                    minWidth: '80px', // Increased from 70px
+                    height: '80px', // Increased from 70px
+                    padding: '0 30px', // Increased padding
+                    borderRadius: '60px',
                     backgroundColor: 'var(--color-electric-blue)',
                     color: 'white',
                     border: 'none',
@@ -322,7 +323,7 @@ export default function Chatbot() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '18px', // Smaller font for text fit
+                    fontSize: '20px', // Increased font size
                     fontWeight: 'bold',
                     zIndex: 1001,
                     position: 'fixed',

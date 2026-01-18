@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useContent } from '../context/ContentContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import EmailServiceSelector from "./EmailServiceSelector";
@@ -171,6 +172,17 @@ export default function Navbar() {
 
     const showShadow = !isOpen && (isHome || isServices || isWork) && !isDarkText;
 
+    const { content } = useContent();
+
+    // Menu Items Config - Now dynamic!
+    const menuItems = [
+        { name: 'Home', path: '/', img: content.siteImages?.menu_home || '/images/home.png', height: '150px', tilt: -10 },
+        { name: 'Our Story', path: '/about', img: content.siteImages?.menu_ourstory || '/images/ourstory.png', height: '150px', tilt: 15 },
+        { name: 'Services', path: '/services', img: content.siteImages?.menu_services || '/images/services.png', height: '130px', tilt: -5 },
+        { name: 'Our Work', path: '/work', img: content.siteImages?.menu_work || '/images/Ourwork.png', height: '140px', tilt: 8 },
+        { name: 'Contact', path: '/contact', img: content.siteImages?.menu_contact || '/images/tele.png', height: '150px', tilt: -5 },
+    ];
+
     return (
         <>
             <header style={{
@@ -196,7 +208,7 @@ export default function Navbar() {
                     }}>
                         {/* Ghost image to maintain aspect ratio and size */}
                         <img
-                            src="/images/Full-Logo.png"
+                            src={content.siteImages?.navbar_logo || "/images/Full-Logo.png"}
                             alt="Bloom Branding"
                             style={{ width: '100%', height: 'auto', opacity: 0 }}
                         />
@@ -205,8 +217,8 @@ export default function Navbar() {
                             position: 'absolute',
                             inset: 0,
                             backgroundColor: 'currentColor',
-                            maskImage: 'url(/images/Full-Logo.png)',
-                            WebkitMaskImage: 'url(/images/Full-Logo.png)',
+                            maskImage: `url(${content.siteImages?.navbar_logo || "/images/Full-Logo.png"})`,
+                            WebkitMaskImage: `url(${content.siteImages?.navbar_logo || "/images/Full-Logo.png"})`,
                             maskSize: 'contain',
                             WebkitMaskSize: 'contain',
                             maskRepeat: 'no-repeat',
@@ -270,13 +282,7 @@ export default function Navbar() {
                         className="nav-menu-wrapper"
                     >
                         <motion.ul variants={listVariants} className="nav-menu-list">
-                            {[
-                                { name: 'Home', path: '/', img: '/images/home.png', height: '150px', tilt: -10 },
-                                { name: 'Our Story', path: '/about', img: '/images/ourstory.png', height: '150px', tilt: 15 },
-                                { name: 'Services', path: '/services', img: '/images/services.png', height: '130px', tilt: -5 },
-                                { name: 'Our Work', path: '/work', img: '/images/Ourwork.png', height: '140px', tilt: 8 },
-                                { name: 'Contact', path: '/contact', img: '/images/tele.png', height: '150px', tilt: -5 },
-                            ].map((link) => (
+                            {menuItems.map((link) => (
                                 <motion.li key={link.name} variants={itemVariants} className="nav-menu-item">
                                     <Link
                                         to={link.path}

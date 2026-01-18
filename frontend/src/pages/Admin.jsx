@@ -942,7 +942,6 @@ const Admin = () => {
         syncFounder({ ...newFounders[section], key: section }, userInfo.token);
     };
 
-    // Helper to handle array updates
     const handleArrayChange = (index, field, value, type) => {
         takeSnapshot();
         let newArray;
@@ -977,6 +976,31 @@ const Admin = () => {
             updateBrandLogos(newArray);
             syncBrand(newArray[index], userInfo.token);
         }
+    };
+
+    const handleProjectImageChange = (index, imgIndex, val) => {
+        takeSnapshot();
+        const newArray = [...content.allProjects];
+        const project = newArray[index];
+        // Ensure images array exists
+        const images = project.images ? [...project.images] : (project.image ? [project.image] : []);
+
+        // Pad array if needed
+        while (images.length <= imgIndex) {
+            images.push("");
+        }
+
+        images[imgIndex] = val;
+
+        // Update both 'images' array AND 'image' (main) for backwards compat
+        newArray[index] = {
+            ...project,
+            images: images,
+            image: images[0] || ""
+        };
+
+        updateAllProjects(newArray);
+        syncProject(newArray[index], userInfo.token);
     };
 
     const addItem = async (type) => {
@@ -1680,7 +1704,7 @@ const Admin = () => {
                                     </div>
                                     <div>
                                         <FileUpload
-                                            label="Service Image"
+                                            label="Service Image (Services Page)"
                                             value={service.image}
                                             onFileSelect={(val) => {
                                                 const newServices = [...content.services];
@@ -1695,6 +1719,24 @@ const Admin = () => {
                                             onUpload={uploadFile}
                                             pathPrefix="services"
                                         />
+                                        <div style={{ marginTop: '1rem' }}>
+                                            <FileUpload
+                                                label="Home Page Icon (Mask)"
+                                                value={service.icon}
+                                                onFileSelect={(val) => {
+                                                    const newServices = [...content.services];
+                                                    newServices[index] = { ...newServices[index], icon: val };
+                                                    updateServices(newServices);
+                                                }}
+                                                onRemove={() => {
+                                                    const newServices = [...content.services];
+                                                    newServices[index] = { ...newServices[index], icon: '' };
+                                                    updateServices(newServices);
+                                                }}
+                                                onUpload={uploadFile}
+                                                pathPrefix="services"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                                 <div style={{ marginTop: '1rem' }}>
@@ -1749,24 +1791,18 @@ const Admin = () => {
                                     placeholder="Project Description"
                                     style={{ width: '100%', padding: '0.8rem', marginBottom: '0.5rem', minHeight: '80px', fontSize: '1.15rem', fontFamily: 'inherit' }}
                                 />
-                                <div className="admin-dual-grid">
-                                    <FileUpload
-                                        label="Project Image"
-                                        value={item.image}
-                                        onFileSelect={(val) => handleArrayChange(index, 'image', val, 'projects')}
-                                        onRemove={() => handleArrayChange(index, 'image', '', 'projects')}
-                                        onUpload={uploadFile}
-                                        pathPrefix="projects"
-                                    />
-                                    <FileUpload
-                                        label="Project Video"
-                                        value={item.video || ''}
-                                        type="video"
-                                        onFileSelect={(val) => handleArrayChange(index, 'video', val, 'projects')}
-                                        onRemove={() => handleArrayChange(index, 'video', '', 'projects')}
-                                        onUpload={uploadFile}
-                                        pathPrefix="projects/videos"
-                                    />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    {[0, 1, 2, 3].map((imgIdx) => (
+                                        <FileUpload
+                                            key={imgIdx}
+                                            label={`Media ${imgIdx + 1} ${imgIdx === 0 ? '(Main)' : ''}`}
+                                            value={item.images?.[imgIdx] || (imgIdx === 0 ? item.image : '')}
+                                            onFileSelect={(val) => handleProjectImageChange(index, imgIdx, val)}
+                                            onRemove={() => handleProjectImageChange(index, imgIdx, '')}
+                                            onUpload={uploadFile}
+                                            pathPrefix="projects"
+                                        />
+                                    ))}
                                 </div>
                             </div>
                         ))}
@@ -2021,6 +2057,7 @@ const Admin = () => {
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
                             {/* Hero Section */}
+                            {/* Hero Section */}
                             <div className="admin-card">
                                 <h3>Home: Hero Section</h3>
                                 <FileUpload
@@ -2035,18 +2072,34 @@ const Admin = () => {
                                     <FileUpload
                                         key={`mag${num}`}
                                         label={`Magazine/Poster ${num}`}
-                                        value={content.siteImages?.[`home_mag_${num}`] || ''}
-                                        onFileSelect={(val) => updateSiteImage(`home_mag_${num}`, 'Home', `Magazine ${num}`, val, userInfo.token)}
-                                        onRemove={() => updateSiteImage(`home_mag_${num}`, 'Home', `Magazine ${num}`, '', userInfo.token)}
+                                        value={content.siteImages?.[`hero_page${num}`] || ''}
+                                        onFileSelect={(val) => updateSiteImage(`hero_page${num}`, 'Home', `Magazine ${num}`, val, userInfo.token)}
+                                        onRemove={() => updateSiteImage(`hero_page${num}`, 'Home', `Magazine ${num}`, '', userInfo.token)}
                                         onUpload={uploadFile}
                                         pathPrefix="site_assets"
                                     />
                                 ))}
                                 <FileUpload
-                                    label="Main Logo (Center)"
-                                    value={content.siteImages?.home_main_logo || ''}
-                                    onFileSelect={(val) => updateSiteImage('home_main_logo', 'Home', 'Main Logo', val, userInfo.token)}
-                                    onRemove={() => updateSiteImage('home_main_logo', 'Home', 'Main Logo', '', userInfo.token)}
+                                    label="Floating Megaphone"
+                                    value={content.siteImages?.hero_megaphone || ''}
+                                    onFileSelect={(val) => updateSiteImage('hero_megaphone', 'Home', 'Floating Megaphone', val, userInfo.token)}
+                                    onRemove={() => updateSiteImage('hero_megaphone', 'Home', 'Floating Megaphone', '', userInfo.token)}
+                                    onUpload={uploadFile}
+                                    pathPrefix="site_assets"
+                                />
+                                <FileUpload
+                                    label="Floating Camera"
+                                    value={content.siteImages?.hero_camera || ''}
+                                    onFileSelect={(val) => updateSiteImage('hero_camera', 'Home', 'Floating Camera', val, userInfo.token)}
+                                    onRemove={() => updateSiteImage('hero_camera', 'Home', 'Floating Camera', '', userInfo.token)}
+                                    onUpload={uploadFile}
+                                    pathPrefix="site_assets"
+                                />
+                                <FileUpload
+                                    label="Floating Star"
+                                    value={content.siteImages?.hero_star || ''}
+                                    onFileSelect={(val) => updateSiteImage('hero_star', 'Home', 'Floating Star', val, userInfo.token)}
+                                    onRemove={() => updateSiteImage('hero_star', 'Home', 'Floating Star', '', userInfo.token)}
                                     onUpload={uploadFile}
                                     pathPrefix="site_assets"
                                 />
@@ -2056,17 +2109,30 @@ const Admin = () => {
                             <div className="admin-card">
                                 <h3>Home: Info Sections</h3>
                                 <FileUpload
-                                    label="Blooming the Brand"
+                                    label="Blooming the Brand (Dome Image)"
                                     value={content.siteImages?.home_blooming || ''}
                                     onFileSelect={(val) => updateSiteImage('home_blooming', 'Home', 'Blooming Image', val, userInfo.token)}
                                     onRemove={() => updateSiteImage('home_blooming', 'Home', 'Blooming Image', '', userInfo.token)}
                                     onUpload={uploadFile}
                                     pathPrefix="site_assets"
                                 />
-
+                                <FileUpload
+                                    label="Testimonial Decor (Left Flower)"
+                                    value={content.siteImages?.testimonial_decor_left || ''}
+                                    onFileSelect={(val) => updateSiteImage('testimonial_decor_left', 'Home', 'Testimonial Left Decor', val, userInfo.token)}
+                                    onRemove={() => updateSiteImage('testimonial_decor_left', 'Home', 'Testimonial Left Decor', '', userInfo.token)}
+                                    onUpload={uploadFile}
+                                    pathPrefix="site_assets"
+                                />
+                                <FileUpload
+                                    label="Testimonial Decor (Right Flower)"
+                                    value={content.siteImages?.testimonial_decor_right || ''}
+                                    onFileSelect={(val) => updateSiteImage('testimonial_decor_right', 'Home', 'Testimonial Right Decor', val, userInfo.token)}
+                                    onRemove={() => updateSiteImage('testimonial_decor_right', 'Home', 'Testimonial Right Decor', '', userInfo.token)}
+                                    onUpload={uploadFile}
+                                    pathPrefix="site_assets"
+                                />
                             </div>
-
-                            {/* Service Images Removed per user request */}
 
                             {/* About Page */}
                             <div className="admin-card">
@@ -2091,12 +2157,20 @@ const Admin = () => {
                             {/* Navbar / Menu Icons */}
                             <div className="admin-card">
                                 <h3>Navbar / Menu Icons</h3>
+                                <FileUpload
+                                    label="Main Navbar Logo"
+                                    value={content.siteImages?.navbar_logo || ''}
+                                    onFileSelect={(val) => updateSiteImage('navbar_logo', 'Navbar', 'Main Navbar Logo', val, userInfo.token)}
+                                    onRemove={() => updateSiteImage('navbar_logo', 'Navbar', 'Main Navbar Logo', '', userInfo.token)}
+                                    onUpload={uploadFile}
+                                    pathPrefix="site_assets"
+                                />
                                 {[
-                                    { k: 'nav_home', l: 'Menu: Home Icon' },
-                                    { k: 'nav_story', l: 'Menu: Our Story Icon' },
-                                    { k: 'nav_services', l: 'Menu: Services Icon' },
-                                    { k: 'nav_work', l: 'Menu: Works Icon' },
-                                    { k: 'nav_contact', l: 'Menu: Contact Icon' }
+                                    { k: 'menu_home', l: 'Menu: Home Icon' },
+                                    { k: 'menu_ourstory', l: 'Menu: Our Story Icon' },
+                                    { k: 'menu_services', l: 'Menu: Services Icon' },
+                                    { k: 'menu_work', l: 'Menu: Works Icon' },
+                                    { k: 'menu_contact', l: 'Menu: Contact Icon' }
                                 ].map(s => (
                                     <FileUpload
                                         key={s.k}

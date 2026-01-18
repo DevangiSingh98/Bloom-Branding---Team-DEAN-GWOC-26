@@ -392,6 +392,7 @@ const InstagramPreview = ({ item }) => {
 };
 
 const Admin = () => {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     // Auth State
     const [userInfo, setUserInfo] = useState(() => {
         const saved = localStorage.getItem('userInfo');
@@ -566,6 +567,7 @@ const Admin = () => {
     const [openEnquiryId, setOpenEnquiryId] = useState(null);
     const [aiIdeas, setAiIdeas] = useState({}); // Store ideas by enquiry ID
     const [loadingAi, setLoadingAi] = useState(null); // ID of enquiry currently generating
+    const [aiError, setAiError] = useState({}); // Store errors per enquiry ID
     const [newVibeInput, setNewVibeInput] = useState('');
 
     const [isInitializing, setIsInitializing] = useState(false);
@@ -618,6 +620,7 @@ const Admin = () => {
     // --- AI GENERATION LOGIC ---
     const handleGenerateIdeas = async (enquiry) => {
         setLoadingAi(enquiry.id);
+        setAiError(prev => ({ ...prev, [enquiry.id]: null })); // Clear prev errors
         try {
             console.log("Generating ideas for:", enquiry.company);
             const { data } = await axios.post('/api/ai/generate', {
@@ -634,7 +637,10 @@ const Admin = () => {
             setAiIdeas(prev => ({ ...prev, [enquiry.id]: data.ideas }));
         } catch (error) {
             console.error("AI Generation Failed:", error);
-            alert("Failed to generate ideas. Check console for details.");
+            const msg = error.response && error.response.data && error.response.data.message
+                ? error.response.data.message
+                : "Failed to generate ideas.";
+            setAiError(prev => ({ ...prev, [enquiry.id]: msg }));
         } finally {
             setLoadingAi(null);
         }
@@ -715,8 +721,6 @@ const Admin = () => {
     const showConfirm = (title, message, onConfirm, confirmText = '', confirmColor = '') => {
         showAlert(title, message, 'confirm', onConfirm, confirmText, confirmColor);
     };
-
-    const API_URL = import.meta.env.VITE_API_URL || 'https://bloom-backend-pq68.onrender.com';
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -1562,6 +1566,12 @@ const Admin = () => {
                                                                             {loadingAi === item.id ? 'Developing Strategy...' : '📈 Generate Marketing Strategy'}
                                                                         </button>
 
+                                                                        {aiError[item.id] && (
+                                                                            <p style={{ color: 'red', marginTop: '0.5rem', fontWeight: 'bold' }}>
+                                                                                ⚠️ {aiError[item.id]}
+                                                                            </p>
+                                                                        )}
+
                                                                         {aiIdeas[item.id] && (
                                                                             <div style={{ backgroundColor: '#fff', padding: '1.5rem', borderRadius: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.05)' }}>
                                                                                 <h4 style={{ margin: '0 0 1rem 0', color: 'var(--color-electric-blue)' }}>Strategic Insight</h4>
@@ -1662,6 +1672,12 @@ const Admin = () => {
                                                                 {loadingAi === item.id ? 'Thinking...' : 'Generate Strategy'}
                                                             </button>
                                                         </div>
+
+                                                        {aiError[item.id] && (
+                                                            <p style={{ color: 'red', marginTop: '0.5rem', fontWeight: 'bold', fontSize: '0.8rem' }}>
+                                                                ⚠️ {aiError[item.id]}
+                                                            </p>
+                                                        )}
 
                                                         {aiIdeas[item.id] && (
                                                             <div style={{ backgroundColor: '#fff', padding: '1rem', borderRadius: '8px', borderLeft: '4px solid var(--color-butter-yellow)' }}>

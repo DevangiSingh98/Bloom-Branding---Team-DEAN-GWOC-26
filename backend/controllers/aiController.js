@@ -69,33 +69,35 @@ export const generateIdeas = async (req, res) => {
         let text;
 
         try {
-            // Use gemini-pro as primary for stability
-            console.log("Using model: gemini-pro");
-            model = genAI.getGenerativeModel({ model: "gemini-pro", safetySettings });
+            // Try Flash Latest first (Proven to work)
+            model = genAI.getGenerativeModel({ model: "gemini-flash-latest", safetySettings });
             const result = await model.generateContent(prompt);
             text = result.response.text();
-        } catch (error) {
-            console.warn("Primary model failed, trying fallback...", error.message);
-            // Fallback (try same or varied)
-            try {
-                model = genAI.getGenerativeModel({ model: "gemini-1.0-pro", safetySettings });
-                const result = await model.generateContent(prompt);
-                text = result.response.text();
-            } catch (fallbackError) {
-                throw new Error(`All AI models failed. Main: ${error.message}`);
-            }
+        } catch (flashError) {
+            console.warn("Gemini Flash Latest failed, trying gemini-pro-latest...", flashError.message);
+            // Fallback
+            model = genAI.getGenerativeModel({ model: "gemini-pro-latest", safetySettings });
+            const result = await model.generateContent(prompt);
+            text = result.response.text();
         }
 
         console.log("Gemini Response Success");
         res.json({ ideas: text });
 
     } catch (error) {
-        console.error("AI Generation Error Details:", error);
+        console.error("AI Generation Error Details (FULL):", JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+        if (error.response) {
+            console.error("AI Error Response Body:", JSON.stringify(error.response, null, 2));
+        }
 
         // Improve error message for frontend
         let userMessage = "Failed to generate ideas.";
         if (error.message.includes("API_KEY")) userMessage = "Server missing API Key.";
         if (error.message.includes("candidate")) userMessage = "AI Safety Filter blocked response. Try different wording.";
+        if (error.message.includes("429") || error.status === 429) {
+            userMessage = "Rate limit exceeded. Please wait a minute.";
+            return res.status(429).json({ message: userMessage, error: error.message });
+        }
 
         res.status(500).json({
             message: userMessage,

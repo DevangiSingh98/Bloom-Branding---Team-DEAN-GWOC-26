@@ -36,18 +36,21 @@ export default function Contact() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!addEnquiry) {
-            alert("Error: Enquiry function not available. Please try again later.");
-            return;
-        }
-        const success = await addEnquiry(formData);
-        if (success) {
-            alert("Enquiry sent successfully! We'll be in touch.");
-            setFormData({
-                name: '', email: '', company: '', service: '', budget: '', timeline: '', message: '', vibes: [], vibeDescription: ''
-            });
-        } else {
-            alert("Failed to send enquiry. Please try again or email us directly.");
+
+        try {
+            const success = await addEnquiry(formData);
+
+            if (success) {
+                alert("Enquiry sent successfully! We'll be in touch.");
+                setFormData({
+                    name: '', email: '', company: '', service: '', budget: '', timeline: '', message: '', vibes: [], vibeDescription: ''
+                });
+            } else {
+                alert("Failed to send enquiry. Please try again or email us directly.");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("An unexpected error occurred.");
         }
     };
 

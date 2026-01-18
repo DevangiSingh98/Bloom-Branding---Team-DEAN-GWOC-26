@@ -29,6 +29,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
+app.set('trust proxy', 1); // Trust first, necessary for Render/Heroku
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 const allowedOrigins = [

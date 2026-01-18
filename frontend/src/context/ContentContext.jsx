@@ -376,7 +376,7 @@ const defaultContent = {
 export const ContentProvider = ({ children }) => {
     // Initialize state from localStorage if available, else default (Forcing Refresh)
     const [content, setContent] = useState(() => {
-        const savedContent = localStorage.getItem('bloomContent_v27'); // Bumped version for Images Fix
+        const savedContent = localStorage.getItem('bloomContent_v28'); // Bumped version for Image Fix v2
         console.log("Loading content...", savedContent ? "Found cached" : "Using default");
         const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
         return { ...defaultContent, ...parsed };
@@ -445,9 +445,11 @@ export const ContentProvider = ({ children }) => {
                     const projects = await response.json();
                     if (projects && projects.length > 0) {
                         const mappedProjects = projects.map(p => {
-                            // Smart Merge: If backend has no images, fallback to defaultContent images matching by Title
+                            // Smart Merge: If backend has no images (or only empty strings), fallback to defaultContent
                             const defaultProj = defaultContent.allProjects.find(dp => dp.title === p.title);
-                            const finalImages = (p.images && p.images.length > 0)
+                            const hasValidImages = p.images && p.images.some(img => img && img.trim() !== '');
+
+                            const finalImages = hasValidImages
                                 ? p.images
                                 : (defaultProj && defaultProj.images ? defaultProj.images : []);
 
@@ -752,7 +754,7 @@ export const ContentProvider = ({ children }) => {
     useEffect(() => {
         try {
             const sanitized = sanitizeForStorage(content);
-            localStorage.setItem('bloomContent_v27', JSON.stringify(sanitized));
+            localStorage.setItem('bloomContent_v28', JSON.stringify(sanitized));
         } catch (e) {
             console.error('Failed to save to localStorage:', e);
         }

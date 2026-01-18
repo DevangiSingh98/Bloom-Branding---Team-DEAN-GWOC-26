@@ -5,55 +5,12 @@ import { useContent } from '../context/ContentContext';
 import EmailServiceSelector from '../components/EmailServiceSelector';
 
 export default function Contact() {
-    const { addEnquiry } = useContent();
-    const [emailModalOpen, setEmailModalOpen] = useState(false);
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        company: '',
-        service: '',
-        budget: '',
-        timeline: '',
-        message: '',
-        vibes: [],
-        vibeDescription: '' // NEW FIELD
-    });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        if (name === 'message' || name === 'vibeDescription') {
-            const words = value.trim().split(/\s+/);
-            if (words.length > 300) return; // Limit word count
-        }
-        setFormData({ ...formData, [name]: value });
-    };
-
-    const toggleVibe = (vibe) => {
-        const currentVibes = formData.vibes || [];
-        const newVibes = currentVibes.includes(vibe)
-            ? currentVibes.filter(v => v !== vibe)
-            : [...currentVibes, vibe];
-        setFormData({ ...formData, vibes: newVibes });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const newEnquiry = {
-            id: Date.now(),
-            date: new Date().toLocaleDateString(),
-            time: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
-            ...formData
-        };
-        addEnquiry(newEnquiry);
-        alert("Thank you for your enquiry! We will bloom together soon.");
-        setFormData({
-            name: '', email: '', company: '', service: '', budget: '', timeline: '', message: '',
-            vibes: [], vibeDescription: ''
-        });
-    };
-
-    // Vibe Keywords
-    const VIBES = ['Minimalist', 'Bold & Loud', 'Luxury', 'Playful', 'Geometric', 'Organic', 'Tech', 'Vintage', 'Editorial', 'Abstract'];
+    const { addEnquiry, content } = useContent(); // Destructure content
+    // ...
+    // Vibe Keywords ( Dynamic with fallback )
+    const VIBES = (content.vibes && content.vibes.length > 0)
+        ? content.vibes.map(v => v.label || v)
+        : ['Minimalist', 'Bold & Loud', 'Luxury', 'Playful', 'Geometric', 'Organic', 'Tech', 'Vintage', 'Editorial', 'Abstract'];
 
     return (
         <>

@@ -4,7 +4,7 @@ import { useContent } from '../context/ContentContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
-const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image", onUpload, pathPrefix }) => {
+const FileUpload = ({ label, value, onFileSelect, onRemove, type = "image", onUpload, pathPrefix, previewBg }) => {
     const [fileName, setFileName] = useState("No file chosen");
     const fileInputRef = React.useRef(null);
 
@@ -526,10 +526,11 @@ const Admin = () => {
         uploadFile,
         updateLegalContent,
         updateSiteImage,
-        undo, redo, canUndo, canRedo, takeSnapshot
+        undo, redo, canUndo, canRedo, takeSnapshot,
+        refreshVibes // Added refreshVibes
     } = useContent();
 
-    const [activeTab, setActiveTab] = useState('Home');
+    const [activeTab, setActiveTab] = useState('enquiries');
     const [clients, setClients] = useState([]);
     const [filteredClients, setFilteredClients] = useState([]);
 
@@ -542,6 +543,12 @@ const Admin = () => {
     useEffect(() => {
         if (userInfo && userInfo.token) {
             refreshEnquiries(userInfo.token);
+            refreshVibes(); // Fetch Vibes
+            // Site images, projects, etc. are fetched on mount in ContentContext.
+            // But if we want to be sure:
+            // updateSiteImage? No, that's for single update.
+            // We assume ContentContext initial fetch worked. IF not, we might need a manual refresh.
+
             const fetchClients = async () => {
                 try {
                     const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
@@ -557,6 +564,7 @@ const Admin = () => {
     const [openEnquiryId, setOpenEnquiryId] = useState(null);
     const [aiIdeas, setAiIdeas] = useState({}); // Store ideas by enquiry ID
     const [loadingAi, setLoadingAi] = useState(null); // ID of enquiry currently generating
+    const [newVibeInput, setNewVibeInput] = useState('');
 
     const [isInitializing, setIsInitializing] = useState(false);
     const [legalForm, setLegalForm] = useState({ privacy: '', terms: '' });
@@ -614,7 +622,8 @@ const Admin = () => {
                 service: enquiry.service,
                 message: enquiry.message,
                 company: enquiry.company,
-                vibe: enquiry.budget // Using Budget field as vibe indicator if specific vibe missing
+                vibe: (enquiry.vibes && enquiry.vibes.length > 0) ? enquiry.vibes.join(', ') : (enquiry.vibeDescription || enquiry.budget),
+                vibeDescription: enquiry.vibeDescription
             }, {
                 headers: { Authorization: `Bearer ${userInfo.token}` }
             });
@@ -629,6 +638,12 @@ const Admin = () => {
         }
     };
 
+
+    const logout = () => {
+        localStorage.removeItem('userInfo');
+        setUserInfo(null);
+        window.location.reload(); // Force reload to clear any context/cache
+    };
 
     const handleDeleteAllEnquiries = () => {
         showAlert("Delete ALL?", "Are you sure you want to delete ALL enquiries? This cannot be undone.", "warning", () => {
@@ -723,16 +738,7 @@ const Admin = () => {
         }
     };
 
-    const logout = () => {
-        localStorage.removeItem('userInfo');
-        setUserInfo(null);
-        setLoginData({ username: '', password: '' });
-    };
 
-    const handleLogout = () => {
-        logout();
-        navigate('/admin');
-    };
 
     // Asset Management Functions
     const openAssetManager = async (client) => {
@@ -1290,7 +1296,7 @@ const Admin = () => {
             </div>
 
             <div className="admin-tabs-container">
-                {['enquiries', 'services', 'projects', 'selected work', 'founder', 'testimonials', 'instagram', 'brands', 'site-images', 'legal'].map(tab => (
+                {['enquiries', 'vibes', 'services', 'projects', 'selected work', 'founder', 'testimonials', 'instagram', 'brands', 'site-images', 'legal'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -1652,6 +1658,94 @@ const Admin = () => {
                     </div>
                 )}
 
+                {/* VIBES MANAGEMENT */}
+                {activeTab === 'vibes' && (
+                    <div>
+                        <div className="admin-section-header">
+                            <div>
+                                <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Manage Vibes</h2>
+                                <p style={{ fontSize: '1.3rem', color: '#666', margin: 0 }}>Add keywords for the "Vibe Check" in the contact form.</p>
+                            </div>
+                            <button
+                                onClick={async () => {
+                                    if (window.confirm("Initialize default vibes?")) {
+                                        try {
+                                            await axios.post('/api/vibes/init', {}, { headers: { Authorization: `Bearer ${userInfo.token}` } });
+                                            refreshVibes();
+                                            alert("Vibes initialized!");
+                                        } catch (e) { alert("Failed to init: " + e.message); }
+                                    }
+                                }}
+                                style={{ padding: '0.5rem 1rem', backgroundColor: '#666', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+                            >
+                                Init Defaults
+                            </button>
+                        </div>
+
+                        {/* Add New Vibe */}
+                        <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                            <input
+                                value={newVibeInput}
+                                onChange={(e) => setNewVibeInput(e.target.value)}
+                                placeholder="Enter bold new vibe..."
+                                style={{ flex: 1, padding: '1rem', border: '1px solid #ddd', borderRadius: '4px', fontSize: '1rem' }}
+                                onKeyPress={(e) => e.key === 'Enter' && newVibeInput && (addVibe(newVibeInput, userInfo.token), setNewVibeInput(''))}
+                            />
+                            <button
+                                onClick={() => {
+                                    if (newVibeInput) {
+                                        addVibe(newVibeInput, userInfo.token);
+                                        setNewVibeInput('');
+                                    }
+                                }}
+                                className="btn-primary"
+                                style={{ padding: '1rem 2rem', fontSize: '1rem' }}
+                            >
+                                + Add Vibe
+                            </button>
+                        </div>
+
+                        {/* Vibe List */}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                            {content.vibes && content.vibes.map((v) => (
+                                <div key={v._id || v.label} style={{
+                                    backgroundColor: 'white',
+                                    padding: '0.8rem 1.2rem',
+                                    borderRadius: '50px',
+                                    boxShadow: '0 2px 5px rgba(0,0,0,0.05)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '0.8rem',
+                                    fontSize: '1rem',
+                                    border: '1px solid #eee'
+                                }}>
+                                    <span style={{ fontWeight: '500' }}>{v.label}</span>
+                                    <button
+                                        onClick={() => removeVibe(v._id, userInfo.token)}
+                                        style={{
+                                            backgroundColor: '#ffebee',
+                                            color: '#c62828',
+                                            border: 'none',
+                                            borderRadius: '50%',
+                                            width: '24px',
+                                            height: '24px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontSize: '0.8rem'
+                                        }}
+                                        title="Remove Vibe"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+
                 {/* SERVICES MANAGEMENT */}
                 {activeTab === 'services' && (
                     <div>
@@ -1722,15 +1816,16 @@ const Admin = () => {
                                         <div style={{ marginTop: '1rem' }}>
                                             <FileUpload
                                                 label="Home Page Icon (Mask)"
-                                                value={service.icon}
+                                                previewBg="#333"
+                                                value={service.iconSrc}
                                                 onFileSelect={(val) => {
                                                     const newServices = [...content.services];
-                                                    newServices[index] = { ...newServices[index], icon: val };
+                                                    newServices[index] = { ...newServices[index], iconSrc: val };
                                                     updateServices(newServices);
                                                 }}
                                                 onRemove={() => {
                                                     const newServices = [...content.services];
-                                                    newServices[index] = { ...newServices[index], icon: '' };
+                                                    newServices[index] = { ...newServices[index], iconSrc: '' };
                                                     updateServices(newServices);
                                                 }}
                                                 onUpload={uploadFile}

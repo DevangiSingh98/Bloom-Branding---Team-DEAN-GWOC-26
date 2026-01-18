@@ -172,7 +172,8 @@ const ServiceList = ({ screenSize }) => {
             maskVal: hasMask ? `url(${iconSrc})` : 'none',
             bgColor: hasMask ? 'var(--color-butter-yellow)' : 'transparent',
             // Default image size usually works well, but can override if needed
-            imgSize: s.imgSize || "60%"
+            imgSize: s.imgSize || "60%",
+            iconSrc // Pass original src for direct rendering
         };
     });
 
@@ -249,8 +250,8 @@ const ServiceList = ({ screenSize }) => {
                                         width: service.imgSize || '80%',
                                         height: '60%',
                                         backgroundColor: 'var(--color-butter-yellow)',
-                                        maskImage: service.maskVal,
-                                        WebkitMaskImage: service.maskVal,
+                                        maskImage: `url(${service.iconSrc || service.maskVal.replace(/url\(['"]?(.+?)['"]?\)/, '$1')})`,
+                                        WebkitMaskImage: `url(${service.iconSrc || service.maskVal.replace(/url\(['"]?(.+?)['"]?\)/, '$1')})`,
                                         maskSize: 'contain',
                                         WebkitMaskSize: 'contain',
                                         maskRepeat: 'no-repeat',
@@ -492,7 +493,7 @@ export default function Home() {
                 position: 'sticky',
                 top: 0,
                 zIndex: 0,
-                backgroundImage: 'url("/images/herosecbg(2).jpg")',
+                backgroundImage: `url("${content.siteImages?.hero_bg || '/images/herosecbg(2).jpg'}")`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 scrollSnapAlign: 'start'

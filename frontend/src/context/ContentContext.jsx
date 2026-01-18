@@ -12,6 +12,11 @@ const defaultContent = {
     hero: {
         subtitle: "We build brands that bloom."
     },
+    vibes: [
+        'Minimalist', 'Bold & Loud', 'Luxury', 'Playful',
+        'Geometric', 'Organic', 'Tech', 'Vintage',
+        'Editorial', 'Abstract'
+    ],
     // ... (rest of default content)
 
     allProjects: [
@@ -212,35 +217,40 @@ const defaultContent = {
         { id: 14, name: "Thyme & Whisk", logo: "/images/thyme & whisk.png" },
         { id: 15, name: "Vardhaman", logo: "/images/vardhaman.png" }
     ],
-    siteImages: [
+    siteImages: {
         // Fallbacks for Home Page
-        { id: "hero_bg", image: "/images/herosecbg(2).jpg", category: "background" },
-        { id: "home_mag_1", image: "/images/page1.png", category: "home" },
-        { id: "home_mag_2", image: "/images/page2.png", category: "home" },
-        { id: "home_mag_3", image: "/images/page3.png", category: "home" },
-        { id: "home_mag_4", image: "/images/page4.png", category: "home" },
-        { id: "home_main_logo", image: "/images/main logo.png", category: "home" },
-        { id: "home_blooming", image: "/images/bloomingthebrand.png", category: "home" },
-        { id: "home_story", image: "/images/ourstory.png", category: "home" },
-        { id: "home_service_branding", image: "/images/service_branding.png", category: "home" },
-        { id: "home_service_social", image: "/images/service_jewellery.png", category: "home" },
-        { id: "home_service_production", image: "/images/service_decor.png", category: "home" },
-        { id: "home_service_influencer", image: "/images/service_fashion.png", category: "home" },
-        { id: "home_service_creative", image: "/images/service_lifestyle.png", category: "home" },
+        hero_bg: "/images/herosecbg(2).jpg",
+        hero_page1: "/images/page1.png",
+        hero_page2: "/images/page2.png",
+        hero_page3: "/images/page3.png",
+        hero_page4: "/images/page4.png",
+        hero_megaphone: "/images/megaphone.png",
+        hero_camera: "/images/cam.png",
+        hero_star: "/images/star.png",
+
+        home_main_logo: "/images/main logo.png",
+        home_blooming: "/images/bloomingthebrand.png",
+        home_story: "/images/ourstory.png",
+
+        home_service_branding: "/images/service_branding.png",
+        home_service_social: "/images/service_jewellery.png",
+        home_service_production: "/images/service_decor.png",
+        home_service_influencer: "/images/service_fashion.png",
+        home_service_creative: "/images/service_lifestyle.png",
 
         // About Page
-        { id: "about_blooming", image: "/images/dummy9.png", category: "about" },
-        { id: "about_vision", image: "/images/dummy6.png", category: "about" },
-        { id: "about_values", image: "/images/dummy8.png", category: "about" },
-        { id: "about_approach", image: "/images/dummy7.png", category: "about" },
+        about_blooming: "/images/dummy9.png",
+        about_vision: "/images/dummy6.png",
+        about_values: "/images/dummy8.png",
+        about_approach: "/images/dummy7.png",
 
         // Navbar / Menu Icons
-        { id: "nav_home", image: "/images/home.png", category: "menu" },
-        { id: "nav_story", image: "/images/ourstory.png", category: "menu" },
-        { id: "nav_services", image: "/images/services.png", category: "menu" },
-        { id: "nav_work", image: "/images/Ourwork.png", category: "menu" },
-        { id: "nav_contact", image: "/images/tele.png", category: "menu" }
-    ],
+        nav_home: "/images/home.png",
+        nav_story: "/images/ourstory.png",
+        nav_services: "/images/services.png",
+        nav_work: "/images/Ourwork.png",
+        nav_contact: "/images/tele.png"
+    },
 
 
     services: [
@@ -250,7 +260,7 @@ const defaultContent = {
             subtitle: 'IDENTITY & STRATEGY',
             description: 'Crafting identities that build dominance.',
             image: '/images/dummypost4.png',
-            icon: '/images/branding.png',
+            iconSrc: '/images/branding.png',
             accent: 'var(--color-electric-blue)',
             textColor: '#FFFFFF',
             longText: 'Crafting narratives that resonate. Your identity, felt not just seen.',
@@ -262,7 +272,7 @@ const defaultContent = {
             subtitle: 'MEDIA & GROWTH',
             description: 'Quality strategies for your goals.',
             image: '/images/s_social.jpg',
-            icon: '/images/socialmedia.png',
+            iconSrc: '/images/socialmedia.png',
             accent: 'var(--color-butter-yellow)',
             textColor: 'var(--color-electric-blue)',
             longText: 'Maximizing engagement with precision. Viral moments to sustained growth.',
@@ -274,7 +284,7 @@ const defaultContent = {
             subtitle: 'SHOOT & EDIT',
             description: 'Cinematic production aligned with your voice.',
             image: '/images/s_production.jpg',
-            icon: '/images/production.png',
+            iconSrc: '/images/production.png',
             accent: 'var(--color-electric-blue)',
             textColor: '#FFFFFF',
             longText: 'Cinematic excellence blending with your brand voice. Visual stories that captivate.',
@@ -286,7 +296,7 @@ const defaultContent = {
             subtitle: 'CONNECT & AMPLIFY',
             description: 'Authentic partnerships maximizing your value.',
             image: '/images/s_influencer.jpg',
-            icon: '/images/influencer.png',
+            iconSrc: '/images/influencer.png',
             accent: 'var(--color-butter-yellow)',
             textColor: 'var(--color-electric-blue)',
             longText: 'Connecting you with voices that amplify your message. Authentic partnerships.',
@@ -298,7 +308,7 @@ const defaultContent = {
             subtitle: 'DESIGN & DIRECTION',
             description: 'Designing experiences that captivate.',
             image: '/images/s_creative.jpg',
-            icon: '/images/creativedesign.png',
+            iconSrc: '/images/creativedesign.png',
             accent: 'var(--color-electric-blue)',
             textColor: '#FFFFFF',
             longText: 'Pushing boundaries to deliver experiences that leave a mark. Aesthetics met with strategy.',
@@ -512,12 +522,26 @@ export const ContentProvider = ({ children }) => {
                 // Fetch Site Images (NEW)
                 const siResponse = await fetch(`${API_BASE_URL}/api/site-images`);
                 if (siResponse.ok) {
-                    const images = await siResponse.json();
-                    if (images && Object.keys(images).length > 0) {
+                    const imagesArr = await siResponse.json();
+                    if (Array.isArray(imagesArr) && imagesArr.length > 0) {
+                        const imagesObj = imagesArr.reduce((acc, img) => {
+                            acc[img.key] = img.image;
+                            return acc;
+                        }, {});
                         setContent(prev => ({
                             ...prev,
-                            siteImages: { ...prev.siteImages, ...images } // Merge with defaults
+                            siteImages: { ...prev.siteImages, ...imagesObj } // Merge with defaults
                         }));
+                    }
+                }
+
+                // Fetch All Projects (NEW)
+                const pResponse = await fetch(`${API_BASE_URL}/api/projects`);
+                if (pResponse.ok) {
+                    const projects = await pResponse.json();
+                    if (projects && projects.length > 0) {
+                        const mappedProjects = projects.map(p => ({ ...p, id: p._id }));
+                        setContent(prev => ({ ...prev, allProjects: mappedProjects })); // Update allProjects
                     }
                 }
 
@@ -541,6 +565,14 @@ export const ContentProvider = ({ children }) => {
                         // FIX: If DB is empty, use defaults immediately so Admin isn't empty
                         setContent(prev => ({ ...prev, services: defaultContent.services }));
                     }
+                }
+
+                // Fetch Vibes (NEW)
+                const vbResponse = await fetch(`${API_BASE_URL}/api/vibes`);
+                if (vbResponse.ok) {
+                    const vibesData = await vbResponse.json();
+                    // Always set vibes, even if empty array, to reflect DB state
+                    setContent(prev => ({ ...prev, vibes: vibesData || [] }));
                 }
 
 
@@ -597,6 +629,44 @@ export const ContentProvider = ({ children }) => {
             return false;
         }
     };
+
+    const addVibe = async (label, token) => {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/vibes`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ label })
+            });
+            if (res.ok) {
+                const newVibe = await res.json();
+                setContent(prev => {
+                    // Handle if vibes is array of strings or objects. normalize to objects.
+                    const current = Array.isArray(prev.vibes) ? prev.vibes : [];
+                    return { ...prev, vibes: [...current, newVibe] };
+                });
+            }
+        } catch (e) { console.error("Failed to add vibe", e); }
+    };
+
+    const removeVibe = async (id, token) => {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/vibes/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                setContent(prev => ({
+                    ...prev,
+                    vibes: prev.vibes.filter(v => v._id !== id)
+                }));
+            }
+        } catch (e) { console.error("Failed to remove vibe", e); }
+    };
+
+
 
 
     // Helper to sanitize content for localStorage (remove large media)
@@ -859,20 +929,7 @@ export const ContentProvider = ({ children }) => {
         }
     };
 
-    const refreshEnquiries = async (token) => {
-        if (!token) return;
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/messages`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                const msgs = await response.json();
-                setContent(prev => ({ ...prev, enquiries: msgs }));
-            }
-        } catch (e) {
-            console.error("Failed to refresh enquiries:", e);
-        }
-    };
+
 
     const syncProject = async (project, token) => {
         try {
@@ -1222,6 +1279,35 @@ export const ContentProvider = ({ children }) => {
         }
     };
 
+
+
+    const refreshEnquiries = async (token) => {
+        if (!token) return;
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/messages`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setContent(prev => ({ ...prev, enquiries: data || [] }));
+            }
+        } catch (e) {
+            console.error("Failed to refresh enquiries", e);
+        }
+    };
+
+    const refreshVibes = async () => {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/vibes`);
+            if (res.ok) {
+                const data = await res.json();
+                setContent(prev => ({ ...prev, vibes: data || [] }));
+            }
+        } catch (e) {
+            console.error("Failed to refresh vibes", e);
+        }
+    };
+
     return (
         <ContentContext.Provider value={{
             content,
@@ -1260,6 +1346,9 @@ export const ContentProvider = ({ children }) => {
             uploadFile, // Export this
             updateLegalContent,
             updateSiteImage,
+            addVibe,
+            removeVibe,
+            refreshVibes,
             // History
             undo, redo, canUndo, canRedo, takeSnapshot,
             // Missing Resets

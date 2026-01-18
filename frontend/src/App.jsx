@@ -109,7 +109,8 @@ function ConditionalFooter() {
     // Let's stick to strict equality for now or strict equality to /work.
     // The user said "remove the footer from THIS page".
     // Normalized path check to prevent duplication
-    if (location.pathname.toLowerCase().replace(/\/$/, '') === '/about') {
+    const path = location.pathname.toLowerCase().replace(/\/$/, '');
+    if (path === '/about' || path === '/vault' || path.startsWith('/vault/')) {
         return null;
     }
     return <Footer />;

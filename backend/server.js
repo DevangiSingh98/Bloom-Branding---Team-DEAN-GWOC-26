@@ -23,14 +23,17 @@ import siteImageRoutes from './routes/siteImageRoutes.js';
 import legalRoutes from './routes/legalRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import assetRoutes from './routes/assetRoutes.js';
+import vibeRoutes from './routes/vibeRoutes.js';
 dotenv.config();
 
 connectDB();
 
 const app = express();
 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: FRONTEND_URL,
     credentials: true
 }));
 app.use(express.json());
@@ -56,8 +59,12 @@ app.use('/api/values', valueRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/selected-work', selectedWorkRoutes);
 app.use('/api/chat', chatRoutes);
+// ... imports
+
 app.use('/api/hero', heroRoutes);
 app.use('/api/site-images', siteImageRoutes);
+app.use('/api/vibes', vibeRoutes); // Register Vibes
+app.use('/api/legal', legalRoutes);
 app.use('/api/legal', legalRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/assets', assetRoutes);
@@ -66,12 +73,12 @@ app.use('/api/assets', assetRoutes);
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: 'http://localhost:5173/vault/login?error=true' }),
+    passport.authenticate('google', { failureRedirect: `${FRONTEND_URL}/vault/login?error=true` }),
     (req, res) => {
         // Successful authentication
         // In a real production app, generate a JWT token here and pass it via URL (or cookie)
         // For now, we redirect to frontend with a flag, and frontend will fetch user data
-        res.redirect('http://localhost:5173/vault?login=success');
+        res.redirect(`${FRONTEND_URL}/vault?login=success`);
     }
 );
 
@@ -99,7 +106,7 @@ app.get('/auth/current_user', (req, res) => {
 app.get('/auth/logout', (req, res) => {
     req.logout((err) => {
         if (err) { return next(err); }
-        res.redirect('http://localhost:5173/');
+        res.redirect(`${FRONTEND_URL}/`);
     });
 });
 

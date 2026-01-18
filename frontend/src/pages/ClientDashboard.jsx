@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Footer from '../components/Footer';
 
 const ClientDashboard = () => {
+    const API_URL = import.meta.env.VITE_API_URL || '';
     const navigate = useNavigate();
     const [clientInfo, setClientInfo] = useState(null);
     const [assets, setAssets] = useState([]);
@@ -20,7 +21,7 @@ const ClientDashboard = () => {
                 try {
                     // Fetch user from session
                     // CRITICAL: Must send cookies for session auth
-                    const { data: user } = await axios.get('http://localhost:5000/auth/current_user', {
+                    const { data: user } = await axios.get(`${API_URL}/auth/current_user`, {
                         withCredentials: true
                     });
 
@@ -96,7 +97,7 @@ const ClientDashboard = () => {
 
     const logout = () => {
         localStorage.removeItem('clientInfo');
-        navigate('/client-login');
+        navigate('/');
     };
 
     const toggleSelection = (id) => {
@@ -107,7 +108,7 @@ const ClientDashboard = () => {
     };
 
     const handleSelectAll = () => {
-        if (selectedAssets.size === assets.length) {
+        if (selectedAssets.size === assets.length && assets.length > 0) {
             setSelectedAssets(new Set());
         } else {
             setSelectedAssets(new Set(assets.map(a => a._id)));
@@ -118,16 +119,33 @@ const ClientDashboard = () => {
         // Trigger downloads for each selected asset
         const selected = assets.filter(a => selectedAssets.has(a._id));
         for (const asset of selected) {
-            // Create a temporary link to force download
-            const link = document.createElement('a');
-            link.href = asset.url;
-            link.download = asset.title || 'download';
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            // Small delay to prevent browser blocking multiple popups
-            await new Promise(r => setTimeout(r, 500));
+            try {
+                // Fetch blob to force download for cross-origin images
+                const response = await fetch(asset.url);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = asset.title || 'download';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+
+                // Small delay
+                await new Promise(r => setTimeout(r, 500));
+            } catch (error) {
+                console.error("Download failed for", asset.title, error);
+                // Fallback to direct link if fetch fails
+                const link = document.createElement('a');
+                link.href = asset.url;
+                link.download = asset.title || 'download';
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
         }
     };
 
@@ -162,6 +180,13 @@ const ClientDashboard = () => {
         visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
     };
 
+    // Helper loading check before render logic if needed, or keep it simple.
+    // The previous code had a loading check. Let's ensure we didn't delete that too?
+    // Wait, the file view shows `if (loading) return (...)` is MISSING in the current view?
+    // Looking at lines 118-120 in previous view_file... it just says `// ... (rest of code)`.
+    // AH, the previous `replace_file_content` (Step 548) replaced a huge chunk including `loading` check and variants with `// ... (rest of code)`.
+    // I NEED TO RESTORE ALL OF THAT.
+
     if (loading) return (
         <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff', flexDirection: 'column', gap: '1rem' }}>
             <div className="loader" style={{ width: '40px', height: '40px', border: '2px solid #eee', borderTop: '2px solid black', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
@@ -195,14 +220,15 @@ const ClientDashboard = () => {
             </AnimatePresence>
 
             {/* HEADER */}
-            <div style={{ padding: '3rem 5%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #f5f5f5' }}>
+            <div style={{ padding: '3rem 5%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid #f5f5f5', textAlign: 'center', position: 'relative' }}>
                 <div>
                     <h1 style={{ fontFamily: 'var(--font-brand)', fontSize: '4rem', margin: 0, lineHeight: 1 }}>THE VAULT</h1>
                     <div style={{ fontFamily: 'var(--font-subtitle)', textTransform: 'uppercase', letterSpacing: '2px', marginTop: '1rem', color: '#666' }}>
                         {clientInfo?.companyName || 'Client Portal'}
                     </div>
                 </div>
-                <div style={{ display: 'flex', gap: '3rem', alignItems: 'center' }}>
+
+                <div style={{ position: 'absolute', right: '5%', bottom: '3rem', display: 'flex', gap: '3rem', alignItems: 'center' }}>
                     <button
                         onClick={handleSelectAll}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-subtitle)', textTransform: 'uppercase', fontSize: '0.9rem', letterSpacing: '1px', borderBottom: '1px solid transparent', transition: 'border-color 0.3s' }}

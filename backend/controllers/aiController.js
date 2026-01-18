@@ -7,7 +7,7 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/ge
 // @access  Private (Admin only - verified by middleware in route)
 export const generateIdeas = async (req, res) => {
     try {
-        const { service, vibe, message, company } = req.body;
+        const { service, vibe, message, company, vibeDescription } = req.body;
 
         console.log("----- GEMINI AI REQUEST -----");
         console.log("Company:", company);
@@ -26,6 +26,7 @@ export const generateIdeas = async (req, res) => {
             - Company/Brand: ${company || 'Unknown Brand'}
             - Service Interested In: ${service || 'General Branding'}
             - Vibe/Aesthetic: ${vibe || 'Not specified'}
+            - Additional Vibe Details: "${vibeDescription || 'N/A'}"
             - Client's Vision: "${message || 'No specific vision provided'}"
 
             Output Format:

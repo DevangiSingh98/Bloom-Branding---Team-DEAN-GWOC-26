@@ -1918,6 +1918,22 @@ const Admin = () => {
                                 <p style={{ fontSize: '1.3rem', color: '#666', margin: 0 }}>Add, edit, or remove projects from the global portfolio.</p>
                             </div>
                             <button onClick={() => addItem('projects')} className="btn-primary" style={{ fontSize: '1rem', padding: '0.8rem 1.5rem', whiteSpace: 'nowrap' }}>+ Add New Project</button>
+                            <button onClick={async () => {
+                                if (!window.confirm("This will overwrite missing database images with system defaults. Continue?")) return;
+                                const token = userInfo.token;
+                                const systemDefaults = content.allProjects || []; // Helper to get current full state with defaults
+
+                                for (let p of systemDefaults) {
+                                    // Logic: If we rely on our Context 'Smart Merge', 'p' ALREADY has the images from default if they were missing in DB.
+                                    // So we just need to save 'p' back to the server to persist them!
+                                    if (p._id && p.images && p.images.length > 0) {
+                                        await syncProject(p, token);
+                                    }
+                                }
+                                alert("All projects synced to database!");
+                            }} className="btn-secondary" style={{ fontSize: '1rem', padding: '0.8rem 1.5rem', whiteSpace: 'nowrap', marginLeft: '1rem', background: '#333', color: '#fff', border: 'none', cursor: 'pointer' }}>
+                                ↻ Sync Defaults to DB
+                            </button>
                         </div>
                         {content.allProjects?.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>

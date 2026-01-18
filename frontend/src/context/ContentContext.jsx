@@ -376,7 +376,7 @@ const defaultContent = {
 export const ContentProvider = ({ children }) => {
     // Initialize state from localStorage if available, else default (Forcing Refresh)
     const [content, setContent] = useState(() => {
-        const savedContent = localStorage.getItem('bloomContent_v28'); // Bumped version for Image Fix v2
+        const savedContent = localStorage.getItem('bloomContent_v29'); // Bump to v29
         console.log("Loading content...", savedContent ? "Found cached" : "Using default");
         const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
         return { ...defaultContent, ...parsed };
@@ -754,7 +754,7 @@ export const ContentProvider = ({ children }) => {
     useEffect(() => {
         try {
             const sanitized = sanitizeForStorage(content);
-            localStorage.setItem('bloomContent_v28', JSON.stringify(sanitized));
+            localStorage.setItem('bloomContent_v29', JSON.stringify(sanitized));
         } catch (e) {
             console.error('Failed to save to localStorage:', e);
         }

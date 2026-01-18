@@ -829,9 +829,6 @@ export default function Home() {
             <section className="section-padding"
                 ref={selectedWorkRef}
                 style={{
-                    backgroundImage: 'url("/images/herosecbg(2).jpg")',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
                     color: 'var(--color-earl-gray)',
                     position: 'relative',
                     zIndex: 10,
@@ -1070,11 +1067,8 @@ export default function Home() {
                                         src={brand.logo}
                                         alt={brand.name}
                                         style={{
-                                            maxWidth: screenSize === 'mobile' ? '70%' : '100%', maxHeight: '100%', objectFit: 'contain',
-                                            filter: 'grayscale(100%)', opacity: 0.8, transition: 'all 0.3s ease'
+                                            maxWidth: screenSize === 'mobile' ? '70%' : '100%', maxHeight: '100%', objectFit: 'contain'
                                         }}
-                                        onMouseOver={(e) => { e.currentTarget.style.filter = 'grayscale(0%)'; e.currentTarget.style.opacity = '1'; }}
-                                        onMouseOut={(e) => { e.currentTarget.style.filter = 'grayscale(100%)'; e.currentTarget.style.opacity = '0.8'; }}
                                     />
                                 </motion.div>
                             ))}

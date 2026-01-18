@@ -25,6 +25,13 @@ function ScrollToTop() {
     const { pathname } = useLocation();
 
     React.useLayoutEffect(() => {
+        // Dynamic Snap Logic
+        if (pathname === '/' || pathname === '/services') {
+            document.documentElement.style.scrollSnapType = 'y proximity';
+        } else {
+            document.documentElement.style.scrollSnapType = 'none';
+        }
+
         // Disable smooth scroll for instant jump
         const originalScrollBehavior = document.documentElement.style.scrollBehavior;
         document.documentElement.style.scrollBehavior = 'auto';
@@ -57,6 +64,8 @@ function ScrollToTop() {
             clearTimeout(t1);
             clearTimeout(t2);
             document.documentElement.style.scrollBehavior = originalScrollBehavior;
+            // Cleanup: Reset to default (optional, but good practice)
+            document.documentElement.style.scrollSnapType = 'none';
         };
     }, [pathname]);
 
@@ -99,7 +108,8 @@ function ConditionalFooter() {
     // However, usually detailed pages also might want this or not. 
     // Let's stick to strict equality for now or strict equality to /work.
     // The user said "remove the footer from THIS page".
-    if (location.pathname === '/about') {
+    // Normalized path check to prevent duplication
+    if (location.pathname.toLowerCase().replace(/\/$/, '') === '/about') {
         return null;
     }
     return <Footer />;
@@ -118,11 +128,13 @@ function App() {
                     {loading && <Preloader key="preloader" setLoading={setLoading} />}
                 </AnimatePresence>
                 {!loading && (
-                    <>
+                    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
                         <Navbar />
-                        <AnimatedRoutes />
+                        <main style={{ flex: 1 }}>
+                            <AnimatedRoutes />
+                        </main>
                         <ConditionalFooter />
-                    </>
+                    </div>
                 )}
             </Router>
         </ContentProvider>

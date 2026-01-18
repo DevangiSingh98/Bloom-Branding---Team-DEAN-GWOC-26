@@ -3,9 +3,7 @@
 /* Google Fonts Import for Lekton (Bold 700) */
 @import url('https://fonts.googleapis.com/css2?family=Lekton:ital,wght@0,400;0,700;1,400&display=swap');
 
-html {
-  scroll-snap-type: y mandatory;
-}
+html {}
 
 @font-face {
   font-family: 'Bigilla';
@@ -113,12 +111,14 @@ html {
 
 html {
   scroll-behavior: smooth;
-  scroll-snap-type: y mandatory;
+
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
   margin: 0;
   padding: 0;
+  height: 100%;
+  /* Ensure full height */
 }
 
 body {
@@ -131,6 +131,14 @@ body {
   max-width: 100%;
   margin: 0;
   padding: 0;
+  min-height: 100vh;
+  /* Ensure full height */
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 h1,
@@ -1910,4 +1918,13 @@ img {
     width: 100%;
     margin: 0 auto;
   }
+}
+
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
+footer {
+  margin-bottom: 0 !important;
 }

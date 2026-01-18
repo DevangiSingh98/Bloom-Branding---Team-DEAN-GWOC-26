@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { useContent } from '../context/ContentContext';
-import Footer from '../components/Footer';
 
 // --- Configuration ---
 const BASE_SERVICES = [
@@ -450,7 +449,8 @@ const Services = () => {
                                             textTransform: 'uppercase',
                                             letterSpacing: '0.02em',
                                             color: currentService.textColor || 'white',
-                                            mixBlendMode: 'difference', // Negative effect for overlap
+                                            mixBlendMode: ['social', 'influencer'].includes(currentService.originalId) ? 'normal' : 'difference',
+                                            textShadow: ['social', 'influencer'].includes(currentService.originalId) ? '0px 0px 20px rgba(255, 255, 255, 1), 0px 0px 10px rgba(255, 255, 255, 0.8)' : 'none',
                                             width: '100%',
                                             maxWidth: '500px'
                                         }}>
@@ -470,7 +470,7 @@ const Services = () => {
                         key={i}
                         style={{
                             height: '100vh',
-                            scrollSnapAlign: 'center',
+                            scrollSnapAlign: i === 0 ? 'start' : 'center',
                             scrollSnapStop: 'always',
                             position: 'relative',
                             border: '1px solid transparent',
@@ -480,6 +480,8 @@ const Services = () => {
                 ))}
             </div>
             {/* Footer removed to rely on global ConditionalFooter */}
+            {/* Spacer to shift footer down */}
+            <div style={{ height: '20vh', backgroundColor: 'var(--color-earl-gray)' }} />
         </>
     );
 };

@@ -447,11 +447,20 @@ export const ContentProvider = ({ children }) => {
                         const mappedProjects = projects.map(p => {
                             // Smart Merge: If backend has no images (or only empty strings), fallback to defaultContent
                             const defaultProj = defaultContent.allProjects.find(dp => dp.title === p.title);
-                            const hasValidImages = p.images && p.images.some(img => img && img.trim() !== '');
 
-                            const finalImages = hasValidImages
-                                ? p.images
-                                : (defaultProj && defaultProj.images ? defaultProj.images : []);
+                            // Filter empty strings from backend images
+                            const validBackendImages = p.images ? p.images.filter(img => img && img.trim() !== '') : [];
+
+                            let finalImages = [];
+
+                            if (validBackendImages.length > 0) {
+                                finalImages = validBackendImages;
+                            } else if (p.imageUrl) {
+                                // If array is empty but we have a single image, use it
+                                finalImages = [p.imageUrl];
+                            } else if (defaultProj && defaultProj.images) {
+                                finalImages = defaultProj.images;
+                            }
 
                             return {
                                 ...p,

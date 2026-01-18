@@ -89,7 +89,7 @@ app.use('/api/assets', assetRoutes);
 // --- GOOGLE AUTH ROUTES ---
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-app.get('/auth/google/callback',
+app.get('/auth/google-callback',
     passport.authenticate('google', { failureRedirect: `${FRONTEND_URL}/vault/login?error=true` }),
     (req, res) => {
         // Successful authentication

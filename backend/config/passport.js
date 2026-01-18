@@ -9,8 +9,8 @@ passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.NODE_ENV === 'production'
-        ? "https://bloom-backend-pq68.onrender.com/auth/google/callback"
-        : (process.env.GOOGLE_CALLBACK_URL || "http://localhost:5000/auth/google/callback"),
+        ? "https://bloom-backend-pq68.onrender.com/auth/google-callback"
+        : (process.env.GOOGLE_CALLBACK_URL || "http://localhost:5000/auth/google-callback"),
     proxy: true
 },
     async (accessToken, refreshToken, profile, done) => {

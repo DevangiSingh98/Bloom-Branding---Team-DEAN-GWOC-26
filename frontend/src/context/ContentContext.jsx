@@ -376,7 +376,7 @@ const defaultContent = {
 export const ContentProvider = ({ children }) => {
     // Initialize state from localStorage if available, else default (Forcing Refresh)
     const [content, setContent] = useState(() => {
-        const savedContent = localStorage.getItem('bloomContent_v26'); // Bumped version for IDs
+        const savedContent = localStorage.getItem('bloomContent_v27'); // Bumped version for Images Fix
         console.log("Loading content...", savedContent ? "Found cached" : "Using default");
         const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
         return { ...defaultContent, ...parsed };
@@ -444,14 +444,23 @@ export const ContentProvider = ({ children }) => {
                 if (response.ok) {
                     const projects = await response.json();
                     if (projects && projects.length > 0) {
-                        const mappedProjects = projects.map(p => ({
-                            _id: p._id,
-                            id: p._id,
-                            title: p.title,
-                            category: p.category,
-                            image: p.imageUrl,
-                            description: p.description
-                        }));
+                        const mappedProjects = projects.map(p => {
+                            // Smart Merge: If backend has no images, fallback to defaultContent images matching by Title
+                            const defaultProj = defaultContent.allProjects.find(dp => dp.title === p.title);
+                            const finalImages = (p.images && p.images.length > 0)
+                                ? p.images
+                                : (defaultProj && defaultProj.images ? defaultProj.images : []);
+
+                            return {
+                                ...p,
+                                id: p._id,
+                                title: p.title,
+                                category: p.category,
+                                image: p.imageUrl,
+                                images: finalImages,
+                                description: p.description
+                            };
+                        });
                         setContent(prev => ({ ...prev, allProjects: mappedProjects }));
                     }
                 }
@@ -701,6 +710,7 @@ export const ContentProvider = ({ children }) => {
             sanitized.allProjects = sanitized.allProjects.map(p => ({
                 ...p,
                 image: p.image && p.image.startsWith('data:') ? '' : p.image,
+                images: p.images ? p.images.map(img => img && img.startsWith('data:') ? '' : img) : [],
                 video: p.video && p.video.startsWith('data:') ? '' : p.video
             }));
         }
@@ -742,7 +752,7 @@ export const ContentProvider = ({ children }) => {
     useEffect(() => {
         try {
             const sanitized = sanitizeForStorage(content);
-            localStorage.setItem('bloomContent_v25', JSON.stringify(sanitized));
+            localStorage.setItem('bloomContent_v27', JSON.stringify(sanitized));
         } catch (e) {
             console.error('Failed to save to localStorage:', e);
         }
@@ -947,6 +957,7 @@ export const ContentProvider = ({ children }) => {
                 description: project.description,
                 category: project.category,
                 imageUrl: project.image !== undefined ? project.image : project.imageUrl,
+                images: project.images,
                 video: project.video,
                 link: project.link
             };

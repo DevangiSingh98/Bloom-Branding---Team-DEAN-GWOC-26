@@ -16,13 +16,14 @@ const getProjects = async (req, res) => {
 // @route   POST /api/projects
 // @access  Private/Admin
 const createProject = async (req, res) => {
-    const { title, description, imageUrl, image, category, link, video } = req.body;
+    const { title, description, imageUrl, image, images, category, link, video } = req.body;
 
     try {
         const project = new Project({
             title,
             description,
             imageUrl: imageUrl || image,
+            images: images || [],
             category,
             link,
             video
@@ -57,7 +58,7 @@ const deleteProject = async (req, res) => {
 // @route   PUT /api/projects/:id
 // @access  Private/Admin
 const updateProject = async (req, res) => {
-    const { title, description, imageUrl, image, category, link, video } = req.body;
+    const { title, description, imageUrl, image, images, category, link, video } = req.body;
 
     try {
         const project = await Project.findById(req.params.id);
@@ -66,6 +67,7 @@ const updateProject = async (req, res) => {
             project.title = title !== undefined ? title : project.title;
             project.description = description !== undefined ? description : project.description;
             project.imageUrl = (imageUrl !== undefined ? imageUrl : (image !== undefined ? image : project.imageUrl));
+            project.images = images !== undefined ? images : project.images;
             project.category = category !== undefined ? category : project.category;
             project.link = link !== undefined ? link : project.link;
             project.video = video !== undefined ? video : project.video;

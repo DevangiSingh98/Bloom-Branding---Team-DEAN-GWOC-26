@@ -157,6 +157,15 @@ If you did not request this, please ignore this email.`;
 
         console.log(`[FORGOT] Generated reset token for ${email}. Sending email...`);
 
+        // Check if SMTP is configured
+        if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+            console.error("[FORGOT] SMTP credentials missing in environment variables");
+            return res.status(500).json({
+                message: "Email service is not configured on the server. Please contact support.",
+                debug: "SMTP_EMAIL/PASSWORD missing"
+            });
+        }
+
         try {
             await sendEmail({
                 email: user.email,
@@ -191,14 +200,17 @@ const resetPassword = async (req, res) => {
         .update(resettoken)
         .digest('hex');
 
+    console.log(`[RESET] Attempting reset with token: ${resettoken.substring(0, 5)}... Hashed: ${resetPasswordToken.substring(0, 8)}...`);
+
     try {
         const user = await User.findOne({
             resetPasswordToken,
-            resetPasswordExpire: { $gt: Date.now() },
+            resetPasswordExpire: { $gt: new Date() },
         });
 
         if (!user) {
-            return res.status(400).json({ message: 'Invalid token' });
+            console.warn(`[RESET] No user found for token or token expired. Hashed Token attempted: ${resetPasswordToken}`);
+            return res.status(400).json({ message: 'Invalid token or token expired' });
         }
 
         user.password = password;

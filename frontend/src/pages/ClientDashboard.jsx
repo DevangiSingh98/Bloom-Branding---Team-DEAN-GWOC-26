@@ -15,48 +15,29 @@ const ClientDashboard = () => {
 
     useEffect(() => {
         const checkAuth = async () => {
-            const searchParams = new URLSearchParams(window.location.search);
-            const loginSuccess = searchParams.get('login');
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlToken = urlParams.get('token');
+            const loginSuccess = urlParams.get('login');
 
-            if (loginSuccess === 'success') {
+            if (urlToken && loginSuccess === 'success') {
                 try {
-                    // Fetch user from session
-                    // CRITICAL: Must send cookies for session auth
+                    // Fetch user details using the token we just got
                     const { data: user } = await axios.get(`${API_URL}/auth/current_user`, {
-                        withCredentials: true
+                        headers: { Authorization: `Bearer ${urlToken}` }
                     });
 
                     if (user) {
-                        // User object from Passport usually has googleId, etc.
-                        // We need to ensure it has a token for future requests if we use JWT?
-                        // Wait, passport session doesn't give a JWT. It gives a session cookie.
-                        // BUT, our API routes protected by `protect` middleware expect `Bearere ${token}`.
-                        // THIS IS A MISMATCH.
-
-                        // FIX: We need generating a Token in the backend for the Google User.
-                        // OR we rely on Session for everything?
-                        // Existing Middleware `protect` uses:
-                        // if (req.headers.authorization && req.headers.authorization.startsWith('Bearer'))
-
-                        // Passport Session works differently.
-                        // We need to return a Token from `/auth/current_user` or generate it in the Callback.
-
-                        // Correction: Let's assume we want to Issue a Token.
-                        // I will update the Frontend to expect a user object that contains a token (if I modify the backend).
-                        // If I don't modify the backend, `req.user` is just the database user object.
-
-                        // Let's modify `server.js` `current_user` route to issue a token if missing.
-
-                        localStorage.setItem('clientInfo', JSON.stringify(user));
-                        setClientInfo(user);
-                        // Clean URL
+                        // Ensure we store the token explicitly
+                        const fullUserInfo = { ...user, token: urlToken };
+                        localStorage.setItem('clientInfo', JSON.stringify(fullUserInfo));
+                        setClientInfo(fullUserInfo);
+                        // Clean URL to remove the sensitive token
                         window.history.replaceState({}, document.title, window.location.pathname);
-                        return user;
+                        return fullUserInfo;
                     }
                 } catch (error) {
-                    console.error("Failed to fetch Google user", error);
-                    navigate('/client-login');
-                    return null;
+                    console.error("Failed to fetch user with URL token", error);
+                    // Fallback to existing logic if token fetch fails
                 }
             }
 
@@ -98,7 +79,9 @@ const ClientDashboard = () => {
 
     const logout = () => {
         localStorage.removeItem('clientInfo');
-        navigate('/');
+        setClientInfo(null);
+        navigate('/client-login?view=login');
+        window.location.reload(); // Clear all state/tokens
     };
 
     const toggleSelection = (id) => {

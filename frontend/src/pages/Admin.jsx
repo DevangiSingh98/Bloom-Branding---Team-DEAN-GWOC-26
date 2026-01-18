@@ -413,6 +413,36 @@ const Admin = () => {
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
 
+    // Check for Token in URL (Google OAuth)
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlToken = urlParams.get('token');
+        const loginSuccess = urlParams.get('login');
+
+        if (urlToken && loginSuccess === 'success') {
+            const fetchAdmin = async () => {
+                try {
+                    const res = await fetch(`${API_URL}/auth/current_user`, {
+                        headers: { Authorization: `Bearer ${urlToken}` }
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.isAdmin) {
+                        const fullUserInfo = { ...data, token: urlToken };
+                        localStorage.setItem('userInfo', JSON.stringify(fullUserInfo));
+                        setUserInfo(fullUserInfo);
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    } else {
+                        setAuthError(data.isAdmin === false ? 'Access Denied: Admin only' : 'Verification failed');
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    }
+                } catch (err) {
+                    console.error("Token verification failed", err);
+                }
+            };
+            fetchAdmin();
+        }
+    }, [API_URL]);
+
     const handleSendEmail = async (e) => {
         e.preventDefault();
         setResetMessage({ type: '', text: '' });
@@ -620,6 +650,10 @@ const Admin = () => {
 
     // --- AI GENERATION LOGIC ---
     const handleGenerateIdeas = async (enquiry) => {
+        if (!userInfo || !userInfo.token) {
+            setAiError(prev => ({ ...prev, [enquiry.id]: "Authentication token missing. Please log in again." }));
+            return;
+        }
         setLoadingAi(enquiry.id);
         setAiError(prev => ({ ...prev, [enquiry.id]: null })); // Clear prev errors
         try {
@@ -666,7 +700,8 @@ const Admin = () => {
     const logout = () => {
         localStorage.removeItem('userInfo');
         setUserInfo(null);
-        window.location.reload(); // Force reload to clear any context/cache
+        navigate('/admin'); // Redirect to login view within Admin page
+        window.location.reload(); // Hard reload to clear all state/tokens in memory
     };
 
     const handleDeleteAllEnquiries = () => {

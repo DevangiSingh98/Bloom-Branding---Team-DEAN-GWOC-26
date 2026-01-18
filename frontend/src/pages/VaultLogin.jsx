@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import api from '../utils/api';
 
 const VaultLogin = () => {
-    const API_URL = import.meta.env.VITE_API_URL ||
-        (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://bloom-backend-pq68.onrender.com');
     const navigate = useNavigate();
     const [isSignUp, setIsSignUp] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -19,46 +17,57 @@ const VaultLogin = () => {
     const [resetMessage, setResetMessage] = useState('');
 
     const handleGoogleLogin = () => {
-        window.location.href = `${API_URL}/auth/google`;
+        // Get the base URL from the api instance defaults (this points to our backend)
+        const baseURL = api.defaults.baseURL || (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://bloom-backend-pq68.onrender.com');
+        window.location.href = `${baseURL}/auth/google?state=vault`;
     };
+
+    // Check for view param (login vs signup) and Handle Auto-Redirect
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const view = params.get('view');
+        if (view === 'signup') setIsSignUp(true);
+        if (view === 'login') setIsSignUp(false);
+
+        const stored = localStorage.getItem('clientInfo');
+        if (stored) {
+            try {
+                const userInfo = JSON.parse(stored);
+                if (userInfo?.token) {
+                    const dashboardPath = userInfo.companyName
+                        ? `/vault/${encodeURIComponent(userInfo.companyName.toLowerCase().replace(/\s+/g, '-'))}`
+                        : '/vault';
+
+                    // ONLY auto-redirect if we are at /client-login or /vault/login 
+                    // AND NOT already at the dashboard. 
+                    const currentPath = window.location.pathname;
+                    if (currentPath === '/client-login' || currentPath === '/vault/login') {
+                        navigate(dashboardPath);
+                    }
+                }
+            } catch (e) {
+                console.error("Failed to parse clientInfo", e);
+                localStorage.removeItem('clientInfo');
+            }
+        }
+    }, [navigate]);
 
     const submitHandler = async (e) => {
         e.preventDefault();
         setError('');
+
         try {
-            const config = { headers: { 'Content-Type': 'application/json' } };
-            let url = isSignUp ? `${API_URL}/api/users/register` : `${API_URL}/api/users/login`;
-            let body = isSignUp ? { username, email, password } : { username: email, email, password };
-            // NOTE: Login usually takes email, but controller expects 'username' or uses email logic? 
-            // My controller uses: const { username, password } = req.body; 
-            // BUT awaits User.findOne({ username }); 
-            // Wait, standard authUser controller I saw earlier checks username. 
-            // Let's re-verify if it supports email login. 
-            // The controller I saw: const { username, password } = req.body; const user = await User.findOne({ username });
-            // Ideally it should be email. I might need to fix controller OR force user to use username. 
-            // Let's assume username for now, or Update controller to allow email.
-            // Actually, for better UX, I'll send email as username if it looks like an email? 
-            // Let's stick to what the controller expects. 
-            // Update: I'll use `email` field for login if I can, but if controller forces username...
-            // Ref: controller said `const { username, password } = req.body`. 
-            // Logic: `const user = await User.findOne({ username });` 
-            // So it MUST be username. 
-            // But wait, `ClientLogin.jsx` had `email` input. 
-            // If ClientLogin was working, maybe users register with email as username? 
-            // Or maybe I should update controller to check email too. 
-            // I WILL UPDATE CONTROLLER TO ALLOW EMAIL LOGIN NEXT. 
-            // For now, I will send the email as 'username' field to the backend if searching by username.
+            const payload = isSignUp
+                ? { username, email, password }
+                : { username: email, password }; // Use email as username for login
 
-            // Actually, finding via email is safer. 
-            // I'll assume for this step I'm sending what is needed.
+            const endpoint = isSignUp ? '/api/users/register' : '/api/users/login';
+            const { data } = await api.post(endpoint, payload);
 
-            const payload = isSignUp ? { username, email, password } : { username: email, password }; // sending email as username for login attempt
+            // Save user info to localStorage
+            localStorage.setItem('clientInfo', JSON.stringify(data));
 
-            const { data } = await axios.post(url, payload, config);
-            localStorage.setItem('clientInfo', JSON.stringify(data)); // Legacy use
-            localStorage.setItem('userInfo', JSON.stringify(data)); // Admin use compatibility
-
-            // Personalized Redirect
+            // Redirect to dashboard
             const dashboardPath = data.companyName
                 ? `/vault/${encodeURIComponent(data.companyName.toLowerCase().replace(/\s+/g, '-'))}`
                 : '/vault';
@@ -72,11 +81,12 @@ const VaultLogin = () => {
     const forgotPasswordHandler = async (e) => {
         e.preventDefault();
         try {
-            const config = { headers: { 'Content-Type': 'application/json' } };
-            await axios.post(`${API_URL}/api/users/forgotpassword`, { email: resetEmail }, config);
+            await api.post('/api/users/forgotpassword', { email: resetEmail });
             setResetMessage(`Reset link sent to ${resetEmail}`);
+            setError('');
         } catch (error) {
             setError(error.response?.data?.message || error.message);
+            setResetMessage('');
         }
     };
 

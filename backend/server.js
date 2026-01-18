@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import jwt from 'jsonwebtoken';
 import connectDB from './config/db.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import session from 'express-session';
@@ -25,6 +26,7 @@ import legalRoutes from './routes/legalRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import assetRoutes from './routes/assetRoutes.js';
 import vibeRoutes from './routes/vibeRoutes.js';
+import User from './models/User.js';
 dotenv.config();
 
 connectDB();
@@ -106,17 +108,36 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/assets', assetRoutes);
 
 // --- GOOGLE AUTH ROUTES ---
-app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+// Start Google Auth - Pass state (admin vs vault)
+app.get('/auth/google', (req, res, next) => {
+    const state = req.query.state || 'vault'; // Default to vault
+    passport.authenticate('google', {
+        scope: ['profile', 'email'],
+        state: state
+    })(req, res, next);
+});
 
 app.get('/auth/google-callback',
-    passport.authenticate('google', { failureRedirect: `${FRONTEND_URL}/vault/login?error=true` }),
+    passport.authenticate('google', { failureRedirect: `${FRONTEND_URL}/vault/login?error=true` || '/vault/login?error=true' }),
     (req, res) => {
         // Successful authentication
-        // Redirect to personalized vault if companyName exists
+        const state = req.query.state || 'vault';
+
+        // Generate JWT Token for persistence bypassing cookies
+        const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET || 'secret', {
+            expiresIn: '30d',
+        });
+
+        if (state === 'admin') {
+            return res.redirect(`${FRONTEND_URL}/admin?token=${token}&login=success`);
+        }
+
+        // Vault Redirect Logic
         const personalizedPath = req.user.companyName
             ? `/vault/${encodeURIComponent(req.user.companyName.toLowerCase().replace(/\s+/g, '-'))}`
             : '/vault';
-        res.redirect(`${FRONTEND_URL}${personalizedPath}?login=success`);
+
+        res.redirect(`${FRONTEND_URL}${personalizedPath}?token=${token}&login=success`);
     }
 );
 
@@ -125,27 +146,44 @@ app.get('/api/diag/env-status', (req, res) => {
         node_env: process.env.NODE_ENV,
         render: !!process.env.RENDER,
         smtp_configured: !!process.env.SMTP_EMAIL,
+        gemini_configured: !!process.env.GEMINI_API_KEY,
         frontend_url: FRONTEND_URL,
         session_secret_set: !!process.env.JWT_SECRET,
         database_connected: mongoose.connection.readyState === 1
     });
 });
 
-app.get('/auth/current_user', (req, res) => {
+app.get('/auth/current_user', async (req, res) => {
     console.log(`[AUTH] Checking current user. SessionID: ${req.sessionID}, Authenticated: ${req.isAuthenticated()}`);
+
+    // 1. Check Passport Session first
     if (req.user) {
         console.log(`[AUTH] User found in session: ${req.user.email}`);
-        import('jsonwebtoken').then(({ default: jwt }) => {
-            const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET || 'secret', {
-                expiresIn: '30d',
-            });
-            const userData = req.user.toObject();
-            res.json({ ...userData, token });
+        const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET || 'secret', {
+            expiresIn: '30d',
         });
-    } else {
-        console.log(`[AUTH] No user found in session: ${req.sessionID}`);
-        res.status(401).json({ message: 'Not authenticated', sessionID: req.sessionID });
+        const userData = req.user.toObject();
+        return res.json({ ...userData, token });
     }
+
+    // 2. Fallback: Check for JWT in Authorization header (Token-based Auth)
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        try {
+            const token = req.headers.authorization.split(' ')[1];
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+            const user = await User.findById(decoded.id).select('-password');
+
+            if (user) {
+                console.log(`[AUTH] User found via JWT Token: ${user.email}`);
+                return res.json({ ...user.toObject(), token });
+            }
+        } catch (error) {
+            console.error(`[AUTH] JWT Token verification failed: ${error.message}`);
+        }
+    }
+
+    console.log(`[AUTH] No user found in session or via valid token.`);
+    res.status(401).json({ message: 'Not authenticated', sessionID: req.sessionID });
 });
 app.get('/auth/logout', (req, res) => {
     req.logout((err) => {

@@ -136,7 +136,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/version', (req, res) => {
-    res.json({ version: '1.4.0', timestamp: new Date().toISOString(), note: 'AI Model Fix' });
+    res.json({ version: '1.5.0', timestamp: new Date().toISOString(), note: 'Model List Debug' });
 });
 
 // Error Handling Middleware (Must be last)

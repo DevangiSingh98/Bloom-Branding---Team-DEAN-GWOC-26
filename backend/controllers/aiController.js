@@ -88,8 +88,14 @@ export const generateIdeas = async (req, res) => {
                 const result = await model.generateContent(prompt);
                 text = result.response.text();
             } catch (proError) {
-                // If both fail, throw a combined error so we debug the ROOT cause (Flash error)
-                throw new Error(`Primary(Flash) Error: ${flashError.message} | Fallback(Pro) Error: ${proError.message}`);
+                try {
+                    console.log("Attempting fallback to gemini-1.0-pro (Legacy Stable)...");
+                    model = genAI.getGenerativeModel({ model: "gemini-1.0-pro", safetySettings });
+                    const result = await model.generateContent(prompt);
+                    text = result.response.text();
+                } catch (legacyError) {
+                    throw new Error(`Flash Error: ${flashError.message} | Pro 1.5 Error: ${proError.message} | Pro 1.0 Error: ${legacyError.message}`);
+                }
             }
         }
 
@@ -97,7 +103,7 @@ export const generateIdeas = async (req, res) => {
         res.json({ ideas: text });
 
     } catch (error) {
-        // ... (rest of catch block)
+        // ... existing error handler ...
         console.error("AI Generation Error Details (FULL):", JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
 
         let userMessage = "Failed to generate ideas.";
@@ -116,5 +122,22 @@ export const generateIdeas = async (req, res) => {
             message: userMessage,
             error: error.message
         });
+    }
+};
+
+// @desc    List available AI models
+// @route   GET /api/ai/models
+// @access  Public (for debugging)
+export const listModels = async (req, res) => {
+    try {
+        if (!process.env.GEMINI_API_KEY) {
+            return res.status(500).json({ error: "No API Key configured" });
+        }
+        // Direct fetch to list models
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`);
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };

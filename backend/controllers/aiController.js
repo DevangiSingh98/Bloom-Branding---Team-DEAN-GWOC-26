@@ -1,10 +1,7 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 
 // Initialize Gemini inside request handler to ensure env vars are loaded
 
-// @desc    Generate ideas based on enquiry
-// @route   POST /api/ai/generate
-// @access  Private (Admin only - verified by middleware in route)
 // @desc    Generate ideas based on enquiry
 // @route   POST /api/ai/generate
 // @access  Private (Admin only - verified by middleware in route)
@@ -43,18 +40,41 @@ export const generateIdeas = async (req, res) => {
         // Initialize Gemini
         const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+        // Relaxed Safety Settings
+        const safetySettings = [
+            {
+                category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+                threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+            {
+                category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+                threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+            {
+                category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+                threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+            {
+                category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                threshold: HarmBlockThreshold.BLOCK_NONE,
+            },
+        ];
+
+        // Debug
+        // console.log("Safety Settings:", JSON.stringify(safetySettings));
+
         let model;
         let text;
 
         try {
             // Try Flash first
-            model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", safetySettings });
             const result = await model.generateContent(prompt);
             text = result.response.text();
         } catch (flashError) {
             console.warn("Gemini 1.5 Flash failed, trying gemini-pro...", flashError.message);
             // Fallback
-            model = genAI.getGenerativeModel({ model: "gemini-pro" });
+            model = genAI.getGenerativeModel({ model: "gemini-pro", safetySettings });
             const result = await model.generateContent(prompt);
             text = result.response.text();
         }

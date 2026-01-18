@@ -74,27 +74,32 @@ export const generateIdeas = async (req, res) => {
         let text;
 
         try {
-            // PRIMARY: Use Gemini 1.5 Flash (Fast & Efficient)
-            model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", safetySettings });
+            // PRIMARY: Use Gemini 2.0 Flash Exp (Verified Available)
+            const primaryModelName = "gemini-2.0-flash-exp";
+            console.log(`Using primary model: ${primaryModelName}`);
+            model = genAI.getGenerativeModel({ model: primaryModelName, safetySettings });
             const result = await model.generateContent(prompt);
             text = result.response.text();
         } catch (flashError) {
-            console.warn("Gemini 1.5 Flash failed:", flashError.message);
+            console.warn("Primary Flash failed:", flashError.message);
 
             try {
-                // FALLBACK: Use Gemini 1.5 Pro (Higher capability) instead of deprecated gemini-pro
-                console.log("Attempting fallback to gemini-1.5-pro...");
-                model = genAI.getGenerativeModel({ model: "gemini-1.5-pro", safetySettings });
+                // FALLBACK 1: Standard Gemini 1.5 Pro
+                const fallback1Name = "gemini-1.5-pro";
+                console.log(`Attempting fallback to ${fallback1Name}...`);
+                model = genAI.getGenerativeModel({ model: fallback1Name, safetySettings });
                 const result = await model.generateContent(prompt);
                 text = result.response.text();
-            } catch (proError) {
+            } catch (fallback1Error) {
                 try {
-                    console.log("Attempting fallback to gemini-1.0-pro (Legacy Stable)...");
-                    model = genAI.getGenerativeModel({ model: "gemini-1.0-pro", safetySettings });
+                    // FALLBACK 2: Gemini 1.0 Pro
+                    const fallback2Name = "gemini-1.0-pro";
+                    console.log(`Attempting fallback to ${fallback2Name}...`);
+                    model = genAI.getGenerativeModel({ model: fallback2Name, safetySettings });
                     const result = await model.generateContent(prompt);
                     text = result.response.text();
-                } catch (legacyError) {
-                    throw new Error(`Flash Error: ${flashError.message} | Pro 1.5 Error: ${proError.message} | Pro 1.0 Error: ${legacyError.message}`);
+                } catch (fallback2Error) {
+                    throw new Error(`Primary(${flashError.message}) | Fallback1(${fallback1Error.message}) | Fallback2(${fallback2Error.message})`);
                 }
             }
         }

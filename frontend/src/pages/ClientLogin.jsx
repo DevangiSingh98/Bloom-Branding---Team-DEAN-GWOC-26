@@ -4,6 +4,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 
 const ClientLogin = () => {
+    const API_URL = import.meta.env.VITE_API_URL || '';
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -16,7 +17,7 @@ const ClientLogin = () => {
         e.preventDefault();
         try {
             const config = { headers: { 'Content-Type': 'application/json' } };
-            const { data } = await axios.post('/api/users/login', { email, password }, config);
+            const { data } = await axios.post(`${API_URL}/api/users/login`, { email, password }, config);
             localStorage.setItem('clientInfo', JSON.stringify(data));
             if (data.role === 'client' || data.isAdmin) {
                 navigate('/vault');
@@ -32,7 +33,7 @@ const ClientLogin = () => {
         e.preventDefault();
         try {
             const config = { headers: { 'Content-Type': 'application/json' } };
-            await axios.post('/api/users/forgotpassword', { email: resetEmail }, config);
+            await axios.post(`${API_URL}/api/users/forgotpassword`, { email: resetEmail }, config);
             setResetMessage(`Reset link sent to ${resetEmail}`);
         } catch (error) {
             setError(error.response?.data?.message || error.message);

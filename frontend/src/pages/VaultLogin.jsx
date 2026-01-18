@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const VaultLogin = () => {
+    const API_URL = import.meta.env.VITE_API_URL || '';
     const navigate = useNavigate();
     const [isSignUp, setIsSignUp] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -17,7 +18,7 @@ const VaultLogin = () => {
     const [resetMessage, setResetMessage] = useState('');
 
     const handleGoogleLogin = () => {
-        window.location.href = "http://localhost:5000/auth/google";
+        window.location.href = `${API_URL}/auth/google`;
     };
 
     const submitHandler = async (e) => {
@@ -25,7 +26,7 @@ const VaultLogin = () => {
         setError('');
         try {
             const config = { headers: { 'Content-Type': 'application/json' } };
-            let url = isSignUp ? '/api/users/register' : '/api/users/login';
+            let url = isSignUp ? `${API_URL}/api/users/register` : `${API_URL}/api/users/login`;
             let body = isSignUp ? { username, email, password } : { username: email, email, password };
             // NOTE: Login usually takes email, but controller expects 'username' or uses email logic? 
             // My controller uses: const { username, password } = req.body; 
@@ -66,7 +67,7 @@ const VaultLogin = () => {
         e.preventDefault();
         try {
             const config = { headers: { 'Content-Type': 'application/json' } };
-            await axios.post('/api/users/forgotpassword', { email: resetEmail }, config);
+            await axios.post(`${API_URL}/api/users/forgotpassword`, { email: resetEmail }, config);
             setResetMessage(`Reset link sent to ${resetEmail}`);
         } catch (error) {
             setError(error.response?.data?.message || error.message);

@@ -227,12 +227,8 @@ const Services = () => {
     const { content } = useContent();
     const dbServices = content?.services || [];
 
-    // Merge DB or Base
-    const RAW_SERVICES = dbServices.length > 0 ? dbServices.map(s => ({
-        ...s,
-        accent: s.accent || 'var(--color-electric-blue)',
-        textColor: s.textColor || '#FFFFFF'
-    })) : BASE_SERVICES;
+    // Force use of local BASE_SERVICES to ensure descriptions match local file
+    const RAW_SERVICES = BASE_SERVICES;
 
     // Force Order
     const ORDER = ['branding', 'social', 'production', 'influencer', 'creative'];

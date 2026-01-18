@@ -584,6 +584,29 @@ export const ContentProvider = ({ children }) => {
         fetchProjects();
     }, []);
 
+    // Add Enquiry (For Contact Form)
+    const addEnquiry = async (data) => {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) {
+                const newMsg = await res.json();
+                setContent(prev => ({
+                    ...prev,
+                    enquiries: [newMsg, ...(prev.enquiries || [])]
+                }));
+                return true;
+            }
+            return false;
+        } catch (e) {
+            console.error("Failed to add enquiry", e);
+            return false;
+        }
+    };
+
     const updateSiteImage = async (key, section, label, image, token) => {
         // Optimistic Update
         setContent(prev => ({
@@ -777,22 +800,7 @@ export const ContentProvider = ({ children }) => {
         setContent(prev => ({ ...prev, values: newValues }));
     };
 
-    const addEnquiry = async (enquiry) => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/messages`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(enquiry)
-            });
-            if (response.ok) {
-                const saved = await response.json();
-                setContent(prev => ({
-                    ...prev,
-                    enquiries: [saved, ...(prev.enquiries || [])]
-                }));
-            }
-        } catch (e) { console.error("Failed to send enquiry:", e); }
-    };
+
 
     const updateEnquiries = (newEnquiries) => {
         setContent(prev => ({ ...prev, enquiries: newEnquiries }));

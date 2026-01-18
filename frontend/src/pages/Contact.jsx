@@ -6,7 +6,51 @@ import EmailServiceSelector from '../components/EmailServiceSelector';
 
 export default function Contact() {
     const { addEnquiry, content } = useContent(); // Destructure content
-    // ...
+
+    const [emailModalOpen, setEmailModalOpen] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        company: '',
+        service: '',
+        budget: '',
+        timeline: '',
+        message: '',
+        vibes: [],
+        vibeDescription: ''
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const toggleVibe = (vibe) => {
+        setFormData(prev => {
+            const vibes = prev.vibes.includes(vibe)
+                ? prev.vibes.filter(v => v !== vibe)
+                : [...prev.vibes, vibe];
+            return { ...prev, vibes };
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!addEnquiry) {
+            alert("Error: Enquiry function not available. Please try again later.");
+            return;
+        }
+        const success = await addEnquiry(formData);
+        if (success) {
+            alert("Enquiry sent successfully! We'll be in touch.");
+            setFormData({
+                name: '', email: '', company: '', service: '', budget: '', timeline: '', message: '', vibes: [], vibeDescription: ''
+            });
+        } else {
+            alert("Failed to send enquiry. Please try again or email us directly.");
+        }
+    };
+
     // Vibe Keywords ( Dynamic with fallback )
     const VIBES = (content.vibes && content.vibes.length > 0)
         ? content.vibes.map(v => v.label || v)

@@ -527,7 +527,9 @@ const Admin = () => {
         updateLegalContent,
         updateSiteImage,
         undo, redo, canUndo, canRedo, takeSnapshot,
-        refreshVibes // Added refreshVibes
+        refreshVibes, // Added refreshVibes
+        addVibe,
+        removeVibe
     } = useContent();
 
     const [activeTab, setActiveTab] = useState('enquiries');
@@ -1515,8 +1517,8 @@ const Admin = () => {
                                                                     <div><strong>Budget:</strong> {item.budget || 'N/A'}</div>
                                                                     <div><strong>Timeline:</strong> {item.timeline || 'N/A'}</div>
 
-                                                                    {/* Display Vibe if present */}
-                                                                    {item.vibes && (
+                                                                    {/* VIBES DISPLAY */}
+                                                                    {item.vibes && item.vibes.length > 0 && (
                                                                         <div style={{ gridColumn: '1 / -1' }}>
                                                                             <strong>Vibes:</strong>
                                                                             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
@@ -1613,6 +1615,27 @@ const Admin = () => {
                                                     <div><strong>Company:</strong> {item.company || 'N/A'}</div>
                                                     <div><strong>Budget:</strong> {item.budget || 'N/A'}</div>
                                                     <div><strong>Timeline:</strong> {item.timeline || 'N/A'}</div>
+
+                                                    {/* MOBILE VIBES DISPLAY */}
+                                                    {item.vibes && item.vibes.length > 0 && (
+                                                        <div style={{ marginTop: '0.5rem' }}>
+                                                            <strong>Vibes:</strong>
+                                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginTop: '5px' }}>
+                                                                {item.vibes.map(v => (
+                                                                    <span key={v} style={{ backgroundColor: 'var(--color-electric-blue)', color: 'white', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem' }}>
+                                                                        {v}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {item.vibeDescription && (
+                                                        <div style={{ marginTop: '0.5rem' }}>
+                                                            <strong>Vibe Details:</strong>
+                                                            <p style={{ margin: '5px 0', fontSize: '0.9rem', fontStyle: 'italic', color: '#555' }}>"{item.vibeDescription}"</p>
+                                                        </div>
+                                                    )}
+
                                                     <div style={{ marginTop: '0.5rem' }}>
                                                         <strong>Message:</strong>
                                                         <p style={{ backgroundColor: 'white', padding: '0.5rem' }}>{item.message}</p>

@@ -30,10 +30,25 @@ connectDB();
 
 const app = express();
 
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:5174', // Sometimes vite switches ports
+    'https://bloom-branding-3bdab.web.app',
+    'https://bloom-branding-3bdab.firebaseapp.com',
+    process.env.FRONTEND_URL
+].filter(Boolean);
 
 app.use(cors({
-    origin: FRONTEND_URL,
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            console.warn(`Blocked by CORS: ${origin}`);
+            callback(null, true); // TEMPORARILY ALLOW ALL TO DEBUG PRODUCTION
+        }
+    },
     credentials: true
 }));
 app.use(express.json());

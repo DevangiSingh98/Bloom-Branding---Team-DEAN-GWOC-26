@@ -4,7 +4,8 @@ import Message from '../models/Message.js';
 // @route   POST /api/messages
 // @access  Public
 const createMessage = async (req, res) => {
-    const { name, email, subject, message, company, service, budget, timeline } = req.body;
+    // Destructure vibes and vibeDescription as well
+    const { name, email, subject, message, company, service, budget, timeline, vibes, vibeDescription } = req.body;
 
     try {
         const msg = new Message({
@@ -15,7 +16,9 @@ const createMessage = async (req, res) => {
             company,
             service,
             budget,
-            timeline
+            timeline,
+            vibes,             // Pass to model
+            vibeDescription    // Pass to model
         });
 
         const createdMessage = await msg.save();

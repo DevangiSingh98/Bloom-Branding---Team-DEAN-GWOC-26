@@ -74,22 +74,30 @@ export const generateIdeas = async (req, res) => {
         let text;
 
         try {
-            // Use Gemini 1.5 Flash (Most efficient and stable for tasks)
+            // PRIMARY: Use Gemini 1.5 Flash (Fast & Efficient)
             model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", safetySettings });
             const result = await model.generateContent(prompt);
             text = result.response.text();
         } catch (flashError) {
-            console.warn("Gemini 1.5 Flash failed, trying gemini-pro...", flashError.message);
-            // Fallback
-            model = genAI.getGenerativeModel({ model: "gemini-pro", safetySettings });
-            const result = await model.generateContent(prompt);
-            text = result.response.text();
+            console.warn("Gemini 1.5 Flash failed:", flashError.message);
+
+            try {
+                // FALLBACK: Use Gemini 1.5 Pro (Higher capability) instead of deprecated gemini-pro
+                console.log("Attempting fallback to gemini-1.5-pro...");
+                model = genAI.getGenerativeModel({ model: "gemini-1.5-pro", safetySettings });
+                const result = await model.generateContent(prompt);
+                text = result.response.text();
+            } catch (proError) {
+                // If both fail, throw a combined error so we debug the ROOT cause (Flash error)
+                throw new Error(`Primary(Flash) Error: ${flashError.message} | Fallback(Pro) Error: ${proError.message}`);
+            }
         }
 
         console.log("Gemini Response Success");
         res.json({ ideas: text });
 
     } catch (error) {
+        // ... (rest of catch block)
         console.error("AI Generation Error Details (FULL):", JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
 
         let userMessage = "Failed to generate ideas.";

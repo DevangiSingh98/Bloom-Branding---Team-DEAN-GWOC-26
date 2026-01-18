@@ -136,7 +136,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/version', (req, res) => {
-    res.json({ version: '1.3.0', timestamp: new Date().toISOString(), note: 'Dynamic Import Fix' });
+    res.json({ version: '1.4.0', timestamp: new Date().toISOString(), note: 'AI Model Fix' });
 });
 
 // Error Handling Middleware (Must be last)

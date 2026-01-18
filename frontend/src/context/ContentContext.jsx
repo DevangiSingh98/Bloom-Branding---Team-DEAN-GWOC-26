@@ -1297,7 +1297,14 @@ export const ContentProvider = ({ children }) => {
             });
             if (res.ok) {
                 const data = await res.json();
-                setContent(prev => ({ ...prev, enquiries: data || [] }));
+                const formatted = Array.isArray(data) ? data.map((msg, idx) => ({
+                    ...msg,
+                    id: msg._id || `enquiry-${idx}`,
+                    service: msg.service || 'General',
+                    date: new Date(msg.createdAt).toLocaleDateString(),
+                    time: new Date(msg.createdAt).toLocaleTimeString(),
+                })) : [];
+                setContent(prev => ({ ...prev, enquiries: formatted }));
             }
         } catch (e) {
             console.error("Failed to refresh enquiries", e);

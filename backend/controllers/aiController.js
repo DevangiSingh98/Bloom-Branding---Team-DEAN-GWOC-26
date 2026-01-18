@@ -69,14 +69,14 @@ export const generateIdeas = async (req, res) => {
         let text;
 
         try {
-            // Try Flash Latest first (Proven to work)
-            model = genAI.getGenerativeModel({ model: "gemini-flash-latest", safetySettings });
+            // Use Gemini 1.5 Flash (Most efficient and stable for tasks)
+            model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", safetySettings });
             const result = await model.generateContent(prompt);
             text = result.response.text();
         } catch (flashError) {
-            console.warn("Gemini Flash Latest failed, trying gemini-pro-latest...", flashError.message);
+            console.warn("Gemini 1.5 Flash failed, trying gemini-pro...", flashError.message);
             // Fallback
-            model = genAI.getGenerativeModel({ model: "gemini-pro-latest", safetySettings });
+            model = genAI.getGenerativeModel({ model: "gemini-pro", safetySettings });
             const result = await model.generateContent(prompt);
             text = result.response.text();
         }

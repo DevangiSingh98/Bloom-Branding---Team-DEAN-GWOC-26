@@ -663,41 +663,9 @@ const Admin = () => {
     // Fetch Enquiries when tab is active and user is logged in
     useEffect(() => {
         if (activeTab === 'enquiries' && userInfo && userInfo.token) {
-            const fetchEnquiries = async () => {
-                try {
-                    const res = await fetch(`${API_URL}/api/messages`, {
-                        headers: {
-                            Authorization: `Bearer ${userInfo.token}`
-                        }
-                    });
-                    if (res.ok) {
-                        const data = await res.json();
-                        // Format msg for UI: backend fields -> UI fields
-                        const formatted = data.map(msg => ({
-                            id: msg._id,
-                            name: msg.name,
-                            email: msg.email,
-                            message: msg.message,
-                            service: msg.service || 'General',
-                            company: msg.company,
-                            budget: msg.budget,
-                            timeline: msg.timeline,
-                            vibes: msg.vibes, // Added
-                            vibeDescription: msg.vibeDescription, // Added
-                            date: new Date(msg.createdAt).toLocaleDateString(),
-                            time: new Date(msg.createdAt).toLocaleTimeString(),
-                            read: msg.read
-                        }));
-                        // Backend already sorts by createdAt: -1 (newest first), so no need to reverse
-                        updateEnquiries(formatted);
-                    }
-                } catch (e) {
-                    console.error("Failed to fetch enquiries", e);
-                }
-            };
-            fetchEnquiries();
+            refreshEnquiries(userInfo.token);
         }
-    }, [activeTab, userInfo]); // Removed updateEnquiries from deps to avoid loop if unstable
+    }, [activeTab, userInfo]);
 
     // Custom Modal State
     const [modal, setModal] = useState({ show: false, title: '', message: '', type: 'info', onConfirm: () => { }, confirmText: '', confirmColor: '' });

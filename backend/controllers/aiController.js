@@ -1,4 +1,5 @@
 import { withRetry } from '../utils/aiRetry.js';
+import { aiQueue } from '../utils/aiQueue.js';
 
 // @desc    Generate ideas based on enquiry
 // @route   POST /api/ai/generate
@@ -71,47 +72,48 @@ export const generateIdeas = async (req, res) => {
             },
         ];
 
-        let text;
-
-        try {
-            // PRIMARY: Use Gemini 1.5 Flash (Known higher stability)
-            const primaryModelName = "gemini-1.5-flash";
-            console.log(`Using primary model: ${primaryModelName} (with max retry)`);
-
-            text = await withRetry(async () => {
-                const model = genAI.getGenerativeModel({ model: primaryModelName, safetySettings });
-                const result = await model.generateContent(prompt);
-                return result.response.text();
-            }, 4, 2000); // 4 retries, starting at 2s delay (up to 30s)
-        } catch (flashError) {
-            console.warn("Primary 1.5 Flash failed after retries:", flashError.message);
-
+        // QUEUE WRAPPER: Serialize requests to avoid concurrent rate limits
+        text = await aiQueue.add(async () => {
             try {
-                // FALLBACK 1: Gemini 2.0 Flash
-                const fallback1Name = "gemini-2.0-flash";
-                console.log(`Attempting fallback to ${fallback1Name} (with retry)...`);
+                // PRIMARY: Use Gemini 1.5 Flash (Known higher stability)
+                const primaryModelName = "gemini-1.5-flash";
+                console.log(`Using primary model: ${primaryModelName} (with max retry)`);
 
-                text = await withRetry(async () => {
-                    const model = genAI.getGenerativeModel({ model: fallback1Name, safetySettings });
+                return await withRetry(async () => {
+                    const model = genAI.getGenerativeModel({ model: primaryModelName, safetySettings });
                     const result = await model.generateContent(prompt);
                     return result.response.text();
-                }, 3, 2000);
-            } catch (fallback1Error) {
-                try {
-                    // FALLBACK 2: Gemini 1.5 Pro
-                    const fallback2Name = "gemini-1.5-pro";
-                    console.log(`Attempting fallback to ${fallback2Name} (with retry)...`);
+                }, 4, 3000); // 4 retries, starting at 3s delay (up to 45s)
+            } catch (flashError) {
+                console.warn("Primary 1.5 Flash failed after retries:", flashError.message);
 
-                    text = await withRetry(async () => {
-                        const model = genAI.getGenerativeModel({ model: fallback2Name, safetySettings });
+                try {
+                    // FALLBACK 1: Gemini 2.0 Flash
+                    const fallback1Name = "gemini-2.0-flash";
+                    console.log(`Attempting fallback to ${fallback1Name} (with retry)...`);
+
+                    return await withRetry(async () => {
+                        const model = genAI.getGenerativeModel({ model: fallback1Name, safetySettings });
                         const result = await model.generateContent(prompt);
                         return result.response.text();
-                    }, 2, 3000);
-                } catch (fallback2Error) {
-                    throw new Error(`Primary(${flashError.message}) | Fallback1(${fallback1Error.message}) | Fallback2(${fallback2Error.message})`);
+                    }, 3, 3000);
+                } catch (fallback1Error) {
+                    try {
+                        // FALLBACK 2: Gemini 1.5 Pro
+                        const fallback2Name = "gemini-1.5-pro";
+                        console.log(`Attempting fallback to ${fallback2Name} (with retry)...`);
+
+                        return await withRetry(async () => {
+                            const model = genAI.getGenerativeModel({ model: fallback2Name, safetySettings });
+                            const result = await model.generateContent(prompt);
+                            return result.response.text();
+                        }, 2, 5000);
+                    } catch (fallback2Error) {
+                        throw new Error(`Primary(${flashError.message}) | Fallback1(${fallback1Error.message}) | Fallback2(${fallback2Error.message})`);
+                    }
                 }
             }
-        }
+        });
 
         console.log("Gemini Response Success");
         res.json({ ideas: text });

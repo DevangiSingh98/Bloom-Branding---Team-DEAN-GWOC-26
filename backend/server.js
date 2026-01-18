@@ -159,7 +159,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/version', (req, res) => {
-    res.json({ version: '1.6.4', timestamp: new Date().toISOString(), note: 'AI Resilience Update (Extended Retries)' });
+    res.json({ version: '1.6.5', timestamp: new Date().toISOString(), note: 'AI Queue Integration (Global Rate Limit)' });
 });
 
 // Error Handling Middleware (Must be last)

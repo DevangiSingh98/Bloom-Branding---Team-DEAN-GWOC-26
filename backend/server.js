@@ -135,6 +135,10 @@ app.get('/', (req, res) => {
     res.send('API is running...');
 });
 
+app.get('/version', (req, res) => {
+    res.json({ version: '1.2.0', timestamp: new Date().toISOString(), note: 'AI Stub Active' });
+});
+
 // Error Handling Middleware (Must be last)
 app.use(notFound);
 app.use(errorHandler);

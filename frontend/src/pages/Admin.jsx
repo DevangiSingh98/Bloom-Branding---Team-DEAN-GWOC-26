@@ -1274,7 +1274,7 @@ const Admin = () => {
 
             <div className="admin-header-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                    <h1 className="admin-header-title">Admin Dashboard</h1>
+                    <h1 className="admin-header-title">Admin Dashboard (v1.1)</h1>
                     <span className="admin-saved-message">
                         ✓ Changes auto-saved to Database
                     </span>

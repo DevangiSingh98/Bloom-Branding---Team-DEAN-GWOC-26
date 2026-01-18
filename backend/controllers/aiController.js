@@ -99,6 +99,9 @@ export const generateIdeas = async (req, res) => {
             return res.status(429).json({ message: userMessage, error: error.message });
         }
 
+        // DEBUG: Expose full error
+        userMessage = `${userMessage} Raw Error: ${error.message}`;
+
         res.status(500).json({
             message: userMessage,
             error: error.message

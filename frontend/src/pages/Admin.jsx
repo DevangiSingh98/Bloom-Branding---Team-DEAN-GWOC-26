@@ -555,7 +555,7 @@ const Admin = () => {
             const fetchClients = async () => {
                 try {
                     const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
-                    const { data } = await axios.get('/api/users', config);
+                    const { data } = await axios.get(`${API_URL}/api/users`, config);
                     const safeData = Array.isArray(data) ? data : [];
                     setClients(safeData);
                     setFilteredClients(safeData);
@@ -623,7 +623,7 @@ const Admin = () => {
         setAiError(prev => ({ ...prev, [enquiry.id]: null })); // Clear prev errors
         try {
             console.log("Generating ideas for:", enquiry.company);
-            const { data } = await axios.post('/api/ai/generate', {
+            const { data } = await axios.post(`${API_URL}/api/ai/generate`, {
                 service: enquiry.service,
                 message: enquiry.message,
                 company: enquiry.company,
@@ -636,11 +636,26 @@ const Admin = () => {
             console.log("AI Response:", data);
             setAiIdeas(prev => ({ ...prev, [enquiry.id]: data.ideas }));
         } catch (error) {
-            console.error("AI Generation Failed:", error);
-            const msg = error.response && error.response.data && error.response.data.message
-                ? error.response.data.message
-                : "Failed to generate ideas.";
-            setAiError(prev => ({ ...prev, [enquiry.id]: msg }));
+            console.error("AI Generation Failed Details:", error);
+            let msg = "Failed to generate ideas.";
+
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                if (error.response.data && error.response.data.message) {
+                    msg = error.response.data.message;
+                } else {
+                    msg = `Server Error: ${error.response.status} ${error.response.statusText}`;
+                }
+            } else if (error.request) {
+                // The request was made but no response was received
+                msg = "No response from server. Check connection.";
+            } else {
+                // Something happened in setting up the request
+                msg = error.message;
+            }
+
+            setAiError(prev => ({ ...prev, [enquiry.id]: msg + (error.message ? ` (${error.message})` : '') }));
         } finally {
             setLoadingAi(null);
         }

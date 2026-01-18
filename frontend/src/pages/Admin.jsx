@@ -2234,22 +2234,7 @@ const Admin = () => {
                                     onUpload={uploadFile}
                                     pathPrefix="site_assets"
                                 />
-                                <FileUpload
-                                    label="Testimonial Decor (Left Flower)"
-                                    value={content.siteImages?.testimonial_decor_left || ''}
-                                    onFileSelect={(val) => updateSiteImage('testimonial_decor_left', 'Home', 'Testimonial Left Decor', val, userInfo.token)}
-                                    onRemove={() => updateSiteImage('testimonial_decor_left', 'Home', 'Testimonial Left Decor', '', userInfo.token)}
-                                    onUpload={uploadFile}
-                                    pathPrefix="site_assets"
-                                />
-                                <FileUpload
-                                    label="Testimonial Decor (Right Flower)"
-                                    value={content.siteImages?.testimonial_decor_right || ''}
-                                    onFileSelect={(val) => updateSiteImage('testimonial_decor_right', 'Home', 'Testimonial Right Decor', val, userInfo.token)}
-                                    onRemove={() => updateSiteImage('testimonial_decor_right', 'Home', 'Testimonial Right Decor', '', userInfo.token)}
-                                    onUpload={uploadFile}
-                                    pathPrefix="site_assets"
-                                />
+
                             </div>
 
                             {/* About Page */}
@@ -2275,14 +2260,6 @@ const Admin = () => {
                             {/* Navbar / Menu Icons */}
                             <div className="admin-card">
                                 <h3>Navbar / Menu Icons</h3>
-                                <FileUpload
-                                    label="Main Navbar Logo"
-                                    value={content.siteImages?.navbar_logo || ''}
-                                    onFileSelect={(val) => updateSiteImage('navbar_logo', 'Navbar', 'Main Navbar Logo', val, userInfo.token)}
-                                    onRemove={() => updateSiteImage('navbar_logo', 'Navbar', 'Main Navbar Logo', '', userInfo.token)}
-                                    onUpload={uploadFile}
-                                    pathPrefix="site_assets"
-                                />
                                 {[
                                     { k: 'menu_home', l: 'Menu: Home Icon' },
                                     { k: 'menu_ourstory', l: 'Menu: Our Story Icon' },
@@ -2396,7 +2373,7 @@ const Admin = () => {
                 )}
 
                 {/* CLIENTS TAB */}
-                {activeTab === 'Clients' && (
+                {activeTab === 'clients' && (
                     <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                             <h2 style={{ fontFamily: 'var(--font-brand)', fontSize: '2rem', margin: 0 }}>Client Users</h2>

@@ -68,16 +68,21 @@ export const generateIdeas = async (req, res) => {
         let text;
 
         try {
-            // Try Flash first
-            model = genAI.getGenerativeModel({ model: "gemini-1.5-flash", safetySettings });
-            const result = await model.generateContent(prompt);
-            text = result.response.text();
-        } catch (flashError) {
-            console.warn("Gemini 1.5 Flash failed, trying gemini-pro...", flashError.message);
-            // Fallback
+            // Use gemini-pro as primary for stability
+            console.log("Using model: gemini-pro");
             model = genAI.getGenerativeModel({ model: "gemini-pro", safetySettings });
             const result = await model.generateContent(prompt);
             text = result.response.text();
+        } catch (error) {
+            console.warn("Primary model failed, trying fallback...", error.message);
+            // Fallback (try same or varied)
+            try {
+                model = genAI.getGenerativeModel({ model: "gemini-1.0-pro", safetySettings });
+                const result = await model.generateContent(prompt);
+                text = result.response.text();
+            } catch (fallbackError) {
+                throw new Error(`All AI models failed. Main: ${error.message}`);
+            }
         }
 
         console.log("Gemini Response Success");

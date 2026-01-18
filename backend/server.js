@@ -4,6 +4,7 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import session from 'express-session';
+import MongoStore from 'connect-mongo';
 import passport from 'passport';
 import './config/passport.js';
 
@@ -59,7 +60,10 @@ app.use(express.json());
 app.use(session({
     secret: process.env.JWT_SECRET || 'secret', // Use JWT_SECRET for session secret
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URI,
+    })
 }));
 
 app.use(passport.initialize());

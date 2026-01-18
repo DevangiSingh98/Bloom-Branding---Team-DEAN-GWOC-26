@@ -74,28 +74,28 @@ export const generateIdeas = async (req, res) => {
         let text;
 
         try {
-            // PRIMARY: Use Gemini 2.0 Flash (Stable)
-            const primaryModelName = "gemini-2.0-flash";
-            console.log(`Using primary model: ${primaryModelName} (with retry)`);
+            // PRIMARY: Use Gemini 1.5 Flash (Known higher stability)
+            const primaryModelName = "gemini-1.5-flash";
+            console.log(`Using primary model: ${primaryModelName} (with max retry)`);
 
             text = await withRetry(async () => {
                 const model = genAI.getGenerativeModel({ model: primaryModelName, safetySettings });
                 const result = await model.generateContent(prompt);
                 return result.response.text();
-            });
+            }, 4, 2000); // 4 retries, starting at 2s delay (up to 30s)
         } catch (flashError) {
-            console.warn("Primary Flash failed after retries:", flashError.message);
+            console.warn("Primary 1.5 Flash failed after retries:", flashError.message);
 
             try {
-                // FALLBACK 1: Standard Gemini 1.5 Flash (Higher limit)
-                const fallback1Name = "gemini-1.5-flash";
+                // FALLBACK 1: Gemini 2.0 Flash
+                const fallback1Name = "gemini-2.0-flash";
                 console.log(`Attempting fallback to ${fallback1Name} (with retry)...`);
 
                 text = await withRetry(async () => {
                     const model = genAI.getGenerativeModel({ model: fallback1Name, safetySettings });
                     const result = await model.generateContent(prompt);
                     return result.response.text();
-                });
+                }, 3, 2000);
             } catch (fallback1Error) {
                 try {
                     // FALLBACK 2: Gemini 1.5 Pro
@@ -106,7 +106,7 @@ export const generateIdeas = async (req, res) => {
                         const model = genAI.getGenerativeModel({ model: fallback2Name, safetySettings });
                         const result = await model.generateContent(prompt);
                         return result.response.text();
-                    });
+                    }, 2, 3000);
                 } catch (fallback2Error) {
                     throw new Error(`Primary(${flashError.message}) | Fallback1(${fallback1Error.message}) | Fallback2(${fallback2Error.message})`);
                 }

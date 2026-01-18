@@ -136,7 +136,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/version', (req, res) => {
-    res.json({ version: '1.6.3', timestamp: new Date().toISOString(), note: 'AI Retry & Model Stability Update (Force v3)' });
+    res.json({ version: '1.6.4', timestamp: new Date().toISOString(), note: 'AI Resilience Update (Extended Retries)' });
 });
 
 // Error Handling Middleware (Must be last)

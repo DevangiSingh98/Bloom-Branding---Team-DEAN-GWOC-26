@@ -4,7 +4,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const VaultLogin = () => {
-    const API_URL = import.meta.env.VITE_API_URL || '';
+    const API_URL = import.meta.env.VITE_API_URL ||
+        (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://bloom-backend-pq68.onrender.com');
     const navigate = useNavigate();
     const [isSignUp, setIsSignUp] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -56,7 +57,12 @@ const VaultLogin = () => {
             const { data } = await axios.post(url, payload, config);
             localStorage.setItem('clientInfo', JSON.stringify(data)); // Legacy use
             localStorage.setItem('userInfo', JSON.stringify(data)); // Admin use compatibility
-            navigate('/vault');
+
+            // Personalized Redirect
+            const dashboardPath = data.companyName
+                ? `/vault/${encodeURIComponent(data.companyName.toLowerCase().replace(/\s+/g, '-'))}`
+                : '/vault';
+            navigate(dashboardPath);
 
         } catch (error) {
             setError(error.response?.data?.message || error.message);

@@ -87,6 +87,7 @@ function AnimatedRoutes() {
                 <Route path="/brands" element={<Brands />} />
                 <Route path="/client-login" element={<VaultLogin />} /> {/* Updated to use VaultLogin */}
                 <Route path="/vault" element={<ClientDashboard />} />
+                <Route path="/vault/:companyName" element={<ClientDashboard />} />
                 <Route path="/vault/login" element={<VaultLogin />} /> {/* New Route */}
                 <Route path="/reset-password/:token" element={<ClientResetPassword />} />
             </Routes>

@@ -431,8 +431,9 @@ export const ContentProvider = ({ children }) => {
     const canUndo = historyIndex >= 0;
     const canRedo = historyIndex < history.length - 1;
 
-    // Use environment variable for API URL, fallback to localhost for dev
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    // Use environment variable for API URL, fallback to localhost for dev or production URL for deployed
+    const API_BASE_URL = import.meta.env.VITE_API_URL ||
+        (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://bloom-backend-pq68.onrender.com');
 
     // 1. Fetch live projects from MongoDB on mount
     useEffect(() => {

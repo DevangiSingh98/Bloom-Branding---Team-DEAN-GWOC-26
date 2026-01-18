@@ -31,7 +31,9 @@ connectDB();
 
 const app = express();
 app.set('trust proxy', 1); // Trust first, necessary for Render/Heroku
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const FRONTEND_URL = (process.env.NODE_ENV === 'production' || process.env.RENDER)
+    ? 'https://bloom-branding-3bdab.web.app'
+    : (process.env.FRONTEND_URL || 'http://localhost:5173');
 
 const allowedOrigins = [
     'http://localhost:5173',
@@ -86,7 +88,7 @@ app.use('/api/hero', heroRoutes);
 app.use('/api/site-images', siteImageRoutes);
 app.use('/api/vibes', vibeRoutes); // Register Vibes
 app.use('/api/legal', legalRoutes);
-app.use('/api/legal', legalRoutes);
+
 app.use('/api/ai', aiRoutes);
 app.use('/api/assets', assetRoutes);
 
@@ -97,9 +99,11 @@ app.get('/auth/google-callback',
     passport.authenticate('google', { failureRedirect: `${FRONTEND_URL}/vault/login?error=true` }),
     (req, res) => {
         // Successful authentication
-        // In a real production app, generate a JWT token here and pass it via URL (or cookie)
-        // For now, we redirect to frontend with a flag, and frontend will fetch user data
-        res.redirect(`${FRONTEND_URL}/vault?login=success`);
+        // Redirect to personalized vault if companyName exists
+        const personalizedPath = req.user.companyName
+            ? `/vault/${encodeURIComponent(req.user.companyName.toLowerCase().replace(/\s+/g, '-'))}`
+            : '/vault';
+        res.redirect(`${FRONTEND_URL}${personalizedPath}?login=success`);
     }
 );
 

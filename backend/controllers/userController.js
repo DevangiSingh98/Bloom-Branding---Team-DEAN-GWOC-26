@@ -108,13 +108,14 @@ const registerUser = async (req, res) => {
 // @route   POST /api/users/forgotpassword
 // @access  Public
 const forgotPassword = async (req, res) => {
-    const { email } = req.body;
+    let { email } = req.body;
+    if (email) email = email.toLowerCase().trim();
 
     try {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: 'User with this email does not exist' });
         }
 
         // Generate Reset Token
@@ -132,9 +133,15 @@ const forgotPassword = async (req, res) => {
         await user.save();
 
         // Create Reset URL
-        // Create Reset URL
-        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-        const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
+        const frontendUrl = (process.env.NODE_ENV === 'production' || process.env.RENDER)
+            ? 'https://bloom-branding-3bdab.web.app'
+            : (process.env.FRONTEND_URL || 'http://localhost:5173');
+
+        // Check origin for different redirect paths
+        const origin = req.body.origin || 'vault';
+        const resetUrl = origin === 'admin'
+            ? `${frontendUrl}/admin?resetToken=${resetToken}`
+            : `${frontendUrl}/reset-password/${resetToken}`;
 
         const message = `You are receiving this email because you (or someone else) has requested the reset of a password. \n\n
 Please click on the following link to reset your password:\n\n
@@ -152,13 +159,14 @@ If you did not request this, please ignore this email.`;
 
             res.status(200).json({ success: true, data: 'Email sent' });
         } catch (err) {
-            console.error(err);
+            console.error('SEND EMAIL ERROR:', err);
             user.resetPasswordToken = undefined;
             user.resetPasswordExpire = undefined;
             await user.save();
-            return res.status(500).json({ message: 'Email could not be sent' });
+            return res.status(500).json({ message: 'Email could not be sent: ' + err.message });
         }
     } catch (error) {
+        console.error('FORGOT PASSWORD ERROR:', error);
         res.status(500).json({ message: error.message });
     }
 };

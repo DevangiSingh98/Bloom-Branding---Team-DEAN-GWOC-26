@@ -4,7 +4,8 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 
 const ClientResetPassword = () => {
-    const API_URL = import.meta.env.VITE_API_URL || '';
+    const API_URL = import.meta.env.VITE_API_URL ||
+        (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://bloom-backend-pq68.onrender.com');
     const { token } = useParams();
     const navigate = useNavigate();
     const [password, setPassword] = useState('');

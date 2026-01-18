@@ -392,7 +392,8 @@ const InstagramPreview = ({ item }) => {
 };
 
 const Admin = () => {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL ||
+        (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://bloom-backend-pq68.onrender.com');
     // Auth State
     const [userInfo, setUserInfo] = useState(() => {
         const saved = localStorage.getItem('userInfo');
@@ -407,6 +408,7 @@ const Admin = () => {
     const [resetToken, setResetToken] = useState('');
     const [resetData, setResetData] = useState({ newPassword: '', confirmPassword: '' });
     const [resetMessage, setResetMessage] = useState({ type: '', text: '' });
+    const [isLoading, setIsLoading] = useState(false);
     const [showPreview, setShowPreview] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
@@ -420,7 +422,7 @@ const Admin = () => {
             const res = await fetch(`${API_URL}/api/users/forgotpassword`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: resetEmail })
+                body: JSON.stringify({ email: resetEmail, origin: 'admin' })
             });
             const data = await res.json();
 
@@ -448,12 +450,11 @@ const Admin = () => {
 
         setIsLoading(true);
         try {
-            const res = await fetch(`${API_URL}/api/users/resetpassword`, {
-                method: 'POST',
+            const res = await fetch(`${API_URL}/api/users/resetpassword/${resetToken}`, {
+                method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    resetToken: resetToken,
-                    newPassword: resetData.newPassword
+                    password: resetData.newPassword
                 })
             });
             const data = await res.json();
@@ -2256,27 +2257,7 @@ const Admin = () => {
                                 ))}
                             </div>
 
-                            {/* Navbar / Menu Icons */}
-                            <div className="admin-card">
-                                <h3>Navbar / Menu Icons</h3>
-                                {[
-                                    { k: 'menu_home', l: 'Menu: Home Icon' },
-                                    { k: 'menu_ourstory', l: 'Menu: Our Story Icon' },
-                                    { k: 'menu_services', l: 'Menu: Services Icon' },
-                                    { k: 'menu_work', l: 'Menu: Works Icon' },
-                                    { k: 'menu_contact', l: 'Menu: Contact Icon' }
-                                ].map(s => (
-                                    <FileUpload
-                                        key={s.k}
-                                        label={s.l}
-                                        value={content.siteImages?.[s.k] || ''}
-                                        onFileSelect={(val) => updateSiteImage(s.k, 'Navbar', s.l, val, userInfo.token)}
-                                        onRemove={() => updateSiteImage(s.k, 'Navbar', s.l, '', userInfo.token)}
-                                        onUpload={uploadFile}
-                                        pathPrefix="site_assets"
-                                    />
-                                ))}
-                            </div>
+                            {/* Navbar / Menu Icons - REMOVED (Static/Cloud only) */}
                         </div>
                     </div>
                 )}

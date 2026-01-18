@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Footer from '../components/Footer';
 
 const ClientDashboard = () => {
-    const API_URL = import.meta.env.VITE_API_URL || '';
+    const API_URL = import.meta.env.VITE_API_URL ||
+        (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://bloom-backend-pq68.onrender.com');
     const navigate = useNavigate();
     const [clientInfo, setClientInfo] = useState(null);
     const [assets, setAssets] = useState([]);
@@ -80,7 +81,7 @@ const ClientDashboard = () => {
             // Fetch Assets
             try {
                 const config = { headers: { Authorization: `Bearer ${user.token}` } };
-                const { data } = await axios.get('/api/assets', config);
+                const { data } = await axios.get(`${API_URL}/api/assets`, config);
                 setAssets(data);
             } catch (error) {
                 console.error("Failed to fetch assets", error);

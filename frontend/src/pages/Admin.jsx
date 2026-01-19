@@ -769,8 +769,8 @@ const Admin = () => {
         // Fetch existing assets
         try {
             const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
-            const { data } = await axios.get(`/api/assets?userId=${client._id}`, config);
-            setClientAssets(data);
+            const { data } = await axios.get(`${API_URL}/api/assets?userId=${client._id}`, config);
+            setClientAssets(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error("Failed to fetch assets", error);
             alert("Could not load assets.");
@@ -781,7 +781,7 @@ const Admin = () => {
         if (!window.confirm("Delete this asset?")) return;
         try {
             const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
-            await axios.delete(`/api/assets/${assetId}`, config);
+            await axios.delete(`${API_URL}/api/assets/${assetId}`, config);
             setClientAssets(prev => prev.filter(a => a._id !== assetId));
         } catch (error) {
             console.error("Failed to delete asset", error);
@@ -838,7 +838,7 @@ const Admin = () => {
                     size: file.size
                 };
 
-                const { data: newAsset } = await axios.post('/api/assets', assetData, {
+                const { data: newAsset } = await axios.post(`${API_URL}/api/assets`, assetData, {
                     headers: { Authorization: `Bearer ${userInfo.token}` }
                 });
                 return newAsset;
@@ -1464,7 +1464,7 @@ const Admin = () => {
                                                     <input
                                                         type="checkbox"
                                                         onChange={handleSelectAll}
-                                                        checked={content.enquiries.length > 0 && selectedEnquiries.size === content.enquiries.length}
+                                                        checked={Array.isArray(content.enquiries) && content.enquiries.length > 0 && selectedEnquiries.size === content.enquiries.length}
                                                         style={{ cursor: 'pointer', transform: 'scale(1.2)' }}
                                                     />
                                                 </th>
@@ -1476,7 +1476,7 @@ const Admin = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {content.enquiries.map((item, index) => (
+                                            {Array.isArray(content.enquiries) && content.enquiries.map((item, index) => (
                                                 <React.Fragment key={item.id || index}>
                                                     <tr style={{ borderBottom: '1px solid #eee', backgroundColor: selectedEnquiries.has(item.id) ? '#e6f7ff' : 'transparent' }}>
                                                         <td style={{ padding: '1rem', textAlign: 'center' }}>
@@ -1538,7 +1538,7 @@ const Admin = () => {
                                                                     <div><strong>Timeline:</strong> {item.timeline || 'N/A'}</div>
 
                                                                     {/* VIBES DISPLAY */}
-                                                                    {item.vibes && item.vibes.length > 0 && (
+                                                                    {item.vibes && Array.isArray(item.vibes) && item.vibes.length > 0 && (
                                                                         <div style={{ gridColumn: '1 / -1' }}>
                                                                             <strong>Vibes:</strong>
                                                                             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>

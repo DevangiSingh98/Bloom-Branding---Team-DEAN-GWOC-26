@@ -443,7 +443,7 @@ export const ContentProvider = ({ children }) => {
                 const response = await fetch(`${API_BASE_URL}/api/projects`);
                 if (response.ok) {
                     const projects = await response.json();
-                    if (projects && projects.length > 0) {
+                    if (Array.isArray(projects) && projects.length > 0) {
                         const mappedProjects = projects.map(p => {
                             // 1. Determine Title Match (Robust)
                             const cleanTitle = p.title.trim();
@@ -477,6 +477,8 @@ export const ContentProvider = ({ children }) => {
                             };
                         });
                         setContent(prev => ({ ...prev, allProjects: mappedProjects }));
+                    } else {
+                        setContent(prev => ({ ...prev, allProjects: defaultContent.allProjects }));
                     }
                 }
 
@@ -493,9 +495,11 @@ export const ContentProvider = ({ children }) => {
                 const iResponse = await fetch(`${API_BASE_URL}/api/instagram`);
                 if (iResponse.ok) {
                     const insta = await iResponse.json();
-                    if (insta && insta.length > 0) {
+                    if (Array.isArray(insta) && insta.length > 0) {
                         const mappedInsta = insta.map(i => ({ ...i, id: i._id }));
                         setContent(prev => ({ ...prev, instagram: mappedInsta }));
+                    } else {
+                        setContent(prev => ({ ...prev, instagram: defaultContent.instagram }));
                     }
                 }
 
@@ -503,7 +507,7 @@ export const ContentProvider = ({ children }) => {
                 const fResponse = await fetch(`${API_BASE_URL}/api/founders`);
                 if (fResponse.ok) {
                     const foundersArr = await fResponse.json();
-                    if (foundersArr && foundersArr.length > 0) {
+                    if (Array.isArray(foundersArr) && foundersArr.length > 0) {
                         const foundersObj = { ...content.founders };
                         foundersArr.forEach(f => {
                             if (f.key && foundersObj[f.key]) {
@@ -518,9 +522,11 @@ export const ContentProvider = ({ children }) => {
                 const vResponse = await fetch(`${API_BASE_URL}/api/values`);
                 if (vResponse.ok) {
                     const values = await vResponse.json();
-                    if (values && values.length > 0) {
+                    if (Array.isArray(values) && values.length > 0) {
                         const mappedValues = values.map(v => ({ ...v, id: v._id }));
                         setContent(prev => ({ ...prev, values: mappedValues }));
+                    } else {
+                        setContent(prev => ({ ...prev, values: defaultContent.values }));
                     }
                 }
 
@@ -528,9 +534,11 @@ export const ContentProvider = ({ children }) => {
                 const cResponse = await fetch(`${API_BASE_URL}/api/brands`);
                 if (cResponse.ok) {
                     const brands = await cResponse.json();
-                    if (brands && brands.length > 0) {
+                    if (Array.isArray(brands) && brands.length > 0) {
                         const mappedBrands = brands.map(c => ({ ...c, id: c._id }));
                         setContent(prev => ({ ...prev, brandLogos: mappedBrands }));
+                    } else {
+                        setContent(prev => ({ ...prev, brandLogos: defaultContent.brandLogos }));
                     }
                 }
 
@@ -538,9 +546,11 @@ export const ContentProvider = ({ children }) => {
                 const wResponse = await fetch(`${API_BASE_URL}/api/selected-work`);
                 if (wResponse.ok) {
                     const work = await wResponse.json();
-                    if (work && work.length > 0) {
+                    if (Array.isArray(work) && work.length > 0) {
                         const mappedWork = work.map(w => ({ ...w, id: w._id }));
                         setContent(prev => ({ ...prev, selectedWork: mappedWork }));
+                    } else {
+                        setContent(prev => ({ ...prev, selectedWork: defaultContent.selectedWork }));
                     }
                 }
 
@@ -564,7 +574,7 @@ export const ContentProvider = ({ children }) => {
                 const pResponse = await fetch(`${API_BASE_URL}/api/projects`);
                 if (pResponse.ok) {
                     const projects = await pResponse.json();
-                    if (projects && projects.length > 0) {
+                    if (Array.isArray(projects) && projects.length > 0) {
                         const mappedProjects = projects.map(p => ({ ...p, id: p._id }));
                         setContent(prev => ({ ...prev, allProjects: mappedProjects })); // Update allProjects
                     }
@@ -584,7 +594,7 @@ export const ContentProvider = ({ children }) => {
                 const sResponse = await fetch(`${API_BASE_URL}/api/services`);
                 if (sResponse.ok) {
                     const servicesData = await sResponse.json();
-                    if (servicesData && servicesData.length > 0) {
+                    if (Array.isArray(servicesData) && servicesData.length > 0) {
                         setContent(prev => ({ ...prev, services: servicesData }));
                     } else {
                         // FIX: If DB is empty, use defaults immediately so Admin isn't empty

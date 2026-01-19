@@ -12,7 +12,9 @@ const sendEmail = async (options) => {
         },
         tls: {
             rejectUnauthorized: false
-        }
+        },
+        connectionTimeout: 15000, // 15 seconds
+        greetingTimeout: 15000,   // 15 seconds
     });
 
     console.log(`[EMAIL SETUP] Host: ${process.env.SMTP_HOST}, Port: ${port}, Secure: ${port == 465}`);
@@ -22,7 +24,6 @@ const sendEmail = async (options) => {
         to: options.email,
         subject: options.subject,
         text: options.message,
-        // html: options.html // Optional: if you want HTML emails later
     };
 
     const info = await transporter.sendMail(message);

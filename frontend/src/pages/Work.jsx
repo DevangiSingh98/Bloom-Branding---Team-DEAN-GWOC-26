@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -127,7 +128,7 @@ const ProjectPanel = ({ project, index, isActive, onClose }) => {
                             initial="hidden" animate="visible" exit="exit"
                             className="project-panel-img-1"
                         >
-                            <img src={images[0]} alt="1" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = project.image; }} />
+                            <img src={images[0]} alt="1" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; if (project.defaultImage) e.target.src = project.defaultImage; }} />
                         </motion.div>
 
                         {/* Img 2: TOP RIGHT (Balancing) */}
@@ -136,7 +137,7 @@ const ProjectPanel = ({ project, index, isActive, onClose }) => {
                             initial="hidden" animate="visible" exit="exit"
                             className="project-panel-img-2"
                         >
-                            <img src={images[1]} alt="2" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = project.image; }} />
+                            <img src={images[1]} alt="2" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; if (project.defaultImage) e.target.src = project.defaultImage; }} />
                         </motion.div>
 
                         {/* Img 3: CENTER BOTTOM (Under Title) */}
@@ -145,7 +146,7 @@ const ProjectPanel = ({ project, index, isActive, onClose }) => {
                             initial="hidden" animate="visible" exit="exit"
                             className="project-panel-img-3"
                         >
-                            <img src={images[2]} alt="3" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = project.image; }} />
+                            <img src={images[2]} alt="3" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; if (project.defaultImage) e.target.src = project.defaultImage; }} />
                         </motion.div>
 
                         {/* Img 4: FAR RIGHT VERTICAL (Optional Anchor) */}
@@ -154,7 +155,7 @@ const ProjectPanel = ({ project, index, isActive, onClose }) => {
                             initial="hidden" animate="visible" exit="exit"
                             className="project-panel-img-4"
                         >
-                            <img src={images[3]} alt="4" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; e.target.src = project.image; }} />
+                            <img src={images[3]} alt="4" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.onerror = null; if (project.defaultImage) e.target.src = project.defaultImage; }} />
                         </motion.div>
 
                     </>
@@ -279,14 +280,39 @@ export default function Work() {
             <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 1.2 }} style={{ position: 'relative', zIndex: 20, paddingTop: '35vh', paddingBottom: '100px' }}>
                 <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '0 5%' }}>
                     <div className="work-grid">
-                        {projects.map((project, index) => (
-                            <motion.div key={index} whileHover={{ scale: 1.02 }} onClick={() => { setInitialSlide(index); setModalOpen(true); }} className="work-grid-item">
-                                <div className="work-grid-item-image-wrapper">
-                                    <img src={project.image} alt={project.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                </div>
-                                <h3 className="work-grid-item-title">{project.title}</h3>
-                            </motion.div>
-                        ))}
+                        {projects.map((project, index) => {
+                            // Robust Image Selection: Prefer project.image, fallback to first item in images array, finally defaultImage
+                            const displayImage = project.image || (project.images && project.images.length > 0 ? project.images[0] : project.defaultImage);
+
+                            return (
+                                <motion.div
+                                    key={project.id || index}
+                                    whileHover={{ scale: 1.02 }}
+                                    onClick={() => { setInitialSlide(index); setModalOpen(true); }}
+                                    className="work-grid-item"
+                                >
+                                    <div className="work-grid-item-image-wrapper">
+                                        <img
+                                            src={displayImage}
+                                            alt={project.title}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                            onError={(e) => {
+                                                e.target.onerror = null;
+                                                // Only fallback if the current src is NOT ALREADY the default image to prevent loops
+                                                if (project.defaultImage && e.target.src !== window.location.origin + project.defaultImage) {
+                                                    e.target.src = project.defaultImage;
+                                                } else {
+                                                    // Ultimate fallback if even default fails (e.g. broken link)
+                                                    e.target.style.display = 'none'; // Or show a placeholder div
+                                                    e.target.parentNode.style.backgroundColor = '#ccc';
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    <h3 className="work-grid-item-title">{project.title}</h3>
+                                </motion.div>
+                            );
+                        })}
                     </div>
                 </div>
             </motion.div>

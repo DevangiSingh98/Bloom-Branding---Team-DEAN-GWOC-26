@@ -376,7 +376,7 @@ const defaultContent = {
 export const ContentProvider = ({ children }) => {
     // Initialize state from localStorage if available, else default (Forcing Refresh)
     const [content, setContent] = useState(() => {
-        const savedContent = localStorage.getItem('bloomContent_v29'); // Bump to v29
+        const savedContent = localStorage.getItem('bloomContent_v31'); // Bump to v31
         console.log("Loading content...", savedContent ? "Found cached" : "Using default");
         const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
         return { ...defaultContent, ...parsed };
@@ -445,21 +445,24 @@ export const ContentProvider = ({ children }) => {
                     const projects = await response.json();
                     if (projects && projects.length > 0) {
                         const mappedProjects = projects.map(p => {
-                            // Smart Merge: If backend has no images (or only empty strings), fallback to defaultContent
-                            const defaultProj = defaultContent.allProjects.find(dp => dp.title === p.title);
+                            // 1. Determine Title Match (Robust)
+                            const cleanTitle = p.title.trim();
+                            const defaultProj = defaultContent.allProjects.find(dp => dp.title.trim().toLowerCase() === cleanTitle.toLowerCase());
 
-                            // Filter empty strings from backend images
-                            const validBackendImages = p.images ? p.images.filter(img => img && img.trim() !== '') : [];
+                            // 2. Determine Primary Image
+                            // Priority: Backend imageUrl -> Default Content Image -> null
+                            let primaryImage = p.imageUrl;
+                            if (!primaryImage && defaultProj) primaryImage = defaultProj.image;
 
-                            let finalImages = [];
-
-                            if (validBackendImages.length > 0) {
-                                finalImages = validBackendImages;
-                            } else if (p.imageUrl) {
-                                // If array is empty but we have a single image, use it
-                                finalImages = [p.imageUrl];
-                            } else if (defaultProj && defaultProj.images) {
-                                finalImages = defaultProj.images;
+                            // 3. Determine Image Array
+                            // Priority: Backend images -> Default Content images -> [Primary Image]
+                            let imageList = [];
+                            if (p.images && p.images.length > 0 && p.images.some(i => i.trim() !== '')) {
+                                imageList = p.images.filter(i => i && i.trim() !== '');
+                            } else if (defaultProj && defaultProj.images && defaultProj.images.length > 0) {
+                                imageList = defaultProj.images;
+                            } else if (primaryImage) {
+                                imageList = [primaryImage];
                             }
 
                             return {
@@ -467,9 +470,10 @@ export const ContentProvider = ({ children }) => {
                                 id: p._id,
                                 title: p.title,
                                 category: p.category,
-                                image: p.imageUrl,
-                                images: finalImages,
-                                description: p.description
+                                image: primaryImage,
+                                images: imageList,
+                                description: p.description,
+                                defaultImage: defaultProj ? defaultProj.image : null,
                             };
                         });
                         setContent(prev => ({ ...prev, allProjects: mappedProjects }));
@@ -763,7 +767,7 @@ export const ContentProvider = ({ children }) => {
     useEffect(() => {
         try {
             const sanitized = sanitizeForStorage(content);
-            localStorage.setItem('bloomContent_v29', JSON.stringify(sanitized));
+            localStorage.setItem('bloomContent_v31', JSON.stringify(sanitized));
         } catch (e) {
             console.error('Failed to save to localStorage:', e);
         }

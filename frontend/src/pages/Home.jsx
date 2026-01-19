@@ -55,55 +55,63 @@ const Counter = ({ to, label }) => {
 
 const BrandRotator = ({ brands }) => {
     const [index, setIndex] = useState(0);
-    const BATCH_SIZE = 15;
+    // Adjusted batch sizes for responsiveness
+    // Mobile: 4 per line * 2 rows = 8? Or just show all? 
+    // User asked "4 in a line min make it smaller". 
+    // Let's scroll through them or just show a grid. 
+    // "The brand logos are in a vertical line one by one which we have make 4 in a line min"
+    // This implies they are currently stacking.
 
-    useEffect(() => {
-        if (!brands || brands.length <= BATCH_SIZE) return;
-
-        const interval = setInterval(() => {
-            setIndex((prev) => (prev + 1) % Math.ceil(brands.length / BATCH_SIZE));
-        }, 4000);
-
-        return () => clearInterval(interval);
-    }, [brands]);
-
-    const visibleBrands = brands ? brands.slice(index * BATCH_SIZE, (index + 1) * BATCH_SIZE) : [];
+    // Let's use a simple marquee or grid.
 
     return (
-        <div style={{ minHeight: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 1.05 }}
-                    transition={{ duration: 0.8, ease: "easeInOut" }}
-                    className="brands-grid"
-                    style={{ width: '100%' }}
-                >
-                    {visibleBrands.map((brand, idx) => (
-                        <motion.div
-                            key={brand.id || (index * BATCH_SIZE + idx)}
-                            className="brand-logo-item"
-                            whileHover={{ opacity: 1, scale: 1.05 }}
-                        >
-                            {brand.logo && (
-                                <img
-                                    src={brand.logo}
-                                    alt="Brand Logo"
-                                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                                />
-                            )}
-                        </motion.div>
-                    ))}
-                </motion.div>
-            </AnimatePresence>
+        <div style={{ padding: '2rem 0', overflow: 'hidden' }}>
+            <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)', // Force 4 columns
+                gap: '1rem',
+                alignItems: 'center',
+                justifyItems: 'center',
+                maxWidth: '100%',
+                padding: '0 10px'
+            }}>
+                {brands.map((brand, idx) => (
+                    <motion.div
+                        key={brand._id || idx}
+                        whileHover={{ scale: 1.1 }}
+                        style={{
+                            width: '100%',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            aspectRatio: '3/2'
+                        }}
+                    >
+                        <img
+                            src={brand.logo}
+                            alt="Brand"
+                            style={{
+                                maxWidth: '80%',
+                                maxHeight: '60px', // Limit height to keep them small/uniform
+                                objectFit: 'contain',
+                                filter: 'grayscale(100%) brightness(0.8)', // Optional styling
+                                opacity: 0.8
+                            }}
+                        />
+                    </motion.div>
+                ))}
+            </div>
         </div>
     );
 };
 
-const ViscousWrapper = ({ children, className, style, intensity = 100 }) => {
+const ViscousWrapper = ({ children, className, style, intensity = 100, screenSize }) => {
     const ref = useRef(null);
+    // Disable effect on mobile for better performance/scrolling
+    if (screenSize === 'mobile') {
+        return <div className={className} style={{ ...style, width: '100%' }}>{children}</div>;
+    }
+
     const { scrollYProgress } = useScroll({
         target: ref,
         offset: ["start end", "end start"]
@@ -127,10 +135,7 @@ const ServiceList = ({ screenSize }) => {
         offset: ["start start", "end end"]
     });
     const smoothProgress = useSpring(scrollYProgress, {
-        stiffness: 800,
-        damping: 60,
-        mass: 1,
-        restDelta: 0.001
+        stiffness: 800, damping: 60, mass: 1, restDelta: 0.001
     });
 
     const services = [
@@ -155,7 +160,7 @@ const ServiceList = ({ screenSize }) => {
             }}>
                 <h2 style={{
                     color: 'var(--color-butter-yellow)',
-                    fontSize: screenSize === 'mobile' ? '3.5rem' : 'clamp(5rem, 10vw, 10rem)',
+                    fontSize: screenSize === 'mobile' ? '10rem' : 'clamp(5rem, 10vw, 10rem)',
                     fontFamily: 'var(--font-brand)',
                     marginBottom: '1rem',
                     flexShrink: 0,
@@ -178,6 +183,7 @@ const ServiceList = ({ screenSize }) => {
                             </div>
                         ))}
                     </div>
+                    {/* PC ONLY Image Reveal */}
                     <div style={{
                         flex: 1,
                         position: 'relative',
@@ -187,33 +193,16 @@ const ServiceList = ({ screenSize }) => {
                         justifyContent: 'center'
                     }}>
                         <motion.div style={{
-                            display: 'flex',
-                            flexDirection: 'column-reverse',
-                            height: '100%',
-                            width: '100%',
+                            display: 'flex', flexDirection: 'column-reverse', height: '100%', width: '100%',
                             y: useTransform(smoothProgress, [0, 1], ['0%', '400%'])
                         }}>
                             {services.map((service, i) => (
-                                <div key={i} style={{
-                                    height: '100%',
-                                    width: '100%',
-                                    flexShrink: 0,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}>
+                                <div key={i} style={{ height: '100%', width: '100%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <div style={{
-                                        width: service.imgSize || '80%',
-                                        height: '60%',
-                                        backgroundColor: 'var(--color-butter-yellow)',
-                                        maskImage: `url(/images/${service.img})`,
-                                        WebkitMaskImage: `url(/images/${service.img})`,
-                                        maskSize: 'contain',
-                                        WebkitMaskSize: 'contain',
-                                        maskRepeat: 'no-repeat',
-                                        WebkitMaskRepeat: 'no-repeat',
-                                        maskPosition: 'center',
-                                        WebkitMaskPosition: 'center',
+                                        width: service.imgSize || '80%', height: '60%', backgroundColor: 'var(--color-butter-yellow)',
+                                        maskImage: `url(/images/${service.img})`, WebkitMaskImage: `url(/images/${service.img})`,
+                                        maskSize: 'contain', WebkitMaskSize: 'contain', maskRepeat: 'no-repeat', WebkitMaskRepeat: 'no-repeat',
+                                        maskPosition: 'center', WebkitMaskPosition: 'center',
                                     }} />
                                 </div>
                             ))}
@@ -221,22 +210,12 @@ const ServiceList = ({ screenSize }) => {
                     </div>
                 </div>
             </div>
-            <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                pointerEvents: 'none',
-            }}>
+            {/* Scroll Triggers */}
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
                 {services.map((_, i) => (
                     <div key={i} style={{
-                        position: 'absolute',
-                        top: `${i * 100}vh`,
-                        height: '100vh',
-                        width: '100%',
-                        scrollSnapAlign: 'start',
-                        scrollSnapStop: 'always'
+                        position: 'absolute', top: `${i * 100}vh`, height: '100vh', width: '100%',
+                        scrollSnapAlign: 'start', scrollSnapStop: 'always'
                     }} />
                 ))}
             </div>
@@ -788,7 +767,7 @@ export default function Home() {
                             <motion.h2
                                 style={{
                                     y: titleY,
-                                    fontSize: 'clamp(5rem, 10vw, 10rem)',
+                                    fontSize: screenSize === 'mobile' ? '10rem' : 'clamp(5rem, 10vw, 10rem)',
                                     color: 'var(--color-butter-yellow)',
                                     textAlign: 'center'
                                 }}>
@@ -804,21 +783,28 @@ export default function Home() {
                                     desktopInitial: { opacity: 0, y: 100 },
                                     desktopAnimate: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut", delay: index * 0.3 } }
                                 };
+                                // Mobile Parallax / Snap Logic
                                 return (
                                     <motion.div
-                                        key={`${isMobile ? 'm' : 'd'}-${item.id}`}
+                                        key={item.id}
                                         className="group"
-                                        style={{ cursor: 'pointer' }}
-                                        whileHover={{ scale: 0.98 }}
+                                        whileHover={!isMobile ? { scale: 0.98 } : {}}
+                                        onClick={() => window.location.href = `/work`}
                                         initial={isMobile ? "mobileInitial" : "desktopInitial"}
                                         whileInView={isMobile ? "mobileAnimate" : "desktopAnimate"}
                                         viewport={{ once: true, margin: "-10%" }}
                                         variants={cardVariants}
+                                        style={{
+                                            cursor: 'pointer',
+                                            minWidth: isMobile ? '100vw' : 'auto', // Full width for mobile snap
+                                            scrollSnapAlign: 'center',
+                                            padding: isMobile ? '0 1rem' : '0'
+                                        }}
                                     >
                                         {item.image ? (
-                                            <img src={item.image} alt={item.title} style={{ width: '100%', height: '600px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem' }} />
+                                            <img src={item.image} alt={item.title} style={{ width: '100%', height: isMobile ? '50vh' : '600px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem' }} />
                                         ) : (
-                                            <div className="img-placeholder" style={{ width: '100%', height: '600px', backgroundColor: '#4a3832', borderRadius: '10px', marginBottom: '1rem' }} />
+                                            <div className="img-placeholder" style={{ width: '100%', height: isMobile ? '50vh' : '600px', backgroundColor: '#4a3832', borderRadius: '10px', marginBottom: '1rem' }} />
                                         )}
                                         <h3 style={{ fontSize: '2rem' }}>{item.title}</h3>
                                         <p className="font-subtitle">{item.category}</p>
@@ -985,15 +971,22 @@ export default function Home() {
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
                             style={{
-                                fontSize: 'clamp(5rem, 10vw, 10rem)', fontFamily: 'var(--font-brand)',
-                                color: 'var(--color-electric-blue)', textAlign: 'center', marginBottom: '4rem', textTransform: 'uppercase'
+                                fontSize: screenSize === 'mobile' ? '10rem' : 'clamp(5rem, 10vw, 10rem)',
+                                fontFamily: 'var(--font-brand)',
+                                color: 'var(--color-electric-blue)',
+                                textAlign: 'center',
+                                marginBottom: '4rem',
+                                textTransform: 'uppercase'
                             }}
                         >
                             Brands We've Bloomed
                         </motion.h2>
                         <div className="brands-grid-container" style={{
-                            display: 'grid', gridTemplateColumns: screenSize === 'mobile' ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)',
-                            gap: '3rem', alignItems: 'center', justifyContent: 'center'
+                            display: 'grid',
+                            gridTemplateColumns: screenSize === 'mobile' ? 'repeat(3, 1fr)' : 'repeat(5, 1fr)',
+                            gap: screenSize === 'mobile' ? '1rem' : '3rem',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                         }}>
                             {content.brandLogos && content.brandLogos.map((brand, index) => (
                                 <motion.div
@@ -1004,7 +997,11 @@ export default function Home() {
                                     transition={{ duration: 0.5, delay: index * 0.05 }}
                                     whileHover={{ scale: 1.05 }}
                                     style={{
-                                        width: '100%', aspectRatio: '3/2', display: 'flex', justifyContent: 'center', alignItems: 'center',
+                                        width: '100%',
+                                        aspectRatio: '3/2',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
                                         padding: screenSize === 'mobile' ? '0.5rem' : '1rem'
                                     }}
                                 >
@@ -1012,7 +1009,9 @@ export default function Home() {
                                         src={brand.logo}
                                         alt={brand.name}
                                         style={{
-                                            maxWidth: screenSize === 'mobile' ? '70%' : '100%', maxHeight: '100%', objectFit: 'contain'
+                                            maxWidth: screenSize === 'mobile' ? '70%' : '100%',
+                                            maxHeight: '100%',
+                                            objectFit: 'contain'
                                         }}
                                     />
                                 </motion.div>

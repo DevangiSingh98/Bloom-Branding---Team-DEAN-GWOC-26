@@ -162,23 +162,27 @@ const ServiceList = ({ screenSize }) => {
                     color: 'var(--color-butter-yellow)',
                     fontSize: screenSize === 'mobile' ? '10rem' : 'clamp(5rem, 10vw, 10rem)',
                     fontFamily: 'var(--font-brand)',
-                    marginBottom: '1rem',
+                    marginBottom: screenSize === 'mobile' ? '2rem' : '1rem',
                     flexShrink: 0,
                     textTransform: 'uppercase',
                     textAlign: 'center',
-                    width: '100%'
+                    width: '100%',
+                    lineHeight: screenSize === 'mobile' ? 0.8 : 0.9,
+                    wordWrap: 'break-word',
+                    display: 'block'
                 }}>
                     Our Expertise
                 </h2>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}>
                     <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column' }}>
                         {services.map((service, i) => (
-                            <div key={i} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginTop: i === 0 ? 0 : '-8vh' }}>
+                            <div key={i} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginTop: i === 0 ? 0 : (screenSize === 'mobile' ? '-17vh' : '-8vh') }}>
                                 <ServiceItem
                                     service={service}
                                     i={i}
                                     total={services.length}
                                     scrollYProgress={smoothProgress}
+                                    screenSize={screenSize}
                                 />
                             </div>
                         ))}
@@ -223,7 +227,7 @@ const ServiceList = ({ screenSize }) => {
     );
 };
 
-const ServiceItem = ({ service, i, total, scrollYProgress }) => {
+const ServiceItem = ({ service, i, total, scrollYProgress, screenSize }) => {
     const steps = [0, 0.25, 0.5, 0.75, 1];
     const flexValues = steps.map((_, idx) => idx === i ? 30 : 1);
     const flexGrow = useTransform(scrollYProgress, steps, flexValues);
@@ -239,11 +243,12 @@ const ServiceItem = ({ service, i, total, scrollYProgress }) => {
             flexGrow,
             display: 'flex',
             alignItems: 'center',
-            overflow: 'hidden',
+            justifyContent: screenSize === 'mobile' ? 'center' : 'flex-start',
+            overflow: 'visible',
             position: 'relative',
             originX: 0
         }}>
-            <Link to={service.link} style={{ display: 'block', width: '100%' }}>
+            <Link to={service.link} style={{ display: 'block', width: '100%', textAlign: screenSize === 'mobile' ? 'center' : 'left' }}>
                 <motion.h3 style={{
                     margin: 0,
                     fontFamily: 'var(--font-subtitle)',
@@ -252,7 +257,7 @@ const ServiceItem = ({ service, i, total, scrollYProgress }) => {
                     opacity,
                     scaleY: textScaleY,
                     scale: textScale,
-                    transformOrigin: 'left center',
+                    transformOrigin: screenSize === 'mobile' ? 'center center' : 'left center',
                     fontSize: 'clamp(3rem, 6vw, 6rem)',
                     whiteSpace: 'nowrap',
                     lineHeight: 0.8
@@ -266,11 +271,30 @@ const ServiceItem = ({ service, i, total, scrollYProgress }) => {
 
 export default function Home() {
     const { content } = useContent();
+    const { scrollY, scrollYProgress } = useScroll();
     const containerRef = useRef(null);
-    const { scrollYProgress, scrollY } = useScroll({
-        target: containerRef,
-        offset: ["start start", "end end"]
+    const [screenSize, setScreenSize] = useState(() => {
+        if (typeof window !== 'undefined') {
+            if (window.innerWidth <= 768) return 'mobile';
+            if (window.innerWidth <= 1024) return 'tablet';
+        }
+        return 'desktop';
     });
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth <= 768) {
+                setScreenSize('mobile');
+            } else if (window.innerWidth <= 1024) {
+                setScreenSize('tablet');
+            } else {
+                setScreenSize('desktop');
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const springConfig = { stiffness: 100, damping: 30, mass: 1 };
     const smoothScrollY = useSpring(scrollY, springConfig);
@@ -295,6 +319,7 @@ export default function Home() {
 
     // Text Parallax Shift
     const textExitY = useTransform(smoothScrollY, [0, 1000], [0, -1500]);
+    const heroContentOpacity = useTransform(smoothScrollY, [0, 500], [1, screenSize === 'mobile' ? 0 : 1]);
     const heroY = useTransform(smoothProgress, [0, 0.2], [0, 200]);
 
     // Selected Work Scroll Logic
@@ -306,22 +331,6 @@ export default function Home() {
     const smoothSwProgress = useSpring(swProgress, { stiffness: 60, damping: 20 });
     const titleY = useTransform(smoothSwProgress, [0, 1], ["-60vh", "0vh"]);
     const titleOpacity = useTransform(swProgress, [0, 0.8], [0, 1]);
-
-    // Lifted state for responsiveness
-    const [screenSize, setScreenSize] = useState('desktop');
-
-    useEffect(() => {
-        const handleResize = () => {
-            const width = window.innerWidth;
-            if (width < 768) setScreenSize('mobile');
-            else if (width < 1200) setScreenSize('tablet');
-            else setScreenSize('desktop');
-        };
-
-        handleResize(); // Initial check
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     // Independent Navbar Color Triggers for Home Page
     useEffect(() => {
@@ -419,9 +428,10 @@ export default function Home() {
                 backgroundImage: `url("${content.siteImages?.hero_bg || '/images/herosecbg(2).jpg'}")`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                scrollSnapAlign: 'start'
+                scrollSnapAlign: 'start',
+                overflow: 'hidden'
             }}>
-                <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <motion.div style={{ opacity: heroContentOpacity, position: 'absolute', inset: 0, pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {(() => {
                         const magazines = [
                             {
@@ -429,64 +439,64 @@ export default function Home() {
                                 start: { x: -1800, y: -1200 },
                                 end: { x: '-42vw', y: '-35vh' },
                                 tabletEnd: { x: -420, y: -180 },
-                                mobileEnd: { x: -160, y: -220 },
+                                mobileEnd: { x: -160, y: -260 },
                                 rotate: -25,
                                 delay: 0.2, z: 1, finalScale: 1.0, scaleX: -1, scaleY: -1,
-                                width: '400px', tabletWidth: '350px', mobileWidth: '220px'
+                                width: '400px', tabletWidth: '350px', mobileWidth: '200px'
                             },
                             {
                                 src: content.siteImages?.hero_page2 || "/images/page2.png",
                                 start: { x: 1800, y: -1200 },
                                 end: { x: '42vw', y: '-35vh' },
                                 tabletEnd: { x: 420, y: -250 },
-                                mobileEnd: { x: 160, y: -220 },
+                                mobileEnd: { x: 160, y: -260 },
                                 rotate: 10,
                                 delay: 0.0, z: 2, scaleY: -1, scaleX: -1,
-                                width: '400px', tabletWidth: '350px', mobileWidth: '220px'
+                                width: '400px', tabletWidth: '350px', mobileWidth: '200px'
                             },
                             {
                                 src: content.siteImages?.hero_page3 || "/images/page3.png",
                                 start: { x: -1800, y: 1200 },
                                 end: { x: '-42vw', y: '32vh' },
                                 tabletEnd: { x: -420, y: 250 },
-                                mobileEnd: { x: -160, y: 240 },
+                                mobileEnd: { x: -160, y: 320 },
                                 rotate: 5,
                                 delay: 0.3, z: 12,
-                                width: '400px', tabletWidth: '350px', mobileWidth: '220px'
+                                width: '400px', tabletWidth: '350px', mobileWidth: '200px'
                             },
                             {
                                 src: content.siteImages?.hero_page4 || "/images/page4.png",
                                 start: { x: 1800, y: 1200 },
                                 end: { x: '40vw', y: '32vh' },
                                 tabletEnd: { x: 420, y: 250 },
-                                mobileEnd: { x: 160, y: 240 },
+                                mobileEnd: { x: 160, y: 320 },
                                 rotate: -25,
                                 delay: 0.1, z: 13,
-                                width: '400px', tabletWidth: '350px', mobileWidth: '220px'
+                                width: '400px', tabletWidth: '350px', mobileWidth: '200px'
                             },
                             {
                                 src: content.siteImages?.hero_megaphone || "/images/megaphone.png",
                                 start: { x: -1500, y: 0 },
                                 end: { x: -450, y: -20 },
                                 tabletEnd: { x: -260, y: -80 },
-                                mobileEnd: { x: -160, y: -60 },
-                                rotate: 25, delay: 0.5, z: 15, width: '180px', tabletWidth: '130px', mobileWidth: '110px'
+                                mobileEnd: { x: -120, y: -60 },
+                                rotate: 25, delay: 0.5, z: 15, width: '180px', tabletWidth: '130px', mobileWidth: '90px'
                             },
                             {
                                 src: content.siteImages?.hero_camera || "/images/cam.png",
                                 start: { x: 1500, y: -500 },
                                 end: { x: 350, y: -250 },
                                 tabletEnd: { x: '35vw', y: '-25vh' },
-                                mobileEnd: { x: '30vw', y: '-25vh' },
-                                rotate: -15, delay: 0.7, z: 6, width: '250px', tabletWidth: '180px', mobileWidth: '130px'
+                                mobileEnd: { x: '35vw', y: '-15vh' },
+                                rotate: -15, delay: 0.7, z: 6, width: '250px', tabletWidth: '180px', mobileWidth: '120px'
                             },
                             {
                                 src: content.siteImages?.hero_star || "/images/star.png",
                                 start: { x: 250, y: -290 },
                                 end: { x: 250, y: -290 },
                                 tabletEnd: { x: '25vw', y: '-30vh' },
-                                mobileEnd: { x: '22vw', y: '-28vh' },
-                                rotate: 45, delay: 1.3, z: 5, width: '130px', tabletWidth: '100px', mobileWidth: '80px'
+                                mobileEnd: { x: '30vw', y: '-18vh' },
+                                rotate: 45, delay: 1.3, z: 5, width: '130px', tabletWidth: '100px', mobileWidth: '70px'
                             }
                         ];
                         return magazines.map((mag, i) => {
@@ -518,13 +528,17 @@ export default function Home() {
                             };
                             let exitX = 0;
                             let exitY = 0;
-                            if (mag.src.includes('page1')) { exitX = p1ExitX; exitY = p1ExitY; }
-                            else if (mag.src.includes('page2')) { exitX = p2ExitX; exitY = p2ExitY; }
-                            else if (mag.src.includes('page3')) { exitX = p3ExitX; exitY = p3ExitY; }
-                            else if (mag.src.includes('page4')) { exitX = p4ExitX; exitY = p4ExitY; }
-                            else if (mag.src.includes('megaphone')) { exitX = megaExitX; exitY = megaExitY; }
-                            else if (mag.src.includes('cam')) { exitX = camExitX; exitY = camExitY; }
-                            else if (mag.src.includes('star')) { exitY = starExitY; }
+
+                            // Exit animations only on desktop/tablet
+                            if (!isMobile) {
+                                if (mag.src.includes('page1')) { exitX = p1ExitX; exitY = p1ExitY; }
+                                else if (mag.src.includes('page2')) { exitX = p2ExitX; exitY = p2ExitY; }
+                                else if (mag.src.includes('page3')) { exitX = p3ExitX; exitY = p3ExitY; }
+                                else if (mag.src.includes('page4')) { exitX = p4ExitX; exitY = p4ExitY; }
+                                else if (mag.src.includes('megaphone')) { exitX = megaExitX; exitY = megaExitY; }
+                                else if (mag.src.includes('cam')) { exitX = camExitX; exitY = camExitY; }
+                                else if (mag.src.includes('star')) { exitY = starExitY; }
+                            }
 
                             if (mag.src.includes('page') || mag.src.includes('megaphone') || mag.src.includes('cam') || mag.src.includes('star')) {
                                 return (
@@ -591,13 +605,14 @@ export default function Home() {
                             );
                         });
                     })()}
-                </div>
+                </motion.div>
                 <ParallaxContent>
                     <motion.div style={{
-                        position: 'relative', zIndex: 14, y: textExitY, textAlign: 'center',
+                        position: 'relative', zIndex: 14, y: screenSize === 'mobile' ? 0 : textExitY, textAlign: 'center',
                         maxWidth: screenSize === 'mobile' ? '95%' : '80%',
                         margin: screenSize === 'mobile' ? '15vh auto 0 auto' : '0 auto',
-                        transform: 'translateX(-35px)'
+                        transform: 'translateX(-35px)',
+                        opacity: heroContentOpacity
                     }}>
                         <motion.img
                             src="/images/main logo.png"
@@ -763,15 +778,18 @@ export default function Home() {
                 }}>
                 <ViscousWrapper intensity={80}>
                     <div className="container">
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: screenSize === 'mobile' ? '0' : '1rem' }}>
                             <motion.h2
                                 style={{
                                     y: titleY,
                                     fontSize: screenSize === 'mobile' ? '10rem' : 'clamp(5rem, 10vw, 10rem)',
                                     color: 'var(--color-butter-yellow)',
-                                    textAlign: 'center'
+                                    textAlign: 'center',
+                                    display: 'block',
+                                    margin: 0,
+                                    lineHeight: 0.8
                                 }}>
-                                Selected Work
+                                Selected Works
                             </motion.h2>
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: screenSize === 'mobile' ? '1fr' : 'repeat(3, 1fr)', gap: '2rem', width: '100%' }}>
@@ -788,23 +806,22 @@ export default function Home() {
                                     <motion.div
                                         key={item.id}
                                         className="group"
-                                        whileHover={!isMobile ? { scale: 0.98 } : {}}
+                                        style={{
+                                            cursor: 'pointer',
+                                            maxWidth: screenSize === 'mobile' ? '90%' : '100%',
+                                            margin: screenSize === 'mobile' ? '0 auto' : '0'
+                                        }}
+                                        whileHover={{ scale: 0.98 }}
                                         onClick={() => window.location.href = `/work`}
                                         initial={isMobile ? "mobileInitial" : "desktopInitial"}
                                         whileInView={isMobile ? "mobileAnimate" : "desktopAnimate"}
                                         viewport={{ once: true, margin: "-10%" }}
                                         variants={cardVariants}
-                                        style={{
-                                            cursor: 'pointer',
-                                            minWidth: isMobile ? '100vw' : 'auto', // Full width for mobile snap
-                                            scrollSnapAlign: 'center',
-                                            padding: isMobile ? '0 1rem' : '0'
-                                        }}
                                     >
                                         {item.image ? (
-                                            <img src={item.image} alt={item.title} style={{ width: '100%', height: isMobile ? '50vh' : '600px', objectFit: 'cover', borderRadius: '10px', marginBottom: '1rem' }} />
+                                            <img src={item.image} alt={item.title} style={{ width: '100%', height: screenSize === 'mobile' ? '400px' : '600px', objectFit: 'cover', borderRadius: '2px', marginBottom: '1rem' }} />
                                         ) : (
-                                            <div className="img-placeholder" style={{ width: '100%', height: isMobile ? '50vh' : '600px', backgroundColor: '#4a3832', borderRadius: '10px', marginBottom: '1rem' }} />
+                                            <div className="img-placeholder" style={{ width: '100%', height: screenSize === 'mobile' ? '400px' : '600px', backgroundColor: '#4a3832', borderRadius: '2px', marginBottom: '1rem' }} />
                                         )}
                                         <h3 style={{ fontSize: '2rem' }}>{item.title}</h3>
                                         <p className="font-subtitle">{item.category}</p>
@@ -812,7 +829,7 @@ export default function Home() {
                                 );
                             })}
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '3rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: screenSize === 'mobile' ? '8rem' : '3rem' }}>
                             <AnimatedButton to="/work" className="btn-primary" style={{ backgroundColor: 'var(--color-butter-yellow)', color: 'var(--color-dark-choc)' }}>View All Projects</AnimatedButton>
                         </div>
                     </div>
@@ -894,7 +911,7 @@ export default function Home() {
                                 viewport={{ once: true, margin: "-10%" }}
                                 variants={{ visible: { transition: { staggerChildren: 0.08 } }, hidden: {} }}
                                 style={{
-                                    fontSize: 'clamp(5rem, 10vw, 10rem)', fontFamily: 'var(--font-brand)', lineHeight: 0.9,
+                                    fontSize: screenSize === 'mobile' ? '10rem' : 'clamp(5rem, 10vw, 10rem)', fontFamily: 'var(--font-brand)', lineHeight: 0.9,
                                     color: 'var(--color-electric-blue)', textAlign: 'left', width: '100%', paddingLeft: '5%'
                                 }}
                             >
@@ -1037,7 +1054,7 @@ export default function Home() {
                         style={{ position: 'relative', zIndex: 1, marginBottom: '3rem', textAlign: 'center' }}
                     >
                         <h2 style={{
-                            fontSize: 'clamp(5rem, 10vw, 10rem)', fontFamily: 'var(--font-brand)',
+                            fontSize: screenSize === 'mobile' ? '10rem' : 'clamp(5rem, 10vw, 10rem)', fontFamily: 'var(--font-brand)',
                             color: 'var(--color-electric-blue)', textTransform: 'uppercase', letterSpacing: '1px', lineHeight: 1
                         }}>
                             Check Out Our Vibe

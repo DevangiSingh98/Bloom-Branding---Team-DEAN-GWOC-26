@@ -625,7 +625,7 @@ const Admin = () => {
 
     const handleSelectAll = (e) => {
         if (e.target.checked) {
-            setSelectedEnquiries(new Set(content.enquiries.map(enq => enq.id)));
+            setSelectedEnquiries(new Set((Array.isArray(content.enquiries) ? content.enquiries : []).map(enq => enq.id)));
         } else {
             setSelectedEnquiries(new Set());
         }
@@ -1762,7 +1762,7 @@ const Admin = () => {
 
                         {/* Vibe List */}
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-                            {content.vibes && content.vibes.map((v) => (
+                            {Array.isArray(content.vibes) && content.vibes.map((v) => (
                                 <div key={v._id || v.label} style={{
                                     backgroundColor: 'white',
                                     padding: '0.8rem 1.2rem',
@@ -1820,7 +1820,7 @@ const Admin = () => {
                                 Reset to Defaults
                             </button>
                         </div>
-                        {content.services && content.services.map((service, index) => (
+                        {Array.isArray(content.services) && content.services.map((service, index) => (
                             <div key={service.id ? `service-${service.id}` : `service-idx-${index}`} style={{ border: '1px solid #eee', padding: '1.5rem', marginBottom: '1.5rem', borderRadius: '8px', background: 'white' }}>
                                 <h3 style={{ margin: '0 0 1rem 0', color: service.accent || 'black' }}>{service.title}</h3>
 
@@ -1932,7 +1932,7 @@ const Admin = () => {
                                 ↻ Sync Defaults to DB
                             </button>
                         </div>
-                        {content.allProjects?.map((item, index) => (
+                        {Array.isArray(content.allProjects) && content.allProjects.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem' }}>
                                     <input
@@ -1984,7 +1984,7 @@ const Admin = () => {
                             </div>
                             <button onClick={() => addItem('work')} className="btn-primary" style={{ fontSize: '0.9rem', padding: '0.6rem 1.2rem', whiteSpace: 'nowrap' }}>+ Add Slot</button>
                         </div>
-                        {content.selectedWork?.map((item, index) => (
+                        {Array.isArray(content.selectedWork) && content.selectedWork.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ marginBottom: '0.5rem' }}>
                                     <label style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem' }}>Project</label>
@@ -2006,7 +2006,7 @@ const Admin = () => {
                                         style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid #ccc', fontSize: '1.15rem' }}
                                     >
                                         <option value="" disabled>Select a project...</option>
-                                        {content.allProjects && content.allProjects.map((proj, idx) => (
+                                        {Array.isArray(content.allProjects) && content.allProjects.map((proj, idx) => (
                                             <option key={proj._id || proj.id || idx} value={proj.title}>
                                                 {proj.title}
                                             </option>
@@ -2053,7 +2053,7 @@ const Admin = () => {
                             <h2 style={{ fontSize: '2.5rem', margin: 0 }}>Testimonials</h2>
                             <button onClick={() => addItem('testimonials')} className="btn-primary" style={{ fontSize: '0.9rem', padding: '0.6rem 1.2rem', whiteSpace: 'nowrap' }}>+ Add Testimonial</button>
                         </div>
-                        {content.testimonials?.map((item, index) => (
+                        {Array.isArray(content.testimonials) && content.testimonials.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ marginBottom: '1rem' }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
@@ -2083,7 +2083,7 @@ const Admin = () => {
                 {activeTab === 'instagram' && (
                     <div>
                         <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Instagram Content</h2>
-                        {content.instagram?.map((item, index) => (
+                        {Array.isArray(content.instagram) && content.instagram.map((item, index) => (
                             <div key={item.id} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px', position: 'relative' }}>
                                 <button
                                     onClick={() => deleteItem(index, 'instagram')}
@@ -2129,7 +2129,7 @@ const Admin = () => {
                 {activeTab === 'brands' && (
                     <div>
                         <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Manage Brand Logos</h2>
-                        {content.brandLogos?.map((item, index) => (
+                        {Array.isArray(content.brandLogos) && content.brandLogos.map((item, index) => (
                             <div key={item.id || index} style={{ border: '1px solid #eee', padding: '1rem', marginBottom: '1rem', borderRadius: '5px' }}>
                                 <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem', alignItems: 'center' }}>
                                     <h4 style={{ margin: 0 }}>{item.name || `Brand ${index + 1}`}</h4>

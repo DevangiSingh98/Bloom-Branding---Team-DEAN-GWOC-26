@@ -245,7 +245,7 @@ const WorkModal = ({ projects, initialIndex, onClose }) => {
                     willChange: 'transform'
                 }}
             >
-                {projects.map((project, index) => (
+                {Array.isArray(projects) && projects.map((project, index) => (
                     <ProjectPanel
                         key={index}
                         project={project}
@@ -280,7 +280,7 @@ export default function Work() {
             <motion.div initial={{ opacity: 0, y: 100 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 1.2 }} style={{ position: 'relative', zIndex: 20, paddingTop: '35vh', paddingBottom: '100px' }}>
                 <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '0 5%' }}>
                     <div className="work-grid">
-                        {projects.map((project, index) => {
+                        {Array.isArray(projects) && projects.map((project, index) => {
                             // Robust Image Selection: Prefer project.image, fallback to first item in images array, finally defaultImage
                             const displayImage = project.image || (project.images && project.images.length > 0 ? project.images[0] : project.defaultImage);
 

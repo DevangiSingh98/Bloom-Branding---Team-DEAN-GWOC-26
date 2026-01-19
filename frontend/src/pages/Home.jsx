@@ -775,7 +775,7 @@ export default function Home() {
                             </motion.h2>
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: screenSize === 'mobile' ? '1fr' : 'repeat(3, 1fr)', gap: '2rem', width: '100%' }}>
-                            {content.selectedWork.map((item, index) => {
+                            {Array.isArray(content.selectedWork) && content.selectedWork.map((item, index) => {
                                 const isMobile = screenSize === 'mobile';
                                 const cardVariants = {
                                     mobileInitial: { opacity: 0, x: index % 2 === 0 ? -100 : 100 },
@@ -920,7 +920,7 @@ export default function Home() {
                                 gap: '2rem', padding: screenSize === 'mobile' ? '0 1rem 4rem 1rem' : '4rem 2rem',
                                 paddingBottom: '10rem', scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch'
                             }}>
-                            {content.testimonials && content.testimonials.map((item, i) => (
+                            {Array.isArray(content.testimonials) && content.testimonials.map((item, i) => (
                                 <motion.div
                                     key={item.id || i}
                                     initial={{ opacity: 0, y: 50 }}
@@ -988,7 +988,7 @@ export default function Home() {
                             alignItems: 'center',
                             justifyContent: 'center'
                         }}>
-                            {content.brandLogos && content.brandLogos.map((brand, index) => (
+                            {Array.isArray(content.brandLogos) && content.brandLogos.map((brand, index) => (
                                 <motion.div
                                     key={brand.id || index}
                                     initial={{ opacity: 0, scale: 0.9 }}
@@ -1053,7 +1053,7 @@ export default function Home() {
                     display: 'grid', gridTemplateColumns: screenSize === 'mobile' ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
                     gap: 0, width: '100%', margin: 0, padding: 0
                 }}>
-                    {content.instagram && content.instagram.slice(0, 4).map((item, i) => (
+                    {Array.isArray(content.instagram) && content.instagram.slice(0, 4).map((item, i) => (
                         <motion.a
                             key={item.id || i}
                             href={item.link || "https://www.instagram.com/bloom.branding_/?hl=en"}

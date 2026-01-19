@@ -56,7 +56,7 @@ export default function Contact() {
 
     // Vibe Keywords ( Dynamic with fallback )
     const VIBES = (content.vibes && content.vibes.length > 0)
-        ? content.vibes.map(v => v.label || v)
+        ? (Array.isArray(content.vibes) ? content.vibes.map(v => v.label || v) : [])
         : ['Minimalist', 'Bold & Loud', 'Luxury', 'Playful', 'Geometric', 'Organic', 'Tech', 'Vintage', 'Editorial', 'Abstract'];
 
     return (

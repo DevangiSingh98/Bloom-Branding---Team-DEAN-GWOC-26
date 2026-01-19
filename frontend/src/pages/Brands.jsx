@@ -30,7 +30,7 @@ const Brands = () => {
                     alignItems: 'center',
                     justifyItems: 'center'
                 }}>
-                    {content.brandLogos && content.brandLogos.map((brand, idx) => (
+                    {Array.isArray(content.brandLogos) && content.brandLogos.map((brand, idx) => (
                         <motion.div
                             key={brand._id || idx}
                             initial={{ opacity: 0, scale: 0.8 }}

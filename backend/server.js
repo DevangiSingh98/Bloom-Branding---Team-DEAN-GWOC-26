@@ -208,5 +208,5 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`DEPLOYED VERSION 1.7.0 - FIX ACTIVE`);
+    console.log(`DEPLOYED VERSION 1.8.0 - DEBUG ACTIVE`);
 });

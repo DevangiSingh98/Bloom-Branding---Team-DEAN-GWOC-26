@@ -15,6 +15,8 @@ const sendEmail = async (options) => {
         }
     });
 
+    console.log(`[EMAIL SETUP] Host: ${process.env.SMTP_HOST}, Port: ${port}, Secure: ${port == 465}`);
+
     const message = {
         from: `${process.env.FROM_NAME || 'Bloom Admin'} <${process.env.FROM_EMAIL || process.env.SMTP_EMAIL}>`,
         to: options.email,

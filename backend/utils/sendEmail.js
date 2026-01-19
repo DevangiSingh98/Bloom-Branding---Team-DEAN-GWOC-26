@@ -1,23 +1,43 @@
 import nodemailer from 'nodemailer';
 
 const sendEmail = async (options) => {
-    const port = process.env.SMTP_PORT || 587;
-    const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: port,
-        secure: port == 465, // true for 465, false for other ports
-        auth: {
-            user: process.env.SMTP_EMAIL,
-            pass: process.env.SMTP_PASSWORD,
-        },
-        tls: {
-            rejectUnauthorized: false
-        },
-        connectionTimeout: 15000, // 15 seconds
-        greetingTimeout: 15000,   // 15 seconds
-    });
+    const isGmail = process.env.SMTP_HOST && process.env.SMTP_HOST.includes('gmail');
 
-    console.log(`[EMAIL SETUP] Host: ${process.env.SMTP_HOST}, Port: ${port}, Secure: ${port == 465}`);
+    let transporterConfigs;
+
+    if (isGmail) {
+        // Optimized for Gmail on cloud hosts like Render/Heroku
+        transporterConfigs = {
+            service: 'gmail',
+            auth: {
+                user: process.env.SMTP_EMAIL,
+                pass: process.env.SMTP_PASSWORD,
+            },
+            connectionTimeout: 30000, // 30 seconds
+            greetingTimeout: 30000,
+            socketTimeout: 30000,
+        };
+    } else {
+        const port = process.env.SMTP_PORT || 587;
+        transporterConfigs = {
+            host: process.env.SMTP_HOST,
+            port: port,
+            secure: port == 465,
+            auth: {
+                user: process.env.SMTP_EMAIL,
+                pass: process.env.SMTP_PASSWORD,
+            },
+            tls: {
+                rejectUnauthorized: false
+            },
+            connectionTimeout: 20000,
+            greetingTimeout: 20000,
+        };
+    }
+
+    const transporter = nodemailer.createTransport(transporterConfigs);
+
+    console.log(`[EMAIL SETUP] Service: ${isGmail ? 'Gmail' : 'Custom'}, Host: ${process.env.SMTP_HOST}`);
 
     const message = {
         from: `${process.env.FROM_NAME || 'Bloom Admin'} <${process.env.FROM_EMAIL || process.env.SMTP_EMAIL}>`,

@@ -28,25 +28,28 @@ export const generateIdeas = async (req, res) => {
             throw new Error(`AI Library Load Failed: ${importError.message}`);
         }
 
-        // Construct Prompt
+        // Construct Prompt (Bloom Branding – Creative Direction AI Workflow)
         const prompt = `
-            You are a senior marketing strategist for a high-end branding agency called Bloom Branding.
-            Develop a concise, high-impact marketing strategy for a new client enquiry.
-            
-            Client Details:
-            - Company/Brand: ${company || 'Unknown Brand'}
-            - Service Interested In: ${service || 'General Branding'}
-            - Vibe/Aesthetic: ${vibe || 'Not specified'}
-            - Additional Vibe Details: "${vibeDescription || 'N/A'}"
-            - Client's Vision: "${message || 'No specific vision provided'}"
+            You are a senior creative strategist at Bloom Branding. Your role is to transform client inputs into a structured "Creative Direction Tool" that designers and strategists can use for moodboards and concept development.
 
-            Output Format:
-            Provide a mini-strategy with exactly 3 sections (headings):
-            1. **Brand Positioning**: One sentence defining their potential market position.
-            2. **Target Audience**: A brief profile of who they should target.
-            3. **Key Marketing Angles**: 3 bullet points of actionable marketing hooks.
+            Bloom branding philosophy: We don't just create logos; we bloom brands. Our tone is professional, visionary, and strategic. We prioritize visual excellence and storytelling.
 
-            Keep the tone professional, strategic, and concise. Do not use markdown bolding in the output if possible, or keep it minimal.
+            Client Inputs:
+            - Brand Name: ${company || 'Unknown'}
+            - Service: ${service || 'General Branding'}
+            - Vibe Keywords: ${Array.isArray(vibe) ? vibe.join(', ') : (vibe || 'Not specified')}
+            - Vision Description: "${message || 'No specific vision provided'}"
+            - Extended Vibe Details: "${vibeDescription || 'N/A'}"
+
+            Develop the creative strategy in the following structured format:
+
+            1. **Brand Personality**: Define the "soul" of the brand in 2-3 sentences.
+            2. **Visual Direction**: Describe the aesthetic, color palettes, and typography vibes (strategic, not generic).
+            3. **Content & Storytelling Angle**: How should this brand talk? What is their unique narrative hook?
+            4. **Design Execution Ideas**: 3-4 specific, actionable ideas for designers (e.g., "Use heavy grain with serif fonts").
+            5. **Keywords for Exploration**: A list of 5-8 niche keywords for moodboard searching.
+
+            Keep it professional, high-impact, and usable. No magic, just good thinking.
         `;
 
         // Initialize Gemini

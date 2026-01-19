@@ -1608,7 +1608,7 @@ const Admin = () => {
                                 </div>
 
                                 <div className="mobile-cards">
-                                    {content.enquiries.map((item, index) => (
+                                    {Array.isArray(content.enquiries) && content.enquiries.map((item, index) => (
                                         <div key={item.id || index} className="mobile-card">
                                             <div className="mobile-card-row">
                                                 <input

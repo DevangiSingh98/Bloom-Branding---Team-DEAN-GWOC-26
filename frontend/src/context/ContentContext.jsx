@@ -607,7 +607,7 @@ export const ContentProvider = ({ children }) => {
                 if (vbResponse.ok) {
                     const vibesData = await vbResponse.json();
                     // Always set vibes, even if empty array, to reflect DB state
-                    setContent(prev => ({ ...prev, vibes: vibesData || [] }));
+                    setContent(prev => ({ ...prev, vibes: Array.isArray(vibesData) ? vibesData : (defaultContent.vibes || []) }));
                 }
 
 

@@ -395,10 +395,7 @@ const Admin = () => {
     const API_URL = import.meta.env.VITE_API_URL ||
         (window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://bloom-backend-pq68.onrender.com');
     // Auth State
-    const [userInfo, setUserInfo] = useState(() => {
-        const saved = localStorage.getItem('userInfo');
-        return saved ? JSON.parse(saved) : null;
-    });
+    const [userInfo, setUserInfo] = useState(null);
     const [loginData, setLoginData] = useState({ username: '', password: '' });
     const [authError, setAuthError] = useState('');
 
@@ -834,7 +831,7 @@ const Admin = () => {
 
                 const assetData = {
                     title: file.name,
-                    type: file.type.startsWith('video') ? 'video' : 'image',
+                    type: file.type.startsWith('video') ? 'video' : (file.type.includes('pdf') ? 'pdf' : 'image'),
                     url: fileUrl,
                     userId: selectedClientForAssets._id,
                     format: file.name.split('.').pop(),
@@ -2505,6 +2502,7 @@ const Admin = () => {
                             <input
                                 type="file"
                                 multiple
+                                accept="image/*,video/*,.pdf"
                                 onChange={handleAssetUpload}
                                 disabled={uploadingAssets}
                                 style={{ display: 'none' }}
@@ -2538,6 +2536,8 @@ const Admin = () => {
                                         <div style={{ height: '120px', backgroundColor: '#f9f9f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             {asset.type === 'image' ? (
                                                 <img src={asset.url} alt={asset.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            ) : asset.type === 'pdf' ? (
+                                                <span style={{ fontSize: '3rem' }}>📄</span>
                                             ) : (
                                                 <span style={{ fontSize: '2rem', color: '#ccc' }}>VIDEO</span>
                                             )}

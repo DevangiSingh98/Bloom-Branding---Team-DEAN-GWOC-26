@@ -38,12 +38,13 @@ const VaultLogin = () => {
                         ? `/vault/${encodeURIComponent(userInfo.companyName.toLowerCase().replace(/\s+/g, '-'))}`
                         : '/vault';
 
-                    // ONLY auto-redirect if we are at /client-login or /vault/login 
-                    // AND NOT already at the dashboard. 
+                    // Auto-redirect removed per user request to always show login page first
+                    /* 
                     const currentPath = window.location.pathname;
                     if (currentPath === '/client-login' || currentPath === '/vault/login') {
                         navigate(dashboardPath);
                     }
+                    */
                 }
             } catch (e) {
                 console.error("Failed to parse clientInfo", e);

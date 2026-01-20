@@ -95,7 +95,7 @@ const ClientDashboard = () => {
         if (selectedAssets.size === assets.length && assets.length > 0) {
             setSelectedAssets(new Set());
         } else {
-            setSelectedAssets(new Set(assets.map(a => a._id)));
+            setSelectedAssets(new Set(Array.isArray(assets) ? assets.map(a => a._id) : []));
         }
     };
 
@@ -248,7 +248,7 @@ const ClientDashboard = () => {
                         gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
                         gap: '4rem 2rem'
                     }}>
-                        {assets.map((asset) => (
+                        {Array.isArray(assets) && assets.map((asset) => (
                             <motion.div
                                 key={asset._id}
                                 variants={itemVariants}

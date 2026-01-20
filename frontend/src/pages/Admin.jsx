@@ -1643,7 +1643,7 @@ const Admin = () => {
                                                     <div><strong>Timeline:</strong> {item.timeline || 'N/A'}</div>
 
                                                     {/* MOBILE VIBES DISPLAY */}
-                                                    {item.vibes && item.vibes.length > 0 && (
+                                                    {item.vibes && Array.isArray(item.vibes) && item.vibes.length > 0 && (
                                                         <div style={{ marginTop: '0.5rem' }}>
                                                             <strong>Vibes:</strong>
                                                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginTop: '5px' }}>
@@ -2428,7 +2428,7 @@ const Admin = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {filteredClients.map((client) => (
+                                    {Array.isArray(filteredClients) && filteredClients.map((client) => (
                                         <tr key={client._id} style={{ borderBottom: '1px solid #eee' }}>
                                             <td style={{ padding: '1rem', fontWeight: 'bold' }}>{client.username}</td>
                                             <td style={{ padding: '1rem' }}>{client.email}</td>
@@ -2522,7 +2522,7 @@ const Admin = () => {
                             {clientAssets.length === 0 ? (
                                 <p style={{ color: '#999', gridColumn: '1/-1', textAlign: 'center', marginTop: '2rem' }}>No assets found.</p>
                             ) : (
-                                clientAssets.map(asset => (
+                                Array.isArray(clientAssets) && clientAssets.map(asset => (
                                     <div key={asset._id} style={{ border: '1px solid #eee', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
                                         <button
                                             onClick={() => handleAssetDelete(asset._id)}

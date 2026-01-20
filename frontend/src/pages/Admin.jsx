@@ -849,7 +849,8 @@ const Admin = () => {
             alert("Upload Complete!");
         } catch (error) {
             console.error("Upload failed", error);
-            alert("Upload failed. Ensure you have an Upload Route working.");
+            const errMsg = error.response?.data?.details ? JSON.stringify(error.response.data.details) : (error.response?.data?.message || error.message);
+            alert(`Upload failed: ${errMsg}`);
         } finally {
             setUploadingAssets(false);
             e.target.value = null; // reset input

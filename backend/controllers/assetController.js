@@ -27,6 +27,7 @@ const getAssets = async (req, res) => {
 // @route   POST /api/assets
 // @access  Private/Admin
 const uploadAsset = async (req, res) => {
+    console.log("[ASSETS] Uploading asset, body:", req.body);
     try {
         const { title, type, url, userId, format, size } = req.body;
 

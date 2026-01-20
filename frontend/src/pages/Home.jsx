@@ -53,6 +53,8 @@ const Counter = ({ to, label }) => {
     );
 };
 
+const ViscousWrapper = ({ children }) => <>{children}</>;
+
 const ServiceList = ({ screenSize }) => {
     const containerRef = useRef(null);
     const { scrollYProgress } = useScroll({

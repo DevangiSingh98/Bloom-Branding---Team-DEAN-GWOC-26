@@ -376,10 +376,19 @@ const defaultContent = {
 export const ContentProvider = ({ children }) => {
     // Initialize state from localStorage if available, else default (Forcing Refresh)
     const [content, setContent] = useState(() => {
-        const savedContent = localStorage.getItem('bloomContent_v31'); // Bump to v31
+        const savedContent = localStorage.getItem('bloomContent_v32'); // Bump to v32 for sync
         console.log("Loading content...", savedContent ? "Found cached" : "Using default");
-        const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
-        return { ...defaultContent, ...parsed };
+        try {
+            const parsed = savedContent ? JSON.parse(savedContent) : defaultContent;
+            // Ensure siteImages is an object in state
+            if (parsed.siteImages && Array.isArray(parsed.siteImages)) {
+                parsed.siteImages = defaultContent.siteImages;
+            }
+            return { ...defaultContent, ...parsed };
+        } catch (e) {
+            console.error("Corrupt cache, using defaults");
+            return defaultContent;
+        }
     });
 
     // History for Undo/Redo

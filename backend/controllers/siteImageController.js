@@ -6,12 +6,7 @@ import SiteImage from '../models/SiteImage.js';
 const getSiteImages = async (req, res) => {
     try {
         const images = await SiteImage.find({});
-        // Convert array to object for easier frontend lookup: { 'home_hero_bg': 'url', ... }
-        const imageMap = {};
-        images.forEach(img => {
-            imageMap[img.key] = img.image;
-        });
-        res.json(imageMap);
+        res.json(images);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

@@ -1,7 +1,16 @@
 import nodemailer from 'nodemailer';
 
 const sendEmail = async (options) => {
-    const isGmail = process.env.SMTP_HOST && process.env.SMTP_HOST.includes('gmail');
+    // Robust detection of Gmail/SMTP settings
+    const smtpHost = process.env.SMTP_HOST || '';
+    const smtpEmail = process.env.SMTP_EMAIL || '';
+    const smtpPass = process.env.SMTP_PASSWORD || '';
+    const isGmail = smtpHost.toLowerCase().includes('gmail') || process.env.SMTP_SERVICE === 'gmail';
+
+    if (!smtpEmail || !smtpPass) {
+        console.error("[EMAIL] Missing SMTP credentials! Email will not be sent.");
+        throw new Error("Email credentials (SMTP_EMAIL/PASSWORD) are missing on the server.");
+    }
 
     let transporterConfigs;
 
@@ -10,22 +19,22 @@ const sendEmail = async (options) => {
         transporterConfigs = {
             service: 'gmail',
             auth: {
-                user: process.env.SMTP_EMAIL,
-                pass: process.env.SMTP_PASSWORD,
+                user: smtpEmail,
+                pass: smtpPass,
             },
-            connectionTimeout: 30000, // 30 seconds
+            connectionTimeout: 30000,
             greetingTimeout: 30000,
             socketTimeout: 30000,
         };
     } else {
-        const port = process.env.SMTP_PORT || 587;
+        const port = parseInt(process.env.SMTP_PORT) || 587;
         transporterConfigs = {
-            host: process.env.SMTP_HOST,
+            host: smtpHost,
             port: port,
-            secure: port == 465,
+            secure: port === 465,
             auth: {
-                user: process.env.SMTP_EMAIL,
-                pass: process.env.SMTP_PASSWORD,
+                user: smtpEmail,
+                pass: smtpPass,
             },
             tls: {
                 rejectUnauthorized: false
@@ -37,7 +46,7 @@ const sendEmail = async (options) => {
 
     const transporter = nodemailer.createTransport(transporterConfigs);
 
-    console.log(`[EMAIL SETUP] Service: ${isGmail ? 'Gmail' : 'Custom'}, Host: ${process.env.SMTP_HOST}`);
+    console.log(`[EMAIL SETUP] Service: ${isGmail ? 'Gmail' : 'Custom'}, Host: ${smtpHost || 'N/A'}`);
 
     const message = {
         from: `${process.env.FROM_NAME || 'Bloom Admin'} <${process.env.FROM_EMAIL || process.env.SMTP_EMAIL}>`,

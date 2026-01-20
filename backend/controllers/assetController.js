@@ -43,7 +43,11 @@ const uploadAsset = async (req, res) => {
         res.status(201).json(createdAsset);
     } catch (error) {
         console.error("Upload Asset Error:", error);
-        res.status(500).json({ message: 'Error creating asset' });
+        res.status(500).json({
+            message: 'Error creating asset',
+            error: error.message,
+            details: error.errors // Mongoose validation details
+        });
     }
 };
 

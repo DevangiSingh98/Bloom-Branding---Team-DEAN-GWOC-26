@@ -281,7 +281,7 @@ const ClientDashboard = () => {
                                             <video src={asset.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} muted playsInline onMouseOver={e => e.target.play()} onMouseOut={e => e.target.pause()} />
                                             <div style={{ position: 'absolute', bottom: '10px', right: '10px', backgroundColor: 'white', padding: '2px 8px', fontSize: '0.7rem', textTransform: 'uppercase', borderRadius: '4px', fontFamily: 'var(--font-subtitle)' }}>Video</div>
                                         </div>
-                                    ) : asset.type === 'pdf' || asset.url.toLowerCase().endsWith('.pdf') ? (
+                                    ) : asset.type === 'pdf' || asset.type === 'document' || asset.url.toLowerCase().endsWith('.pdf') ? (
                                         <div style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%' }}>
                                             <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📄</div>
                                             <div style={{ fontSize: '0.9rem', color: '#666', fontFamily: 'var(--font-subtitle)', textTransform: 'uppercase', letterSpacing: '1px' }}>PDF Document</div>

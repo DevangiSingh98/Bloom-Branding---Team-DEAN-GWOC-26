@@ -831,7 +831,7 @@ const Admin = () => {
 
                 const assetData = {
                     title: file.name,
-                    type: file.type.startsWith('video') ? 'video' : (file.type.includes('pdf') ? 'pdf' : 'image'),
+                    type: file.type.startsWith('video') ? 'video' : (file.type.includes('pdf') ? 'document' : 'image'),
                     url: fileUrl,
                     userId: selectedClientForAssets._id,
                     format: file.name.split('.').pop(),
@@ -2536,10 +2536,10 @@ const Admin = () => {
                                         <div style={{ height: '120px', backgroundColor: '#f9f9f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             {asset.type === 'image' ? (
                                                 <img src={asset.url} alt={asset.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                            ) : asset.type === 'pdf' ? (
+                                            ) : asset.type === 'pdf' || asset.type === 'document' ? (
                                                 <span style={{ fontSize: '3rem' }}>📄</span>
                                             ) : (
-                                                <span style={{ fontSize: '2rem', color: '#ccc' }}>VIDEO</span>
+                                                <span style={{ fontSize: '2rem', color: '#ccc' }}>{asset.type?.toUpperCase() || 'FILE'}</span>
                                             )}
                                         </div>
                                         <div style={{ padding: '0.5rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.8rem' }}>

@@ -17,6 +17,7 @@ export default function About() {
         const container = storyContainerRef.current;
         const track = container.querySelector('.horizontal-track');
         const titleCard = container.querySelector('.title-card');
+        const storyBg = container.querySelector('.story-bg-parallax');
         const textStream = container.querySelector('.text-stream');
 
         // Reveal items
@@ -43,7 +44,7 @@ export default function About() {
                 trigger: storyContainerRef.current,
                 start: "top top",
                 end: "+=5000",
-                scrub: 5, // Increased viscosity as requested
+                scrub: 1.2, // Reduced from 5 for less 'stop-y' feel
                 pin: true,
                 invalidateOnRefresh: true,
             }
@@ -54,6 +55,11 @@ export default function About() {
             x: () => -getScrollDistance(),
             duration: 2 // Increased duration relative to total timeline
         })
+            .to(storyBg, {
+                xPercent: -200, // Slides out even faster
+                ease: "none",
+                duration: 2
+            }, "<")
             .call(() => {
                 // If going backwards past this point (Phase 1), revert to Dark (Title Card)
                 // Note: .call() in a timeline fires on playIn and playReverse usually depending on position.
@@ -114,6 +120,17 @@ export default function About() {
             .to({}, { duration: 0.5 });
 
     }, { scope: storyContainerRef });
+    
+    useGSAP(() => {
+        ScrollTrigger.create({
+            trigger: founderSectionRef.current,
+            start: "top top",
+            end: "+=1000",
+            pin: true,
+            scrub: 1, // Added smoothing to the pin
+            invalidateOnRefresh: true,
+        });
+    }, { scope: founderSectionRef });
 
     const { scrollYProgress } = useScroll({
         target: founderSectionRef,
@@ -127,7 +144,7 @@ export default function About() {
         restDelta: 0.001
     });
 
-    const titleY = useTransform(smoothProgress, [0, 1], [150, -250]);
+    const titleY = useTransform(smoothProgress, [0, 1], [200, 50]);
     const xLeft = useTransform(smoothProgress, [0.1, 0.4], [80, 0]);
     const xRight = useTransform(smoothProgress, [0.1, 0.4], [-80, 0]);
 
@@ -164,16 +181,36 @@ export default function About() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            flexShrink: 0
+                            flexShrink: 0,
+                            position: 'relative',
+                            overflow: 'hidden',
+                            backgroundColor: '#fff' // Revelas this background
                         }}
                     >
+                        <div 
+                            className="story-bg-parallax"
+                            style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%', // Reset to 100% since it's sliding out
+                            height: '100%',
+                            backgroundImage: 'url("/images/download (4).jpg")',
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            transform: 'rotate(180deg)',
+                            zIndex: 0
+                        }}></div>
+
                         <h1 style={{
                             fontSize: 'clamp(4rem, 12vw, 12rem)',
                             fontFamily: 'var(--font-brand)',
-                            color: 'var(--color-dark-choc)',
+                            color: 'var(--color-butter-yellow)', // Changed to butter yellow for contrast against the image
                             lineHeight: 0.9,
                             textAlign: 'center',
-                            textTransform: 'uppercase'
+                            textTransform: 'uppercase',
+                            position: 'relative',
+                            zIndex: 1
                         }}>
                             The <br /> Story <br /> of <br /> Bloom
                         </h1>
@@ -276,14 +313,14 @@ export default function About() {
             </section>
 
             {/* Founder Section */}
-            <section ref={founderSectionRef} className="section-padding" style={{ backgroundColor: 'var(--color-dark-choc)', paddingBottom: 0, paddingTop: '6rem', position: 'relative', overflow: 'hidden' }}>
-                <div className="container" style={{ position: 'relative' }}>
+            <section ref={founderSectionRef} className="section-padding" style={{ backgroundColor: 'var(--color-dark-choc)', paddingBottom: 0, paddingTop: '4rem', position: 'relative', overflow: 'hidden', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                <div className="container" style={{ position: 'relative', maxWidth: '1200px', margin: '0 auto' }}>
 
                     <motion.h2
                         style={{
                             y: titleY,
-                            fontSize: 'clamp(4rem, 8vw, 8rem)',
-                            marginBottom: '-3rem',
+                            fontSize: 'clamp(2.5rem, 6vw, 6rem)',
+                            marginBottom: '4rem',
                             color: 'var(--color-butter-yellow)',
                             textAlign: 'center',
                             position: 'relative',
@@ -325,129 +362,7 @@ export default function About() {
                 </div>
             </section>
 
-            {/* JOURNEY & PHILOSOPHY ARCHED PORTALS */}
-            <section style={{ backgroundColor: '#fff', padding: '180px 5% 50px', overflow: 'hidden' }}>
-                <div className="container">
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', // Adjusted for mobile
-                        gap: '40px', // Increased gap
-                        alignItems: 'start'
-                    }}>
-                        {/* ARCH 1: OUR JOURNEY */}
-                        <motion.div
-                            id="journey-section"
-                            onViewportEnter={() => {
-                                window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: true } }));
-                            }}
-                            onViewportLeave={(entry) => {
-                                // If leaving to the top (scrolling back up), go back to Yellow (Founder layout)
-                                if (entry.boundingClientRect.y > 0) {
-                                    window.dispatchEvent(new CustomEvent('bloom-navbar-change', { detail: { isDark: false } }));
-                                }
-                            }}
-                            initial={{ opacity: 0, y: 50 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8 }}
-                            style={{
-                                backgroundColor: 'transparent',
-                                borderRadius: '500px 500px 0 0',
-                                padding: '60px 20px 40px', // Reduced padding further
-                                border: '2.5px solid var(--color-dark-choc)',
-                                color: 'var(--color-dark-choc)',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                height: 'auto', // Allow it to adjust
-                                minHeight: '500px',
-                                position: 'relative',
-                                marginBottom: '2rem'
-                            }}
-                        >
-                            {/* Decorative Star */}
-                            <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', color: 'var(--color-dark-choc)' }}>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-                                </svg>
-                            </div>
 
-                            <h3 style={{
-                                fontFamily: 'var(--font-brand)',
-                                fontSize: '3rem', // Slightly smaller title
-                                textAlign: 'center',
-                                marginBottom: '1.5rem',
-                                lineHeight: 1.1,
-                                letterSpacing: '1px'
-                            }}>
-                                OUR <br /> JOURNEY
-                            </h3>
-
-                            <p style={{
-                                fontFamily: 'var(--font-subtitle)',
-                                fontSize: '1.3rem', // Slightly smaller text
-                                fontWeight: 'bold',
-                                lineHeight: 1.5,
-                                textAlign: 'justify', // Changed to justify
-                                marginTop: 'auto',
-                                marginBottom: 'auto',
-                                padding: '0 10px'
-                            }}>
-                                OUR JOURNEY DIDN'T BEGIN IN A BOARDROOM. IT STARTED WITH A PASSION FOR ART, A CURIOSITY FOR TECHNOLOGY, AND A BELIEF THAT BUSINESS CAN BE BEAUTIFUL. WE'VE NAVIGATED THE EVOLVING DIGITAL LANDSCAPE BY STAYING TRUE TO OUR CORE: AUTHENTIC CONNECTION.
-                            </p>
-                        </motion.div>
-
-                        {/* ARCH 2: PHILOSOPHY */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 50 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                            style={{
-                                backgroundColor: 'transparent',
-                                borderRadius: '500px 500px 0 0',
-                                padding: '60px 20px 40px', // Reduced padding
-                                border: '2.5px solid var(--color-dark-choc)',
-                                color: 'var(--color-dark-choc)',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                height: 'auto',
-                                minHeight: '500px',
-                                position: 'relative',
-                                marginBottom: '2rem'
-                            }}
-                        >
-                            {/* Decorative Star */}
-                            <div style={{ position: 'absolute', top: '20px', left: '50%', transform: 'translateX(-50%)', color: 'var(--color-dark-choc)' }}>
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z" />
-                                </svg>
-                            </div>
-
-                            <h3 style={{
-                                fontFamily: 'var(--font-brand)',
-                                fontSize: '3rem',
-                                textAlign: 'center',
-                                marginBottom: '1.5rem',
-                                lineHeight: 1.1,
-                                letterSpacing: '1px'
-                            }}>
-                                OUR <br /> PHILOSOPHY
-                            </h3>
-
-                            <p style={{
-                                fontFamily: 'var(--font-subtitle)',
-                                fontSize: '1.3rem',
-                                fontWeight: 'bold',
-                                lineHeight: 1.4,
-                                textAlign: 'justify', // Changed to justify
-                                marginTop: 'auto',
-                                marginBottom: 'auto',
-                                padding: '0 10px'
-                            }}>
-                                MOTION IS AT THE HEART OF OUR PHILOSOPHY BECAUSE LIFE DOESN'T STAND STILL. BY INTEGRATING FLUID ANIMATIONS AND DYNAMIC VISUALS, WE BREATHE LIFE INTO STATIC BRANDS. WE CREATE DIGITAL ECOSYSTEMS WHERE USERS DON'T JUST VISIT—THEY FEEL, INTERACT, AND REMEMBER.
-                            </p>
-                        </motion.div>
-                    </div>
-                </div>
-            </section>
             <Footer />
         </motion.div>
     );

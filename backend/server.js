@@ -14,18 +14,14 @@ import userRoutes from './routes/userRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import testimonialRoutes from './routes/testimonialRoutes.js';
-import instagramRoutes from './routes/instagramRoutes.js';
 import founderRoutes from './routes/founderRoutes.js';
 import valueRoutes from './routes/valueRoutes.js';
 import brandRoutes from './routes/brandRoutes.js';
 import selectedWorkRoutes from './routes/selectedWorkRoutes.js';
-import chatRoutes from './routes/chatRoutes.js';
 import heroRoutes from './routes/heroRoutes.js';
 import siteImageRoutes from './routes/siteImageRoutes.js';
 import legalRoutes from './routes/legalRoutes.js';
-import aiRoutes from './routes/aiRoutes.js';
 import assetRoutes from './routes/assetRoutes.js';
-import vibeRoutes from './routes/vibeRoutes.js';
 import User from './models/User.js';
 dotenv.config();
 
@@ -91,20 +87,17 @@ app.use('/api/users', userRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/testimonials', testimonialRoutes);
-app.use('/api/instagram', instagramRoutes);
+
 app.use('/api/founders', founderRoutes);
 app.use('/api/values', valueRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/selected-work', selectedWorkRoutes);
-app.use('/api/chat', chatRoutes);
 // ... imports
 
 app.use('/api/hero', heroRoutes);
 app.use('/api/site-images', siteImageRoutes);
-app.use('/api/vibes', vibeRoutes); // Register Vibes
 app.use('/api/legal', legalRoutes);
 
-app.use('/api/ai', aiRoutes);
 app.use('/api/assets', assetRoutes);
 
 // --- GOOGLE AUTH ROUTES ---

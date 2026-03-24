@@ -20,7 +20,7 @@ export default function Navbar() {
     // Track scroll position for robust fallback
     useEffect(() => {
         const handleScroll = () => setScrollY(window.scrollY);
-        const handleResize = () => setIsMobile(window.innerWidth <= 1200); // Expanded to include Tablet
+        const handleResize = () => setIsMobile(window.innerWidth <= 640); // Lowered breakpoint to cover smaller tablets/laptops
 
         window.addEventListener('scroll', handleScroll, { passive: true });
         window.addEventListener('resize', handleResize);
@@ -126,6 +126,8 @@ export default function Navbar() {
     const isHome = location.pathname === '/';
     const isServices = location.pathname === '/services';
     const isWork = location.pathname === '/work';
+    const isHomeHero = isHome && scrollY < (typeof window !== 'undefined' ? window.innerHeight : 800) - 100;
+    const isPastHomeHero = isHome && scrollY >= (typeof window !== 'undefined' ? window.innerHeight : 800) - 100;
 
     // Unified Logic:
     // 1. Menu Open -> Butter Yellow
@@ -149,6 +151,8 @@ export default function Navbar() {
     const getColor = () => {
         if (isOpen) return 'var(--color-butter-yellow)';
         if (isWork) return '#4A3426'; // Brown for Work Page using Ingrao theme
+
+        if (isPastHomeHero) return 'var(--color-dark-choc)';
 
         // 1. SAFETY OVERRIDE: Enforce "Top of Page" colors
         // If we are basically at the top (< 10px), FORCE the correct color
@@ -185,20 +189,58 @@ export default function Navbar() {
 
     return (
         <>
+            {/* Always-visible Menu Button Component */}
+            <div style={{
+                position: 'fixed',
+                top: '1.2rem',
+                right: '5%',
+                zIndex: 101, // Above the header
+                opacity: (isHomeHero && !isOpen) ? 1 : 0, // Show ONLY when header is hidden to avoid duplicate buttons
+                pointerEvents: (isHomeHero && !isOpen) ? 'auto' : 'none',
+                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}>
+                <button onClick={toggleMenu} style={{
+                    background: 'var(--color-white)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '0.8rem 1.5rem',
+                    borderRadius: '100px', // Fully rounded pill shape
+                    color: 'var(--color-dark-choc)', // Dark text for contrast against white
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.6rem',
+                    fontFamily: 'var(--font-subtitle)',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.1)', // Soft shadow
+                    transition: 'all 0.3s ease'
+                }}>
+                    <span className="font-subtitle" style={{ textTransform: 'uppercase', fontSize: '1rem', fontWeight: 'bold' }}>Menu</span>
+                    <div style={{ position: 'relative', width: '20px', height: '20px' }}>
+                        <Menu size={20} strokeWidth={2.5} />
+                    </div>
+                </button>
+            </div>
+
             <header style={{
                 position: 'fixed',
                 top: 0,
                 left: 0,
                 right: 0,
-                padding: '2rem 5%',
+                padding: isPastHomeHero ? '0.8rem 5%' : '1.2rem 5%',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 zIndex: 100,
-                // Removed mixBlendMode and color (handled individually)
-                transition: 'color 0.3s ease'
+                backgroundColor: (isPastHomeHero && !isOpen) ? 'var(--color-white)' : 'transparent',
+                boxShadow: (isPastHomeHero && !isOpen) ? '0 4px 20px rgba(0,0,0,0.05)' : 'none',
+                pointerEvents: 'auto',
+                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
             }}>
-                <Link to="/" style={{ display: 'block', width: '200px', color: logoColor }}>
+                <Link to="/" style={{
+                    display: 'block',
+                    width: isPastHomeHero ? '40px' : '160px', /* Shrink width for BB logo */
+                    color: logoColor,
+                    transition: 'width 0.4s ease'
+                }}>
                     <div style={{
                         position: 'relative',
                         width: '100%',
@@ -208,7 +250,7 @@ export default function Navbar() {
                     }}>
                         {/* Ghost image to maintain aspect ratio and size */}
                         <img
-                            src={content.siteImages?.navbar_logo || "/images/Full-Logo.png"}
+                            src={isPastHomeHero ? (content.siteImages?.navbar_icon || "/images/brandmark.png") : (content.siteImages?.navbar_logo || "/images/Full-Logo.png")}
                             alt="Bloom Branding"
                             style={{ width: '100%', height: 'auto', opacity: 0 }}
                         />
@@ -217,59 +259,92 @@ export default function Navbar() {
                             position: 'absolute',
                             inset: 0,
                             backgroundColor: 'currentColor',
-                            maskImage: `url(${content.siteImages?.navbar_logo || "/images/Full-Logo.png"})`,
-                            WebkitMaskImage: `url(${content.siteImages?.navbar_logo || "/images/Full-Logo.png"})`,
+                            maskImage: `url(${isPastHomeHero ? (content.siteImages?.navbar_icon || "/images/brandmark.png") : (content.siteImages?.navbar_logo || "/images/Full-Logo.png")})`,
+                            WebkitMaskImage: `url(${isPastHomeHero ? (content.siteImages?.navbar_icon || "/images/brandmark.png") : (content.siteImages?.navbar_logo || "/images/Full-Logo.png")})`,
                             maskSize: 'contain',
                             WebkitMaskSize: 'contain',
                             maskRepeat: 'no-repeat',
                             WebkitMaskRepeat: 'no-repeat',
-                            maskPosition: 'center',
-                            WebkitMaskPosition: 'center',
+                            maskPosition: 'left center',
+                            WebkitMaskPosition: 'left center',
                             transition: 'background-color 0.3s ease'
                         }} />
                     </div>
                 </Link>
 
-                <button onClick={toggleMenu} style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: 0,
-                    color: menuColor,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.8rem',
-                    fontFamily: 'var(--font-subtitle)',
-                    filter: showShadow ? 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))' : 'none',
-                    transition: 'filter 0.3s ease, color 0.3s ease'
-                }}>
-                    <span className="font-subtitle" style={{ textTransform: 'uppercase', fontSize: '1.5rem', fontWeight: 'bold' }}>{isOpen ? 'Close' : 'Menu'}</span>
-                    <div style={{ position: 'relative', width: '32px', height: '32px' }}>
-                        <AnimatePresence mode="wait">
-                            {isOpen ? (
-                                <motion.div
-                                    key="close"
-                                    initial={{ opacity: 0, rotate: -90 }}
-                                    animate={{ opacity: 1, rotate: 0 }}
-                                    exit={{ opacity: 0, rotate: 90 }}
-                                    style={{ position: 'absolute' }}
-                                >
-                                    <X size={32} />
-                                </motion.div>
-                            ) : (
-                                <motion.div
-                                    key="menu"
-                                    initial={{ opacity: 0, rotate: 90 }}
-                                    animate={{ opacity: 1, rotate: 0 }}
-                                    exit={{ opacity: 0, rotate: -90 }}
-                                    style={{ position: 'absolute' }}
-                                >
-                                    <Menu size={32} />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                </button>
+                {/* Inline Desktop Links */}
+                {!isMobile && (
+                    <nav style={{
+                        display: 'flex',
+                        gap: '4rem',
+                        alignItems: 'center',
+                        position: 'absolute',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        opacity: (isHomeHero || isOpen) ? 0 : 1, // Hide in hero or when full menu is open
+                        pointerEvents: (isHomeHero || isOpen) ? 'none' : 'auto',
+                        transition: 'opacity 0.3s ease'
+                    }}>
+                        {menuItems.map(link => (
+                            <Link key={link.name} to={link.path} style={{
+                                color: menuColor,
+                                textDecoration: 'none',
+                                fontFamily: 'var(--font-subtitle)',
+                                fontSize: '1.2rem',
+                                fontWeight: '600',
+                                filter: showShadow && !isHomeHero ? 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))' : 'none',
+                                transition: 'all 0.3s ease'
+                            }}>
+                                {link.name}
+                            </Link>
+                        ))}
+                    </nav>
+                )}
+
+                {isMobile && (
+                    <button onClick={toggleMenu} style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: 0,
+                        color: menuColor,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.6rem',
+                        fontFamily: 'var(--font-subtitle)',
+                        filter: showShadow && !isHomeHero ? 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))' : 'none',
+                        opacity: isHomeHero ? 0 : 1, // Hide standard menu button in hero
+                        pointerEvents: isHomeHero ? 'none' : 'auto',
+                        transition: 'all 0.3s ease'
+                    }}>
+                        <span className="font-subtitle" style={{ textTransform: 'uppercase', fontSize: '1.2rem', fontWeight: 'bold' }}>{isOpen ? 'Close' : 'Menu'}</span>
+                        <div style={{ position: 'relative', width: '28px', height: '28px' }}>
+                            <AnimatePresence mode="wait">
+                                {isOpen ? (
+                                    <motion.div
+                                        key="close"
+                                        initial={{ opacity: 0, rotate: -90 }}
+                                        animate={{ opacity: 1, rotate: 0 }}
+                                        exit={{ opacity: 0, rotate: 90 }}
+                                        style={{ position: 'absolute' }}
+                                    >
+                                        <X size={28} />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="menu"
+                                        initial={{ opacity: 0, rotate: 90 }}
+                                        animate={{ opacity: 1, rotate: 0 }}
+                                        exit={{ opacity: 0, rotate: -90 }}
+                                        style={{ position: 'absolute' }}
+                                    >
+                                        <Menu size={28} />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </button>
+                )}
             </header>
 
             <AnimatePresence>

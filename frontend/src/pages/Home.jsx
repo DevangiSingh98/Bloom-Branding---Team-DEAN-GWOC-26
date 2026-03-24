@@ -56,143 +56,134 @@ const Counter = ({ to, label }) => {
 const ViscousWrapper = ({ children }) => <>{children}</>;
 
 const ServiceList = ({ screenSize }) => {
-    const containerRef = useRef(null);
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start start", "end end"]
-    });
-    const smoothProgress = useSpring(scrollYProgress, {
-        stiffness: 800, damping: 60, mass: 1, restDelta: 0.001
-    });
+    const isMobile = screenSize === 'mobile';
 
     const services = [
-        { title: "Branding", link: "/services#branding", img: "branding.png", imgSize: "60%" },
-        { title: "Social Media", link: "/services#social-media", img: "socialmedia.png", imgSize: "60%" },
-        { title: "Production", link: "/services#production", img: "production.png", imgSize: "60%" },
-        { title: "Influencer", link: "/services#influencer-marketing", img: "influencer.png" },
-        { title: "Creative Design", link: "/services#creative-design", img: "creativedesign.png" }
+        { id: 1, title: "Branding", link: "/services#branding" },
+        { id: 2, title: "Social Media Marketing", link: "/services#social-media" },
+        { id: 3, title: "Production", link: "/services#production" },
+        { id: 4, title: "Influencer Marketing", link: "/services#influencer-marketing" },
+        { id: 5, title: "Creative Design", link: "/services#creative-design" }
     ];
 
     return (
-        <div ref={containerRef} style={{ height: '500vh', position: 'relative' }}>
-            <div style={{
-                position: 'sticky',
-                top: 0,
-                height: '100vh',
-                backgroundColor: 'var(--color-electric-blue)',
-                display: 'flex',
-                flexDirection: 'column',
-                padding: screenSize === 'mobile' ? '15vh 5vw 2vh 5vw' : '2vh 5vw',
-                overflow: 'hidden'
-            }}>
-                <h2 style={{
-                    color: 'var(--color-butter-yellow)',
-                    fontSize: screenSize === 'mobile' ? '10rem' : 'clamp(5rem, 10vw, 10rem)',
-                    fontFamily: 'var(--font-brand)',
-                    marginBottom: screenSize === 'mobile' ? '2rem' : '1rem',
-                    flexShrink: 0,
-                    textTransform: 'uppercase',
-                    textAlign: 'center',
-                    width: '100%',
-                    lineHeight: screenSize === 'mobile' ? 0.8 : 0.9,
-                    wordWrap: 'break-word',
-                    display: 'block'
-                }}>
-                    Our Expertise
-                </h2>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}>
-                    <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column' }}>
-                        {services.map((service, i) => (
-                            <div key={i} style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', marginTop: i === 0 ? 0 : (screenSize === 'mobile' ? '-17vh' : '-8vh') }}>
-                                <ServiceItem
-                                    service={service}
-                                    i={i}
-                                    total={services.length}
-                                    scrollYProgress={smoothProgress}
-                                    screenSize={screenSize}
-                                />
-                            </div>
-                        ))}
-                    </div>
-                    {/* PC ONLY Image Reveal */}
-                    <div style={{
-                        flex: 1,
-                        position: 'relative',
-                        overflow: 'hidden',
-                        display: screenSize === 'mobile' ? 'none' : 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
+        <div style={{
+            width: '100%',
+            padding: isMobile ? '4rem 1rem' : '10vw 5vw',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            position: 'relative',
+            backgroundColor: 'var(--color-electric-blue)',
+            minHeight: '80vh',
+            justifyContent: 'center'
+        }}>
+
+
+            <div style={{ position: 'relative', zIndex: 2, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {/* Title Section */}
+                <div style={{ textAlign: 'center', marginBottom: '4rem', position: 'relative' }}>
+                    <h2 style={{
+                        color: 'var(--color-butter-yellow)',
+                        fontSize: isMobile ? '4rem' : 'clamp(6rem, 12vw, 10rem)',
+                        fontFamily: 'var(--font-brand)',
+                        lineHeight: 0.9,
+                        margin: 0,
+                        textTransform: 'uppercase'
                     }}>
-                        <motion.div style={{
-                            display: 'flex', flexDirection: 'column-reverse', height: '100%', width: '100%',
-                            y: useTransform(smoothProgress, [0, 1], ['0%', '400%'])
+                        Services
+                    </h2>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginTop: '1rem' }}>
+                        <p style={{
+                            color: 'var(--color-butter-yellow)',
+                            fontFamily: 'var(--font-subtitle)',
+                            fontSize: isMobile ? '1.2rem' : '1.8rem',
+                            margin: 0,
+                            fontStyle: 'italic'
                         }}>
-                            {services.map((service, i) => (
-                                <div key={i} style={{ height: '100%', width: '100%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <div style={{
-                                        width: service.imgSize || '80%', height: '60%', backgroundColor: 'var(--color-butter-yellow)',
-                                        maskImage: `url(/images/${service.img})`, WebkitMaskImage: `url(/images/${service.img})`,
-                                        maskSize: 'contain', WebkitMaskSize: 'contain', maskRepeat: 'no-repeat', WebkitMaskRepeat: 'no-repeat',
-                                        maskPosition: 'center', WebkitMaskPosition: 'center',
-                                    }} />
-                                </div>
-                            ))}
-                        </motion.div>
+                            that won our clients' hearts over the past 5 years!
+                        </p>
                     </div>
                 </div>
-            </div>
-            {/* Scroll Triggers */}
-            <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-                {services.map((_, i) => (
-                    <div key={i} style={{
-                        position: 'absolute', top: `${i * 100}vh`, height: '100vh', width: '100%',
-                        scrollSnapAlign: 'start', scrollSnapStop: 'always'
-                    }} />
-                ))}
+
+                {/* Services Layout */}
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: isMobile ? '3rem' : '4rem',
+                    width: '100%',
+                    maxWidth: '1200px'
+                }}>
+                    {/* Top Row (3 items) */}
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
+                        justifyContent: 'center',
+                        width: '100%',
+                        gap: isMobile ? '3rem' : '8rem'
+                    }}>
+                        {services.slice(0, 3).map((service) => (
+                            <ServiceLink key={service.id} service={service} isMobile={isMobile} />
+                        ))}
+                    </div>
+
+                    {/* Bottom Row (2 items) */}
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
+                        justifyContent: 'center',
+                        gap: isMobile ? '2rem' : '12rem', // Massive gap as requested
+                        width: '100%'
+                    }}>
+                        {services.slice(3, 5).map((service) => (
+                            <ServiceLink key={service.id} service={service} isMobile={isMobile} />
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
 
-const ServiceItem = ({ service, i, total, scrollYProgress, screenSize }) => {
-    const steps = [0, 0.25, 0.5, 0.75, 1];
-    const flexValues = steps.map((_, idx) => idx === i ? 30 : 1);
-    const flexGrow = useTransform(scrollYProgress, steps, flexValues);
-    const opacityValues = steps.map((_, idx) => idx === i ? 1 : 0.3);
-    const opacity = useTransform(scrollYProgress, steps, opacityValues);
-    const scaleYValues = steps.map((_, idx) => idx === i ? 1.5 : 0.5);
-    const textScaleY = useTransform(scrollYProgress, steps, scaleYValues);
-    const scaleValues = steps.map((_, idx) => idx === i ? 1.2 : 0.8);
-    const textScale = useTransform(scrollYProgress, steps, scaleValues);
-
+const ServiceLink = ({ service, isMobile }) => {
     return (
-        <motion.div style={{
-            flexGrow,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: screenSize === 'mobile' ? 'center' : 'flex-start',
-            overflow: 'visible',
-            position: 'relative',
-            originX: 0
-        }}>
-            <Link to={service.link} style={{ display: 'block', width: '100%', textAlign: screenSize === 'mobile' ? 'center' : 'left' }}>
-                <motion.h3 style={{
-                    margin: 0,
-                    fontFamily: 'var(--font-subtitle)',
-                    fontWeight: 'bold',
-                    color: 'var(--color-butter-yellow)',
-                    opacity,
-                    scaleY: textScaleY,
-                    scale: textScale,
-                    transformOrigin: screenSize === 'mobile' ? 'center center' : 'left center',
-                    fontSize: 'clamp(3rem, 6vw, 6rem)',
-                    whiteSpace: 'nowrap',
-                    lineHeight: 0.8
-                }}>
-                    {service.title}
-                </motion.h3>
-            </Link>
-        </motion.div>
+        <Link
+            to={service.link}
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                textDecoration: 'none',
+                color: 'var(--color-white)',
+                flex: isMobile ? 1 : '0 1 auto',
+                cursor: 'pointer',
+                transition: 'transform 0.3s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        >
+            <span style={{
+                color: 'var(--color-butter-yellow)',
+                fontFamily: 'var(--font-brand)',
+                fontSize: isMobile ? '1.5rem' : '2rem',
+                fontWeight: 'bold',
+                marginBottom: '0.5rem'
+            }}>
+                {service.id}.
+            </span>
+            <span style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: isMobile ? '1.1rem' : '1.3rem',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+                textAlign: 'center',
+                color: 'var(--color-white)'
+            }}>
+                {service.title}
+            </span>
+        </Link>
     );
 };
 
@@ -221,6 +212,61 @@ export default function Home() {
 
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        // Load the Elfsight script dynamically when the component mounts
+        const script = document.createElement('script');
+        script.src = "https://elfsightcdn.com/platform.js";
+        script.async = true;
+        document.body.appendChild(script);
+
+        // Function to find and hide Elfsight watermark/spacing, even in Shadow DOM
+        const cleanupElfsight = () => {
+            const widgets = document.querySelectorAll('[class*="elfsight-app"]');
+            widgets.forEach(widget => {
+                const searchRoot = (root) => {
+                    if (!root) return;
+                    // Hide Watermark Links
+                    const links = root.querySelectorAll('a[href*="elfsight.com"]');
+                    links.forEach(link => {
+                        link.style.setProperty('display', 'none', 'important');
+                        link.style.setProperty('visibility', 'hidden', 'important');
+                        link.style.setProperty('height', '0', 'important');
+                        link.style.setProperty('opacity', '0', 'important');
+                    });
+                    // Hide Badge Containers
+                    const badges = root.querySelectorAll('[class*="Badge__Container"], [class*="eapps-link"], [class*="Badge__Inner"]');
+                    badges.forEach(badge => badge.style.setProperty('display', 'none', 'important'));
+                    
+                    // Remove internal bottom padding to close the gap
+                    const containers = root.querySelectorAll('[class*="Container__Component"], [class*="Layout__Component"]');
+                    containers.forEach(c => {
+                        c.style.setProperty('padding-bottom', '0', 'important');
+                        c.style.setProperty('margin-bottom', '0', 'important');
+                    });
+
+                    // Recursive search into nested shadow roots if any
+                    const allElements = root.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        if (el.shadowRoot) searchRoot(el.shadowRoot);
+                    });
+                };
+
+                searchRoot(document);
+                if (widget.shadowRoot) searchRoot(widget.shadowRoot);
+            });
+        };
+
+        const interval = setInterval(cleanupElfsight, 1000);
+        cleanupElfsight();
+
+        return () => {
+            if (document.body.contains(script)) {
+                document.body.removeChild(script);
+            }
+            clearInterval(interval);
+        };
     }, []);
 
     const springConfig = { stiffness: 100, damping: 30, mass: 1 };
@@ -535,11 +581,13 @@ export default function Home() {
                 </motion.div>
                 <ParallaxContent>
                     <motion.div style={{
-                        position: 'relative', zIndex: 14, y: screenSize === 'mobile' ? 0 : textExitY, textAlign: 'center',
+                        position: 'relative',
+                        zIndex: 14,
+                        y: textExitY,
+                        textAlign: 'left', // Set text alignment to left since they want it heavily left
                         maxWidth: screenSize === 'mobile' ? '95%' : '80%',
                         margin: screenSize === 'mobile' ? '15vh auto 0 auto' : '0 auto',
-                        transform: 'translateX(-35px)',
-                        opacity: heroContentOpacity
+                        left: screenSize === 'mobile' ? '0' : '-2vw' // Forcefully moving left relative to center
                     }}>
                         <motion.img
                             src="/images/main logo.png"
@@ -561,10 +609,10 @@ export default function Home() {
                             className="font-subtitle"
                             style={{
                                 fontSize: screenSize === 'mobile' ? '0.9rem' : '1.2rem',
-                                margin: '0 auto 2rem auto',
+                                margin: '0 auto 2rem 0', // Changed right/left margins to left-align
                                 color: 'var(--color-white)',
                                 textShadow: '0 0 10px rgba(0,0,0,0.5)',
-                                textAlign: 'center',
+                                textAlign: 'center', // Image is left aligned but let's keep text centered relative to image width
                                 whiteSpace: screenSize === 'mobile' ? 'nowrap' : 'normal'
                             }}
                         >
@@ -925,41 +973,64 @@ export default function Home() {
                         >
                             Brands We've Bloomed
                         </motion.h2>
-                        <div className="brands-grid-container" style={{
-                            display: 'grid',
-                            gridTemplateColumns: screenSize === 'mobile' ? 'repeat(3, 1fr)' : 'repeat(5, 1fr)',
-                            gap: screenSize === 'mobile' ? '1rem' : '3rem',
-                            alignItems: 'center',
-                            justifyContent: 'center'
+                        <div style={{
+                            width: '100%',
+                            overflow: 'hidden',
+                            position: 'relative',
+                            padding: '2rem 0',
+                            maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+                            WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)'
                         }}>
-                            {Array.isArray(content.brandLogos) && content.brandLogos.map((brand, index) => (
-                                <motion.div
-                                    key={brand.id || index}
-                                    initial={{ opacity: 0, scale: 0.9 }}
-                                    whileInView={{ opacity: 1, scale: 1 }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 0.5, delay: index * 0.05 }}
-                                    whileHover={{ scale: 1.05 }}
-                                    style={{
-                                        width: '100%',
-                                        aspectRatio: '3/2',
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        padding: screenSize === 'mobile' ? '0.5rem' : '1rem'
-                                    }}
-                                >
-                                    <img
-                                        src={brand.logo}
-                                        alt={brand.name}
+                            <motion.div
+                                animate={{ x: ["0%", "-50%"] }}
+                                transition={{
+                                    repeat: Infinity,
+                                    ease: "linear",
+                                    duration: 30 // Adjust speed here
+                                }}
+                                style={{
+                                    display: 'flex',
+                                    gap: '4rem',
+                                    width: 'fit-content',
+                                    paddingRight: '4rem', // Gap compensation at the end
+                                    alignItems: 'center'
+                                }}
+                            >
+                                {/* Double the array to ensure continuous seamless scrolling */}
+                                {[...(content.brandLogos || []), ...(content.brandLogos || [])].map((brand, index) => (
+                                    <div
+                                        key={brand.id ? `brand-${brand.id}-${index}` : index}
                                         style={{
-                                            maxWidth: screenSize === 'mobile' ? '70%' : '100%',
-                                            maxHeight: '100%',
-                                            objectFit: 'contain'
+                                            width: screenSize === 'mobile' ? '120px' : '180px',
+                                            height: '100px',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            flexShrink: 0,
+                                            opacity: 0.8,
+                                            transition: 'transform 0.3s ease, opacity 0.3s ease',
                                         }}
-                                    />
-                                </motion.div>
-                            ))}
+                                        onMouseEnter={(e) => {
+                                            e.currentTarget.style.transform = 'scale(1.1)';
+                                            e.currentTarget.style.opacity = '1';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.currentTarget.style.transform = 'scale(1)';
+                                            e.currentTarget.style.opacity = '0.8';
+                                        }}
+                                    >
+                                        <img
+                                            src={brand.logo}
+                                            alt={brand.name || 'Brand Logo'}
+                                            style={{
+                                                maxWidth: '100%',
+                                                maxHeight: '100%',
+                                                objectFit: 'contain'
+                                            }}
+                                        />
+                                    </div>
+                                ))}
+                            </motion.div>
                         </div>
                     </div>
                 </div>
@@ -984,7 +1055,7 @@ export default function Home() {
                             fontSize: screenSize === 'mobile' ? '10rem' : 'clamp(5rem, 10vw, 10rem)', fontFamily: 'var(--font-brand)',
                             color: 'var(--color-electric-blue)', textTransform: 'uppercase', letterSpacing: '1px', lineHeight: 1
                         }}>
-                            Check Out Our Vibe
+                            Check Out Our Feed
                         </h2>
                         <a href="https://www.instagram.com/bloom.branding_/?hl=en" target="_blank" rel="noopener noreferrer" style={{
                             fontSize: 'clamp(1.5rem, 2.5vw, 2.5rem)', fontFamily: 'var(--font-subtitle)',
@@ -994,38 +1065,9 @@ export default function Home() {
                 </div>
                 <div style={{
                     position: 'relative', zIndex: 10, backgroundColor: '#fafafa',
-                    display: 'grid', gridTemplateColumns: screenSize === 'mobile' ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-                    gap: 0, width: '100%', margin: 0, padding: 0
+                    width: '100%', margin: 0, padding: 0
                 }}>
-                    {Array.isArray(content.instagram) && content.instagram.slice(0, 4).map((item, i) => (
-                        <motion.a
-                            key={item.id || i}
-                            href={item.link || "https://www.instagram.com/bloom.branding_/?hl=en"}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group"
-                            style={{
-                                display: 'block', width: '100%', position: 'relative', overflow: 'hidden', aspectRatio: '1/1'
-                            }}
-                        >
-                            <img
-                                src={item.image}
-                                alt="Instagram Post"
-                                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
-                                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                            />
-                            <div style={{
-                                position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.3)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.3s ease'
-                            }}
-                                onMouseOver={(e) => e.currentTarget.style.opacity = 1}
-                                onMouseOut={(e) => e.currentTarget.style.opacity = 0}
-                            >
-                                <span style={{ color: '#fff', fontSize: '2rem' }}>↗</span>
-                            </div>
-                        </motion.a>
-                    ))}
+                    <div className="elfsight-app-a3cc93fe-4fe9-4652-8dc4-aab6bc14cbb2" data-elfsight-app-lazy></div>
                 </div>
             </section>
         </motion.div>

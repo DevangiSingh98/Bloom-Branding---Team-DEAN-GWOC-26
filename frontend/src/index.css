@@ -152,6 +152,8 @@ h6 {
   /* Very Bold */
   line-height: 1.1;
   text-transform: uppercase;
+  font-size: calc(0.8 * 1em);
+  /* Base scaling factor to reduce default H sizes slightly */
 }
 
 p {
@@ -367,7 +369,7 @@ button {
 }
 
 .service-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   margin: 0;
   font-family: var(--font-brand);
   color: var(--color-butter-yellow);
@@ -495,7 +497,7 @@ button {
 
 .work-grid-item-title {
   font-family: var(--font-brand);
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   /* Small but readable */
   color: var(--color-dark-choc);
   text-transform: uppercase;
@@ -541,7 +543,7 @@ button {
 .project-panel-title {
   font-family: var(--font-brand);
   /* Slightly smaller but still bold */
-  font-size: clamp(4rem, 15vw, 10rem);
+  font-size: clamp(3rem, 10vw, 7rem);
   font-weight: 700;
   text-transform: uppercase;
   text-align: center;
@@ -637,7 +639,7 @@ button {
   }
 
   .project-panel-title {
-    font-size: 11vh !important;
+    font-size: 8vh !important;
     line-height: 0.8 !important;
     white-space: nowrap !important;
     /* Removed fixed width to let it flow naturally */
@@ -1927,4 +1929,39 @@ body {
 
 footer {
   margin-bottom: 0 !important;
+}
+
+/* --- Elfsight Zero-Gap & Watermark Removal --- */
+/* Target ONLY the elfsight.com links to avoid hiding the actual feed photos */
+[class*="elfsight-app"] a[href*="elfsight.com"],
+[class*="eapps-instagram-feed"] a[href*="elfsight.com"],
+a[href*="elfsight.com"],
+.elfsight-app-a3cc93fe-4fe9-4652-8dc4-aab6bc14cbb2 > a[href*="elfsight.com"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  line-height: 0 !important;
+  font-size: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+}
+
+/* Force zero padding/margin on the section and widget itself */
+#instagram-section,
+[class*="elfsight-app"],
+[class*="eapps-instagram-feed"] {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+  border-bottom: none !important;
+}
+
+/* Remove footer top padding when it follows the instagram section on Home */
+#instagram-section + footer,
+#instagram-section ~ footer {
+  padding-top: 0 !important;
 }

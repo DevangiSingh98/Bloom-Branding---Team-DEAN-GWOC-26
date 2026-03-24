@@ -1928,3 +1928,38 @@ body {
 footer {
   margin-bottom: 0 !important;
 }
+
+/* --- Elfsight Zero-Gap & Watermark Removal --- */
+/* Target ONLY the elfsight.com links to avoid hiding the actual feed photos */
+[class*="elfsight-app"] a[href*="elfsight.com"],
+[class*="eapps-instagram-feed"] a[href*="elfsight.com"],
+a[href*="elfsight.com"],
+.elfsight-app-a3cc93fe-4fe9-4652-8dc4-aab6bc14cbb2 > a[href*="elfsight.com"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  line-height: 0 !important;
+  font-size: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+}
+
+/* Force zero padding/margin on the section and widget itself */
+#instagram-section,
+[class*="elfsight-app"],
+[class*="eapps-instagram-feed"] {
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+  border-bottom: none !important;
+}
+
+/* Remove footer top padding when it follows the instagram section on Home */
+#instagram-section + footer,
+#instagram-section ~ footer {
+  padding-top: 0 !important;
+}

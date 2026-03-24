@@ -13,12 +13,6 @@ import Admin from './pages/Admin';
 import Brands from './pages/Brands';
 import { ContentProvider } from './context/ContentContext';
 import { AnimatePresence } from 'framer-motion';
-import Chatbot from './components/Chatbot';
-import ClientLogin from './pages/ClientLogin'; // Import
-import ClientDashboard from './pages/ClientDashboard'; // Import
-import VaultLogin from './pages/VaultLogin'; // Import
-import ClientResetPassword from './pages/ClientResetPassword'; // Import
-
 // Scroll to top on route change
 // Scroll to top on route change and refresh
 function ScrollToTop() {
@@ -85,11 +79,6 @@ function AnimatedRoutes() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/admin" element={<Admin />} />
                 <Route path="/brands" element={<Brands />} />
-                <Route path="/client-login" element={<VaultLogin />} /> {/* Updated to use VaultLogin */}
-                <Route path="/vault" element={<ClientDashboard />} />
-                <Route path="/vault/:companyName" element={<ClientDashboard />} />
-                <Route path="/vault/login" element={<VaultLogin />} /> {/* New Route */}
-                <Route path="/reset-password/:token" element={<ClientResetPassword />} />
             </Routes>
         </AnimatePresence>
     );
@@ -111,7 +100,7 @@ function ConditionalFooter() {
     // The user said "remove the footer from THIS page".
     // Normalized path check to prevent duplication
     const path = location.pathname.toLowerCase().replace(/\/$/, '');
-    if (path === '/about' || path === '/vault' || path.startsWith('/vault/')) {
+    if (path === '/about') {
         return null;
     }
     return <Footer />;
@@ -136,7 +125,6 @@ function App() {
                             <AnimatedRoutes />
                         </main>
                         <ConditionalFooter />
-                        <Chatbot />
                     </div>
                 )}
             </Router>

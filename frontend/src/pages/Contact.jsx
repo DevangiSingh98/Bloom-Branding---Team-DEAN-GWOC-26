@@ -15,23 +15,12 @@ export default function Contact() {
         service: '',
         budget: '',
         timeline: '',
-        message: '',
-        vibes: [],
-        vibeDescription: ''
+        message: ''
     });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const toggleVibe = (vibe) => {
-        setFormData(prev => {
-            const vibes = prev.vibes.includes(vibe)
-                ? prev.vibes.filter(v => v !== vibe)
-                : [...prev.vibes, vibe];
-            return { ...prev, vibes };
-        });
     };
 
     const handleSubmit = async (e) => {
@@ -43,7 +32,7 @@ export default function Contact() {
             if (success) {
                 alert("Enquiry sent successfully! We'll be in touch.");
                 setFormData({
-                    name: '', email: '', company: '', service: '', budget: '', timeline: '', message: '', vibes: [], vibeDescription: ''
+                    name: '', email: '', company: '', service: '', budget: '', timeline: '', message: ''
                 });
             } else {
                 alert("Failed to send enquiry. Please try again or email us directly.");
@@ -53,11 +42,6 @@ export default function Contact() {
             alert("An unexpected error occurred.");
         }
     };
-
-    // Vibe Keywords ( Dynamic with fallback )
-    const VIBES = (content.vibes && content.vibes.length > 0)
-        ? (Array.isArray(content.vibes) ? content.vibes.map(v => v.label || v) : [])
-        : ['Minimalist', 'Bold & Loud', 'Luxury', 'Playful', 'Geometric', 'Organic', 'Tech', 'Vintage', 'Editorial', 'Abstract'];
 
     return (
         <>
@@ -98,70 +82,10 @@ export default function Contact() {
 
                     <form onSubmit={handleSubmit} style={{ marginTop: '5rem' }}>
 
-                        {/* 01. THE VIBE */}
+                        {/* 01. THE BASICS */}
                         <section style={{ marginBottom: '8rem' }}>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '2rem', marginBottom: '3rem', borderBottom: '2px solid var(--color-dark-choc)', paddingBottom: '1rem' }}>
                                 <span style={{ fontFamily: 'var(--font-brand)', fontSize: '3rem', color: 'var(--color-electric-blue)' }}>01</span>
-                                <h2 style={{ fontFamily: 'var(--font-subtitle)', fontSize: '2rem', textTransform: 'uppercase', margin: 0 }}>The Vibe Check</h2>
-                            </div>
-
-                            <p style={{ fontSize: '1.2rem', marginBottom: '2rem', fontFamily: 'var(--font-subtitle)' }}>Select keywords that define your vision:</p>
-
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-                                {VIBES.map(vibe => (
-                                    <motion.button
-                                        key={vibe}
-                                        type="button"
-                                        onClick={() => toggleVibe(vibe)}
-                                        whileHover={{ scale: 1.05, backgroundColor: 'var(--color-dark-choc)', color: '#fff' }}
-                                        whileTap={{ scale: 0.95 }}
-                                        style={{
-                                            padding: '0.8rem 2rem',
-                                            fontSize: '1.1rem',
-                                            textTransform: 'uppercase',
-                                            border: '1px solid var(--color-dark-choc)',
-                                            backgroundColor: formData.vibes.includes(vibe) ? 'var(--color-electric-blue)' : 'transparent',
-                                            color: formData.vibes.includes(vibe) ? '#fff' : 'var(--color-dark-choc)',
-                                            borderColor: formData.vibes.includes(vibe) ? 'var(--color-electric-blue)' : 'var(--color-dark-choc)',
-                                            borderRadius: '50px',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.3s ease'
-                                        }}
-                                    >
-                                        {vibe}
-                                    </motion.button>
-                                ))}
-                            </div>
-
-                            <div style={{ marginTop: '3rem' }}>
-                                <label style={{ display: 'block', fontSize: '1.5rem', fontFamily: 'var(--font-subtitle)', marginBottom: '1rem', fontWeight: 'bold' }}>
-                                    Tell us more about your vibe...
-                                </label>
-                                <textarea
-                                    name="vibeDescription"
-                                    value={formData.vibeDescription}
-                                    onChange={handleChange}
-                                    placeholder="Describe the mood, feeling, or aesthetic you're aiming for..."
-                                    rows="3"
-                                    style={{
-                                        width: '100%',
-                                        border: 'none',
-                                        borderBottom: '2px solid #ccc',
-                                        fontSize: '1.5rem',
-                                        padding: '1rem 0',
-                                        fontFamily: 'var(--font-subtitle)',
-                                        resize: 'none',
-                                        outline: 'none',
-                                        backgroundColor: 'transparent'
-                                    }}
-                                />
-                            </div>
-                        </section>
-
-                        {/* 02. THE BASICS */}
-                        <section style={{ marginBottom: '8rem' }}>
-                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '2rem', marginBottom: '3rem', borderBottom: '2px solid var(--color-dark-choc)', paddingBottom: '1rem' }}>
-                                <span style={{ fontFamily: 'var(--font-brand)', fontSize: '3rem', color: 'var(--color-electric-blue)' }}>02</span>
                                 <h2 style={{ fontFamily: 'var(--font-subtitle)', fontSize: '2rem', textTransform: 'uppercase', margin: 0 }}>The Basics</h2>
                             </div>
 
@@ -172,10 +96,10 @@ export default function Contact() {
                             </div>
                         </section>
 
-                        {/* 03. THE DETAILS */}
+                        {/* 02. THE DETAILS */}
                         <section style={{ marginBottom: '8rem' }}>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '2rem', marginBottom: '3rem', borderBottom: '2px solid var(--color-dark-choc)', paddingBottom: '1rem' }}>
-                                <span style={{ fontFamily: 'var(--font-brand)', fontSize: '3rem', color: 'var(--color-electric-blue)' }}>03</span>
+                                <span style={{ fontFamily: 'var(--font-brand)', fontSize: '3rem', color: 'var(--color-electric-blue)' }}>02</span>
                                 <h2 style={{ fontFamily: 'var(--font-subtitle)', fontSize: '2rem', textTransform: 'uppercase', margin: 0 }}>The Details</h2>
                             </div>
 

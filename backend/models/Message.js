@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const messageSchema = mongoose.Schema({
     name: { type: String, required: true },
+    phone: { type: String },
     email: { type: String, required: true },
     company: { type: String },
     service: { type: String },

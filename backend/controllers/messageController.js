@@ -1,15 +1,17 @@
 import Message from '../models/Message.js';
+import sendEmail from '../utils/sendEmail.js';
 
 // @desc    Create a new message
 // @route   POST /api/messages
 // @access  Public
 const createMessage = async (req, res) => {
-    const { name, email, subject, message, company, service, budget, timeline } = req.body;
+    const { name, email, subject, message, company, service, budget, timeline, phone } = req.body;
 
     try {
         const msg = new Message({
             name,
             email,
+            phone,
             subject,
             message,
             company,
@@ -19,6 +21,35 @@ const createMessage = async (req, res) => {
         });
 
         const createdMessage = await msg.save();
+
+        // Prepare email content
+        const emailMessage = `
+            Name: ${name}
+            Phone NO: ${phone || 'N/A'}
+            Email: ${email}
+            Subject: ${subject}
+            Message: ${message}
+            Company: ${company || 'N/A'}
+            Service: ${service || 'N/A'}
+            Budget: ${budget || 'N/A'}
+            Timeline: ${timeline || 'N/A'}
+        `;
+
+        // Attempt to send email
+        try {
+            await sendEmail({
+                email: 'akshayabalagopalan14@gmail.com', // Recipient email
+                subject: `New Query from ${name}`,
+                message: emailMessage
+            });
+        } catch (emailError) {
+            console.error("Email failed to send:", emailError);
+            // If email fails, respond with 500 but still return the created message if database save was successful
+            // Or, if the instruction means to fail the entire request if email fails, then return here.
+            // The instruction "Throw 500 status on email failure instead of eating the error" implies failing the request.
+            return res.status(500).json({ message: 'Message saved, but failed to send notification email via SMTP', error: emailError.message, createdMessage });
+        }
+
         res.status(201).json(createdMessage);
     } catch (error) {
         res.status(400).json({ message: error.message });

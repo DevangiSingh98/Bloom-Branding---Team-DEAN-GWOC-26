@@ -12,11 +12,7 @@ const defaultContent = {
     hero: {
         subtitle: "We build brands that bloom."
     },
-    vibes: [
-        'Minimalist', 'Bold & Loud', 'Luxury', 'Playful',
-        'Geometric', 'Organic', 'Tech', 'Vintage',
-        'Editorial', 'Abstract'
-    ],
+
     // ... (rest of default content)
 
     allProjects: [
@@ -172,12 +168,7 @@ const defaultContent = {
             author: "Purva Shah"
         }
     ],
-    instagram: [
-        { id: 1, link: "https://www.instagram.com/p/DMfXqlEoCHN/?hl=en&img_index=1", image: "/images/insta1.png" },
-        { id: 2, link: "https://www.instagram.com/p/DMScm7lITsA/?hl=en", image: "/images/insta2.png" },
-        { id: 3, link: "https://www.instagram.com/p/DBd_RZBy7JS/?hl=en", image: "/images/insta3.png" },
-        { id: 4, link: "https://www.instagram.com/p/C_5lTgmByDn/?hl=en&img_index=1", image: "/images/insta4.png" }
-    ],
+
     founders: {
         main: {
             image: "/images/founders.png"
@@ -500,17 +491,6 @@ export const ContentProvider = ({ children }) => {
                     }
                 }
 
-                // Fetch Instagram
-                const iResponse = await fetch(`${API_BASE_URL}/api/instagram`);
-                if (iResponse.ok) {
-                    const insta = await iResponse.json();
-                    if (Array.isArray(insta) && insta.length > 0) {
-                        const mappedInsta = insta.map(i => ({ ...i, id: i._id }));
-                        setContent(prev => ({ ...prev, instagram: mappedInsta }));
-                    } else {
-                        setContent(prev => ({ ...prev, instagram: defaultContent.instagram }));
-                    }
-                }
 
                 // Fetch Founders
                 const fResponse = await fetch(`${API_BASE_URL}/api/founders`);
@@ -611,13 +591,7 @@ export const ContentProvider = ({ children }) => {
                     }
                 }
 
-                // Fetch Vibes (NEW)
-                const vbResponse = await fetch(`${API_BASE_URL}/api/vibes`);
-                if (vbResponse.ok) {
-                    const vibesData = await vbResponse.json();
-                    // Always set vibes, even if empty array, to reflect DB state
-                    setContent(prev => ({ ...prev, vibes: Array.isArray(vibesData) ? vibesData : (defaultContent.vibes || []) }));
-                }
+
 
 
             } catch (error) {
@@ -697,41 +671,7 @@ export const ContentProvider = ({ children }) => {
         }
     };
 
-    const addVibe = async (label, token) => {
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/vibes`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ label })
-            });
-            if (res.ok) {
-                const newVibe = await res.json();
-                setContent(prev => {
-                    // Handle if vibes is array of strings or objects. normalize to objects.
-                    const current = Array.isArray(prev.vibes) ? prev.vibes : [];
-                    return { ...prev, vibes: [...current, newVibe] };
-                });
-            }
-        } catch (e) { console.error("Failed to add vibe", e); }
-    };
 
-    const removeVibe = async (id, token) => {
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/vibes/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.ok) {
-                setContent(prev => ({
-                    ...prev,
-                    vibes: prev.vibes.filter(v => v._id !== id)
-                }));
-            }
-        } catch (e) { console.error("Failed to remove vibe", e); }
-    };
 
 
 
@@ -760,9 +700,7 @@ export const ContentProvider = ({ children }) => {
                 ...t
             }));
         }
-        if (sanitized.instagram) {
-            sanitized.instagram = sanitized.instagram.map(i => ({ ...i, image: i.image && i.image.startsWith('data:') ? '' : i.image }));
-        }
+
         if (sanitized.brandLogos) {
             sanitized.brandLogos = sanitized.brandLogos.map(c => ({ ...c, logo: c.logo && c.logo.startsWith('data:') ? '' : c.logo }));
         }
@@ -830,9 +768,6 @@ export const ContentProvider = ({ children }) => {
         setContent(prev => ({ ...prev, brandLogos: newLogos }));
     };
 
-    const updateInstagram = (newInsta) => {
-        setContent(prev => ({ ...prev, instagram: newInsta }));
-    };
 
     const updateFounders = (updates) => {
         setContent(prev => ({
@@ -1084,45 +1019,6 @@ export const ContentProvider = ({ children }) => {
         } catch (e) { console.error(e); }
     };
 
-    const syncInstagram = async (post, token) => {
-        try {
-            const url = post._id ? `${API_BASE_URL}/api/instagram/${post._id}` : `${API_BASE_URL}/api/instagram`;
-            const method = post._id ? 'PUT' : 'POST';
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(post)
-            });
-            if (response.ok) {
-                const saved = await response.json();
-                if (!post._id) {
-                    setContent(prev => ({
-                        ...prev,
-                        instagram: prev.instagram.map(item =>
-                            (item.id === post.id && !item._id) ? { ...saved, id: saved._id } : item
-                        )
-                    }));
-                }
-                return saved;
-            } else {
-                console.error("Sync Instagram Failed");
-                alert("Failed to save Instagram post.");
-            }
-        } catch (e) { console.error(e); }
-    };
-
-    const removeInstagram = async (id, token) => {
-        if (!id) return;
-        try {
-            await fetch(`${API_BASE_URL}/api/instagram/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-        } catch (e) { console.error(e); }
-    };
 
     const syncFounder = async (f, token) => {
         try {
@@ -1380,8 +1276,7 @@ export const ContentProvider = ({ children }) => {
             removeProject,
             syncTestimonial,
             removeTestimonial,
-            syncInstagram,
-            removeInstagram,
+
             syncFounder,
             removeFounder,
             syncValue,
@@ -1393,7 +1288,7 @@ export const ContentProvider = ({ children }) => {
             updateSelectedWork,
             updateTestimonials,
             updateBrandLogos,
-            updateInstagram,
+
             updateFounders,
             updateValues,
             updateServices, // Newly added
@@ -1410,9 +1305,7 @@ export const ContentProvider = ({ children }) => {
             uploadFile, // Export this
             updateLegalContent,
             updateSiteImage,
-            addVibe,
-            removeVibe,
-            refreshVibes,
+
             // History
             undo, redo, canUndo, canRedo, takeSnapshot,
             // Missing Resets

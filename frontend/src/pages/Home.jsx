@@ -214,6 +214,61 @@ export default function Home() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    useEffect(() => {
+        // Load the Elfsight script dynamically when the component mounts
+        const script = document.createElement('script');
+        script.src = "https://elfsightcdn.com/platform.js";
+        script.async = true;
+        document.body.appendChild(script);
+
+        // Function to find and hide Elfsight watermark/spacing, even in Shadow DOM
+        const cleanupElfsight = () => {
+            const widgets = document.querySelectorAll('[class*="elfsight-app"]');
+            widgets.forEach(widget => {
+                const searchRoot = (root) => {
+                    if (!root) return;
+                    // Hide Watermark Links
+                    const links = root.querySelectorAll('a[href*="elfsight.com"]');
+                    links.forEach(link => {
+                        link.style.setProperty('display', 'none', 'important');
+                        link.style.setProperty('visibility', 'hidden', 'important');
+                        link.style.setProperty('height', '0', 'important');
+                        link.style.setProperty('opacity', '0', 'important');
+                    });
+                    // Hide Badge Containers
+                    const badges = root.querySelectorAll('[class*="Badge__Container"], [class*="eapps-link"], [class*="Badge__Inner"]');
+                    badges.forEach(badge => badge.style.setProperty('display', 'none', 'important'));
+                    
+                    // Remove internal bottom padding to close the gap
+                    const containers = root.querySelectorAll('[class*="Container__Component"], [class*="Layout__Component"]');
+                    containers.forEach(c => {
+                        c.style.setProperty('padding-bottom', '0', 'important');
+                        c.style.setProperty('margin-bottom', '0', 'important');
+                    });
+
+                    // Recursive search into nested shadow roots if any
+                    const allElements = root.querySelectorAll('*');
+                    allElements.forEach(el => {
+                        if (el.shadowRoot) searchRoot(el.shadowRoot);
+                    });
+                };
+
+                searchRoot(document);
+                if (widget.shadowRoot) searchRoot(widget.shadowRoot);
+            });
+        };
+
+        const interval = setInterval(cleanupElfsight, 1000);
+        cleanupElfsight();
+
+        return () => {
+            if (document.body.contains(script)) {
+                document.body.removeChild(script);
+            }
+            clearInterval(interval);
+        };
+    }, []);
+
     const springConfig = { stiffness: 100, damping: 30, mass: 1 };
     const smoothScrollY = useSpring(scrollY, springConfig);
     const smoothProgress = useSpring(scrollYProgress, springConfig);
@@ -1000,7 +1055,7 @@ export default function Home() {
                             fontSize: screenSize === 'mobile' ? '10rem' : 'clamp(5rem, 10vw, 10rem)', fontFamily: 'var(--font-brand)',
                             color: 'var(--color-electric-blue)', textTransform: 'uppercase', letterSpacing: '1px', lineHeight: 1
                         }}>
-                            Check Out Our Vibe
+                            Check Out Our Feed
                         </h2>
                         <a href="https://www.instagram.com/bloom.branding_/?hl=en" target="_blank" rel="noopener noreferrer" style={{
                             fontSize: 'clamp(1.5rem, 2.5vw, 2.5rem)', fontFamily: 'var(--font-subtitle)',
@@ -1010,38 +1065,9 @@ export default function Home() {
                 </div>
                 <div style={{
                     position: 'relative', zIndex: 10, backgroundColor: '#fafafa',
-                    display: 'grid', gridTemplateColumns: screenSize === 'mobile' ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-                    gap: 0, width: '100%', margin: 0, padding: 0
+                    width: '100%', margin: 0, padding: 0
                 }}>
-                    {Array.isArray(content.instagram) && content.instagram.slice(0, 4).map((item, i) => (
-                        <motion.a
-                            key={item.id || i}
-                            href={item.link || "https://www.instagram.com/bloom.branding_/?hl=en"}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group"
-                            style={{
-                                display: 'block', width: '100%', position: 'relative', overflow: 'hidden', aspectRatio: '1/1'
-                            }}
-                        >
-                            <img
-                                src={item.image}
-                                alt="Instagram Post"
-                                style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
-                                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                            />
-                            <div style={{
-                                position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.3)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.3s ease'
-                            }}
-                                onMouseOver={(e) => e.currentTarget.style.opacity = 1}
-                                onMouseOut={(e) => e.currentTarget.style.opacity = 0}
-                            >
-                                <span style={{ color: '#fff', fontSize: '2rem' }}>↗</span>
-                            </div>
-                        </motion.a>
-                    ))}
+                    <div className="elfsight-app-a3cc93fe-4fe9-4652-8dc4-aab6bc14cbb2" data-elfsight-app-lazy></div>
                 </div>
             </section>
         </motion.div>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import AnimatedButton from './AnimatedButton';
 import Modal from './Modal';
 import { useContent } from '../context/ContentContext';
@@ -16,6 +16,9 @@ export default function Footer() {
         setModal({ isOpen: true, title, content: modalContent || '<p>Content coming soon.</p>' });
     };
 
+    const { pathname } = useLocation();
+    const isHomePage = pathname === '/';
+
     return (
         <>
             <Modal
@@ -24,7 +27,13 @@ export default function Footer() {
                 title={modal.title}
                 content={modal.content}
             />
-            <footer style={{ backgroundColor: 'var(--color-electric-blue)', color: 'var(--color-earl-gray)', padding: '6rem 5% 2rem', position: 'relative', zIndex: 10 }}>
+            <footer style={{ 
+                backgroundColor: 'var(--color-electric-blue)', 
+                color: 'var(--color-earl-gray)', 
+                padding: isHomePage ? '0 5% 2rem' : '6rem 5% 2rem', 
+                position: 'relative', 
+                zIndex: 10 
+            }}>
                 <div className="container" style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '3rem' }}>
                         <div style={{ flex: 2, minWidth: '300px' }}>
@@ -61,9 +70,6 @@ export default function Footer() {
                         <div style={{ display: 'flex', gap: '2rem' }}>
                             <span onClick={() => openLegal('privacy')} style={{ cursor: 'pointer', transition: 'color 0.3s' }} onMouseEnter={e => e.target.style.color = 'var(--color-butter-yellow)'} onMouseLeave={e => e.target.style.color = 'inherit'}>Privacy Policy</span>
                             <span onClick={() => openLegal('terms')} style={{ cursor: 'pointer', transition: 'color 0.3s' }} onMouseEnter={e => e.target.style.color = 'var(--color-butter-yellow)'} onMouseLeave={e => e.target.style.color = 'inherit'}>Terms</span>
-                            <div style={{ marginLeft: '1rem', borderLeft: '1px solid rgba(255,255,255,0.3)', paddingLeft: '1rem' }}>
-                                <a href="/client-login" style={{ textDecoration: 'none', color: 'var(--color-butter-yellow)', fontWeight: 'bold', textTransform: 'uppercase' }}>Client Access</a>
-                            </div>
                         </div>
                     </div>
                 </div>

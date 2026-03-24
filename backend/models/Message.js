@@ -9,8 +9,6 @@ const messageSchema = mongoose.Schema({
     timeline: { type: String },
     subject: { type: String },
     message: { type: String },
-    vibes: { type: [String], default: [] }, // Added vibes array
-    vibeDescription: { type: String }, // Added vibe description
     read: { type: Boolean, default: false }
 }, {
     timestamps: true

@@ -928,11 +928,7 @@ export default function Home() {
                                         border: '1px solid rgba(0,0,0,0.05)', scrollSnapAlign: 'center', flexShrink: 0
                                     }}
                                 >
-                                    <div style={{ display: 'flex', gap: '5px', marginBottom: '1rem' }}>
-                                        {[...Array(5)].map((_, s) => (
-                                            <span key={s} style={{ color: s < (item.rating || 5) ? '#FFD700' : '#ddd', fontSize: '1.2rem' }}>★</span>
-                                        ))}
-                                    </div>
+
                                     <p style={{
                                         fontSize: screenSize === 'mobile' ? '0.9rem' : '1rem', lineHeight: 1.5,
                                         marginBottom: '1.5rem', fontFamily: 'var(--font-body)'

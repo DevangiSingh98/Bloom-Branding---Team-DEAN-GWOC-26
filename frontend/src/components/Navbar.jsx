@@ -210,7 +210,7 @@ export default function Navbar() {
                     alignItems: 'center',
                     gap: '0.6rem',
                     fontFamily: 'var(--font-subtitle)',
-                    boxShadow: '0 4px 15px rgba(0,0,0,0.1)', // Soft shadow
+                    boxShadow: 'none',
                     transition: 'all 0.3s ease'
                 }}>
                     <span className="font-subtitle" style={{ textTransform: 'uppercase', fontSize: '1rem', fontWeight: 'bold' }}>Menu</span>
@@ -231,7 +231,7 @@ export default function Navbar() {
                 alignItems: 'center',
                 zIndex: 100,
                 backgroundColor: (isPastHomeHero && !isOpen) ? 'var(--color-white)' : 'transparent',
-                boxShadow: (isPastHomeHero && !isOpen) ? '0 4px 20px rgba(0,0,0,0.05)' : 'none',
+                boxShadow: 'none',
                 pointerEvents: 'auto',
                 transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
             }}>
@@ -245,8 +245,8 @@ export default function Navbar() {
                         position: 'relative',
                         width: '100%',
                         lineHeight: 0,
-                        filter: showShadow ? 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))' : 'none',
-                        transition: 'filter 0.3s ease'
+                        filter: 'none',
+                        transition: 'none'
                     }}>
                         {/* Ghost image to maintain aspect ratio and size */}
                         <img
@@ -292,7 +292,7 @@ export default function Navbar() {
                                 fontFamily: 'var(--font-subtitle)',
                                 fontSize: '1.2rem',
                                 fontWeight: '600',
-                                filter: showShadow && !isHomeHero ? 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))' : 'none',
+                                filter: 'none',
                                 transition: 'all 0.3s ease'
                             }}>
                                 {link.name}
@@ -312,7 +312,7 @@ export default function Navbar() {
                         alignItems: 'center',
                         gap: '0.6rem',
                         fontFamily: 'var(--font-subtitle)',
-                        filter: showShadow && !isHomeHero ? 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))' : 'none',
+                        filter: 'none',
                         opacity: isHomeHero ? 0 : 1, // Hide standard menu button in hero
                         pointerEvents: isHomeHero ? 'none' : 'auto',
                         transition: 'all 0.3s ease'

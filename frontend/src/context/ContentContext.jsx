@@ -139,31 +139,28 @@ const defaultContent = {
     testimonials: [
         {
             id: 1,
-            rating: 4,
+
             text: "I’ve been working with Bloom for past 4-5 months and my experience with them has been great! Both the founders are very creative and also the team is flexible managing shoot timings and dates and accommodating special requests needed be! I’d recommend you take that meeting :)",
             author: "Nishant Shah"
         },
         {
             id: 2,
-            rating: 5,
+
             text: "The bloom branding team is really hardworking and efficient. I am associated with bloom since more than a year now and they have taken my brand’s page from 20k followers to 50k + followers . Looking forward to touching 100k followers and many more effective collabs together . So wish they were in my city though to really make organic content for me as I suck at it myself.",
             author: "Mansi Nagdev"
         },
         {
             id: 3,
-            rating: 5,
             text: "I had an exceptional experience working with Bloom Branding. Their professionalism, tailored strategies, and excellent communication made them stand out. They tackled challenges creatively, delivered precise campaigns, and their dedication to results was evident throughout. I highly recommend Bloom Branding for their expertise and commitment to excellence.",
             author: "Harsh Kheni"
         },
         {
             id: 4,
-            rating: 5,
             text: "It was such a nice experience to have an working with bloom branding as, The way they all measure single detail is amazing and apart from that it really help my business. Keep it up bloom branding and team and thanks to you.",
             author: "Shwet Tejani"
         },
         {
             id: 5,
-            rating: 5,
             text: "Great work done by these people! One stop for all the assistance needed for digital marketing related work. The employees and all the staff here provide all the guidance to the best of your satisfaction.",
             author: "Purva Shah"
         }

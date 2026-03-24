@@ -882,7 +882,7 @@ const Admin = () => {
             const newProject = { id: tempId, title: "New Project", category: "Category", image: "", description: "Description" };
             updateAllProjects([newProject, ...content.allProjects]);
         } else if (type === 'testimonials') {
-            const newItem = { id: tempId, text: "New testimonial", author: "Author", rating: 5 };
+            const newItem = { id: tempId, text: "New testimonial", author: "Author" };
             updateTestimonials([newItem, ...content.testimonials]);
 
         } else if (type === 'values') {
@@ -1525,10 +1525,6 @@ const Admin = () => {
                                     <div style={{ flex: 1 }}>
                                         <label style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem', color: '#666' }}>Reviewer Name</label>
                                         <input value={item.author} onChange={(e) => handleArrayChange(index, 'author', e.target.value, 'testimonials')} placeholder="Author" style={{ width: '100%', padding: '0.8rem', fontSize: '1.15rem' }} />
-                                    </div>
-                                    <div style={{ width: '100px' }}>
-                                        <label style={{ display: 'block', fontSize: '1.15rem', marginBottom: '0.5rem', color: '#666' }}>Rating (1-5)</label>
-                                        <input type="number" max="5" min="1" value={item.rating} onChange={(e) => handleArrayChange(index, 'rating', parseInt(e.target.value), 'testimonials')} placeholder="Rating" style={{ width: '100%', padding: '0.8rem', fontSize: '1.15rem' }} />
                                     </div>
                                 </div>
 

@@ -20,7 +20,7 @@ export default function Navbar() {
     // Track scroll position for robust fallback
     useEffect(() => {
         const handleScroll = () => setScrollY(window.scrollY);
-        const handleResize = () => setIsMobile(window.innerWidth <= 1200); // Expanded to include Tablet
+        const handleResize = () => setIsMobile(window.innerWidth <= 640); // Lowered breakpoint to cover smaller tablets/laptops
 
         window.addEventListener('scroll', handleScroll, { passive: true });
         window.addEventListener('resize', handleResize);
@@ -281,8 +281,8 @@ export default function Navbar() {
                         position: 'absolute',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        opacity: (isHomeHero && !isOpen) ? 0 : 1, // Hide links in hero
-                        pointerEvents: (isHomeHero && !isOpen) ? 'none' : 'auto',
+                        opacity: (isHomeHero || isOpen) ? 0 : 1, // Hide in hero or when full menu is open
+                        pointerEvents: (isHomeHero || isOpen) ? 'none' : 'auto',
                         transition: 'opacity 0.3s ease'
                     }}>
                         {menuItems.map(link => (
@@ -301,48 +301,50 @@ export default function Navbar() {
                     </nav>
                 )}
 
-                <button onClick={toggleMenu} style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: 0,
-                    color: menuColor,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.6rem',
-                    fontFamily: 'var(--font-subtitle)',
-                    filter: showShadow && !isHomeHero ? 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))' : 'none',
-                    opacity: (isHomeHero && !isOpen) ? 0 : 1, // Hide duplicate text menu trigger in hero
-                    pointerEvents: (isHomeHero && !isOpen) ? 'none' : 'auto',
-                    transition: 'all 0.3s ease'
-                }}>
-                    <span className="font-subtitle" style={{ textTransform: 'uppercase', fontSize: '1.2rem', fontWeight: 'bold' }}>{isOpen ? 'Close' : 'Menu'}</span>
-                    <div style={{ position: 'relative', width: '28px', height: '28px' }}>
-                        <AnimatePresence mode="wait">
-                            {isOpen ? (
-                                <motion.div
-                                    key="close"
-                                    initial={{ opacity: 0, rotate: -90 }}
-                                    animate={{ opacity: 1, rotate: 0 }}
-                                    exit={{ opacity: 0, rotate: 90 }}
-                                    style={{ position: 'absolute' }}
-                                >
-                                    <X size={28} />
-                                </motion.div>
-                            ) : (
-                                <motion.div
-                                    key="menu"
-                                    initial={{ opacity: 0, rotate: 90 }}
-                                    animate={{ opacity: 1, rotate: 0 }}
-                                    exit={{ opacity: 0, rotate: -90 }}
-                                    style={{ position: 'absolute' }}
-                                >
-                                    <Menu size={28} />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                </button>
+                {isMobile && (
+                    <button onClick={toggleMenu} style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: 0,
+                        color: menuColor,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.6rem',
+                        fontFamily: 'var(--font-subtitle)',
+                        filter: showShadow && !isHomeHero ? 'drop-shadow(0 2px 5px rgba(0,0,0,0.5))' : 'none',
+                        opacity: isHomeHero ? 0 : 1, // Hide standard menu button in hero
+                        pointerEvents: isHomeHero ? 'none' : 'auto',
+                        transition: 'all 0.3s ease'
+                    }}>
+                        <span className="font-subtitle" style={{ textTransform: 'uppercase', fontSize: '1.2rem', fontWeight: 'bold' }}>{isOpen ? 'Close' : 'Menu'}</span>
+                        <div style={{ position: 'relative', width: '28px', height: '28px' }}>
+                            <AnimatePresence mode="wait">
+                                {isOpen ? (
+                                    <motion.div
+                                        key="close"
+                                        initial={{ opacity: 0, rotate: -90 }}
+                                        animate={{ opacity: 1, rotate: 0 }}
+                                        exit={{ opacity: 0, rotate: 90 }}
+                                        style={{ position: 'absolute' }}
+                                    >
+                                        <X size={28} />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="menu"
+                                        initial={{ opacity: 0, rotate: 90 }}
+                                        animate={{ opacity: 1, rotate: 0 }}
+                                        exit={{ opacity: 0, rotate: -90 }}
+                                        style={{ position: 'absolute' }}
+                                    >
+                                        <Menu size={28} />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
+                    </button>
+                )}
             </header>
 
             <AnimatePresence>

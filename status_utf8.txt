@@ -1,0 +1,15 @@
+﻿On branch feat/contact-page-redesign
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	files_main.txt
+	frontend/dev_output.txt
+	git_status.txt
+	git_status_pop.txt
+	git_status_pop_utf8.txt
+	git_status_utf8.txt
+	projects.json
+	push_error.txt
+	status.txt
+	status_utf8.txt
+
+nothing added to commit but untracked files present (use "git add" to track)

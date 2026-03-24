@@ -1,0 +1,14 @@
+﻿M	.env
+M	.firebase/hosting.ZnJvbnRlbmRcZGlzdA.cache
+M	backend/controllers/messageController.js
+M	backend/models/Message.js
+M	backend/package-lock.json
+D	frontend/dev_output.txt
+A	frontend/public/images/download (4).jpg
+M	frontend/src/pages/About.jsx
+M	frontend/src/pages/Contact.jsx
+D	git_status.txt
+D	git_status_pop.txt
+D	git_status_pop_utf8.txt
+D	git_status_utf8.txt
+D	projects.json

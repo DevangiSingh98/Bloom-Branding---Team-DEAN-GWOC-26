@@ -1,0 +1,5 @@
+﻿042e09e Update Our Story page and associated assets
+1e1ba5e CRITICAL FIX: Restored ViscousWrapper stub to fix production crash. enhanced error reports
+c6e96c9 Phase 3: Fixed Asset validation (pdf->document) and enhanced SMTP diagnostics
+df45fc0 Phase 2: Standardized site-images API, fixed email 500 errors, and added frontend resilience guards
+7622faa Merge branch 'main' of https://github.com/DevangiSingh98/Bloom-Branding---Team-DEAN-GWOC-26

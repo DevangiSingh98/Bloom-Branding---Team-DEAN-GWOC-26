@@ -1,27 +1,41 @@
 import Message from '../models/Message.js';
+import sendEmail from '../utils/sendEmail.js';
 
 // @desc    Create a new message
 // @route   POST /api/messages
 // @access  Public
 const createMessage = async (req, res) => {
-    // Destructure vibes and vibeDescription as well
-    const { name, email, subject, message, company, service, budget, timeline, vibes, vibeDescription } = req.body;
+    const { name, email, phone, message } = req.body;
 
     try {
         const msg = new Message({
             name,
             email,
-            subject,
-            message,
-            company,
-            service,
-            budget,
-            timeline,
-            vibes,             // Pass to model
-            vibeDescription    // Pass to model
+            phone,
+            message
         });
 
         const createdMessage = await msg.save();
+
+        const emailMessage = `You have a new contact form submission!
+
+Name: ${name}
+Phone NO: ${phone}
+Email: ${email}
+
+Query/Help Needed:
+${message}`;
+
+        try {
+            await sendEmail({
+                email: 'akshayabalagopalan14@gmail.com',
+                subject: `New Query from ${name}`,
+                message: emailMessage
+            });
+        } catch (emailError) {
+            console.error("Email failed to send:", emailError);
+        }
+
         res.status(201).json(createdMessage);
     } catch (error) {
         res.status(400).json({ message: error.message });

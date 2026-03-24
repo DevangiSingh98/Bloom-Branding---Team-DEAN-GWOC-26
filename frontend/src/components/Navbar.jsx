@@ -276,7 +276,7 @@ export default function Navbar() {
                 {!isMobile && (
                     <nav style={{
                         display: 'flex',
-                        gap: '2.5rem',
+                        gap: '4rem',
                         alignItems: 'center',
                         position: 'absolute',
                         left: '50%',
